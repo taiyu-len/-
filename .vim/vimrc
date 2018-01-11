@@ -68,8 +68,11 @@ elseif &term == 'rxvt-unicode-256color'
 	map! [3^ <C-delete>
 endif
 " }}}
-set shiftwidth=0 " make <Tab> inserts tab.
 " }}}
+set shiftwidth=0 " make <Tab> inserts tab.
+" Auto pairs
+let s:plugins["delimitMate"] = "Raimondi"
+let delimitMate_expand_cr = 1
 " Minor mapping fixes {{{
 " remap backspace/delete keys
 map  <BS>       X
@@ -154,10 +157,10 @@ set nowrap           " Disable wrapping
 " add surround motions
 let s:plugins["vim-surround"] = "tpope"
 let s:plugins["vim-repeat"] = "tpope"
-" add sexp motions
 let s:plugins["vim-sexp"] = "guns"
 let s:plugins["vim-sexp-mappings-for-regular-people"] = "tpope"
 let g:sexp_filetypes = 'clojure,scheme,lisp,timl,c,cpp'
+let g:sexp_enable_insert_mode_mappings=0
 " }}}
 " }}}
 " [Display] {{{
@@ -321,7 +324,7 @@ function! VIMRC_run_minpac() " {{{
 	call minpac#init({'jobs': '1'})
 	call minpac#add('k-takata/minpac', {'type': 'opt'})
 	for addon in items(s:plugins)
-		call minpac#add(addon[0] . '/' . addon[1], {'type': 'opt'})
+		call minpac#add(addon[1] . '/' . addon[0], {'type': 'opt'})
 	endfor
 endfunction " }}}
 

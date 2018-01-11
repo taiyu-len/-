@@ -1,0 +1,63 @@
+#!/bin/bash -ue
+savedir="~/www"
+homepage="$savedir/homepage.html"
+# wget options
+: ${USER_AGENT:="Mozilla/5.0 (compatible; Konqueror/3.2; Linux)"}
+options+=(--directory-prefix="$savedir")     # directory to store mirroring
+options+=(--no-verbose --show-progress) # less spam
+options+=(--force-directories)          # always use directories
+options+=(--execute=robots=off)         # ignore robots.txt
+options+=(--user-agent="$USER_AGENT")
+options+=(--no-check-certificate)       # ignore certificates
+options+=(--adjust-extension)           # fix extensions
+# unfortunately required as not having it breaks websites with pages like
+# example.com/foo
+# example.com/foo/bar.html
+# ideally, foo would be saved like v, but wget lacks such capability. might add that to wget later, looks easy enough to do
+# example.com/foo/index.html
+options+=(--wait=0.5 --random-wait)     # wait a little
+options+=(--tries=100 --timeout=60)     # tries a lot and timeout after a minute
+options+=(--timestamping)               # dont redownload files that havnt changed
+options+=(--convert-links)              # convert links for local use
+options+=(--page-requisites)            # download all prerequisites for local use
+options+=(--span-hosts)                 # get prerequisites from other sites
+options+=(--rejected-log=dl-log)        # log rejections
+options+=(--ignore-case)                # ignore case for resource extensions
+if [ "$(basename "$0")" = wwwmirror ]   # use mirror if this script is called with that name
+then options+=(--mirror)
+fi
+
+# foreign resources to save
+resources+=(js css)                   # common prerequisites
+resources+=(woff ttf eot)             # fonts
+resources+=(png jpeg jpg svg gif bmp) # graphics
+resources+=(pdf epub djvu txt)        # documents
+resources_regex=$(IFS='|'; printf "${resources[*]}")
+
+# seperate out urls and wget options
+for arg in "$@"
+do
+	if [[ "$arg" = -* ]]
+	then options+=("$arg")
+	else urls+=("$arg")
+	fi
+done
+
+# download urls
+for url in "${urls[@]}"
+do
+	# strip protocol, subdirectorys, then subdomains
+	stripped_url=$(sed -r -e 's_.*://__' -e 's_/.*__' -e 's_^.*\.([^.]*\.[^.]*)$_\1_' <<< "$url")
+	accept=(--accept-regex "$stripped_url|\.($resources_regex)")
+	wget "${accept[@]}" "${options[@]}" "$url" || true
+	echo "<a href=\"$url\">" >> $homepage
+	echo "$url"              >> $homepage
+	echo "</a><br>"          >> $homepage
+done
+
+# edit homepage file
+: ${EDITOR:=vi}
+if [ "$EDITOR" = vim ]
+then vim + $homepage # opens homepage at bottom
+else "$EDITOR" $homepage
+fi
