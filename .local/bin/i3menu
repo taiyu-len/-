@@ -1,0 +1,8 @@
+#!/bin/sh
+dmenu <<-EOF | xargs i3-msg
+	border none
+	border normal
+	border 1pixel
+	sticky toggle
+EOF
+

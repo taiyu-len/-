@@ -1,0 +1,177 @@
+############################### i3 Config
+# Outputs
+set $laptop  LVDS1
+set $monitor  VGA1
+
+# Workspaces
+set $dev  "1:dev"
+set $weeb "2:weeb"
+set $book "8:book"
+set $anki "9:anki"
+set $www  "0:www"
+
+set $ws1  "1:dev"
+set $ws2  "2:weeb"
+set $ws3  "3"
+set $ws4  "4"
+set $ws5  "5"
+set $ws6  "6"
+set $ws7  "7"
+set $ws8  "8:book"
+set $ws9  "9:anki"
+set $ws0  "0:www"
+
+# Assign Workspace to Screen
+workspace $ws1 output $laptop
+workspace $ws2 output $laptop
+workspace $ws8 output $monitor
+workspace $ws9 output $monitor
+workspace $ws0 output $monitor
+
+# Assign Programs to Workspace
+assign [class="^Pale moon$"] → $www
+assign [class="^Firefox$"]   → $www
+assign [class="^URxvt$"]     → $dev
+assign [class="^Anki$"]      → $anki
+assign [class="^MuPDF$"]     → $book
+assign [class="^llpp$"]      → $book
+
+# Float images
+for_window [class="^feh$"] floating enable, border normal
+
+############ Keybinds
+# use Super for modkey
+set               $mod Mod4
+floating_modifier $mod
+
+### window control
+# Focus Windows
+bindsym $mod+h     focus left
+bindsym $mod+Left  focus left
+bindsym $mod+j     focus down
+bindsym $mod+Down  focus down
+bindsym $mod+k     focus up
+bindsym $mod+Up    focus up
+bindsym $mod+l     focus right
+bindsym $mod+Right focus right
+bindsym $mod+a     focus parent
+bindsym $mod+space focus mode_toggle
+
+# Move windows
+bindsym $mod+Shift+h     move left
+bindsym $mod+Shift+Left  move left
+bindsym $mod+Shift+j     move down
+bindsym $mod+Shift+Down  move down
+bindsym $mod+Shift+k     move up
+bindsym $mod+Shift+Up    move up
+bindsym $mod+Shift+l     move right
+bindsym $mod+Shift+Right move right
+
+# Resize windows
+bindsym $mod+Control+h     resize shrink width  10 px
+bindsym $mod+Control+Left  resize shrink width  3  px
+bindsym $mod+Control+j     resize grow   height 10 px
+bindsym $mod+Control+Down  resize grow   height 3  px
+bindsym $mod+Control+k     resize shrink height 10 px
+bindsym $mod+Control+Up    resize shrink height 3  px
+bindsym $mod+Control+l     resize grow   width  10 px
+bindsym $mod+Control+Right resize grow   width  3  px
+bindsym $mod+b split h
+bindsym $mod+v split v
+bindsym $mod+f fullscreen
+
+# Change layout
+bindsym $mod+s layout stacking
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout toggle split
+bindsym $mod+Shift+space floating toggle
+
+# switch to workspace
+bindsym $mod+1 workspace $ws1
+bindsym $mod+2 workspace $ws2
+bindsym $mod+3 workspace $ws3
+bindsym $mod+4 workspace $ws4
+bindsym $mod+5 workspace $ws5
+bindsym $mod+6 workspace $ws6
+bindsym $mod+7 workspace $ws7
+bindsym $mod+8 workspace $ws8
+bindsym $mod+9 workspace $ws9
+bindsym $mod+0 workspace $ws0
+
+# move focused container to workspace
+bindsym $mod+Shift+1 move container to workspace $ws1
+bindsym $mod+Shift+2 move container to workspace $ws2
+bindsym $mod+Shift+3 move container to workspace $ws3
+bindsym $mod+Shift+4 move container to workspace $ws4
+bindsym $mod+Shift+5 move container to workspace $ws5
+bindsym $mod+Shift+6 move container to workspace $ws6
+bindsym $mod+Shift+7 move container to workspace $ws7
+bindsym $mod+Shift+8 move container to workspace $ws8
+bindsym $mod+Shift+9 move container to workspace $ws9
+bindsym $mod+Shift+0 move container to workspace $ws0
+
+# reload config file
+bindsym $mod+Shift+r reload
+
+# exit i3
+bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+
+# Marks
+show_marks yes
+bindsym $mod+m exec i3-input -F 'mark %s' -l 1 -P 'Mark: '
+bindsym $mod+apostrophe exec i3-input -F '[con_mark="%s"] focus' -l 1 -P 'Go to: '
+
+# Programs
+bindsym XF86AudioMute        exec amixer set Master toggle
+bindsym XF86AudioLowerVolume exec amixer set Master 8%-
+bindsym XF86AudioRaiseVolume exec amixer set Master 8%+
+bindsym XF86AudioPlay        exec mpc toggle
+bindsym XF86AudioNext        exec mpc next
+bindsym XF86AudioPrev        exec mpc prev
+bindsym XF86ScreenSaver      exec i3lock
+bindsym $mod+Return          exec i3-sensible-terminal
+bindsym $mod+d               exec dmenu-launch
+bindsym $mod+i               exec i3menu
+
+# kill window
+bindsym $mod+Shift+q  kill
+
+####### Appearance
+# Font
+font pango:DejaVu Sans Mono Bold 7.5
+
+# Colors                border  backgr. text    indicator
+client.focused          #333366 #333366 #ffffff #2e9ef4
+client.focused_inactive #222244 #222244 #cccccc #484e50
+client.unfocused        #111122 #111122 #cccccc #292d2e
+client.urgent           #ee7777 #ee7777 #111122 #900000
+client.placeholder      #333366 #0c0c0c #ffffff #000000
+client.background               #ffffff
+
+
+# default layout
+workspace_layout tabbed
+
+force_display_urgency_hint 500 ms
+# Setup status bar
+bar {
+	status_command i3status
+	tray_padding 0
+	tray_output $laptop
+	mode hide
+	strip_workspace_numbers yes
+	colors {
+		background         #111122
+#                          border  bg      text
+		focused_workspace  #333366 #333366 #ffffff
+		active_workspace   #222244 #222244 #cccccc
+		inactive_workspace #111122 #111122 #cccccc
+		urgent_workspace   #ee7777 #ee7777 #111122
+	}
+}
+
+# remove edge borders.
+hide_edge_borders both
+
+#Hide titles for all windows
+new_window pixel

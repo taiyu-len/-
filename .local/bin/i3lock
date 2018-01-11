@@ -1,0 +1,8 @@
+#!/bin/bash
+revert() {
+	xset dpms 600 600 600
+}
+trap revert SIGHUP SIGINT SIGTERM
+xset +dpms dpms 5 5 5
+/bin/i3lock -nfc 000000
+revert
