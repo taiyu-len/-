@@ -1,0 +1,93 @@
+!set up triple click grabs logical line
+URxvt*tripleclickwords:       false
+
+!Font
+URxvt.font:     -xos4-terminus-medium-r-normal--14-140-72-72-c-80-iso10646-1
+URxvt.boldFont: -xos4-terminus-bold-r-normal--14-140-72-72-c-80-iso10646-1
+URxvt.letterSpace: 0
+
+!! Font keybinds
+!! 4x6. tiny font
+
+!! Disable ctrl+shift shit
+URxvt.iso14755: false
+URxvt.iso14755_52: false
+
+! set up fading on no focus
+URxvt.fadeColor:     #666
+
+! set pastable tabs
+URxvt.pastableTabs:  true
+
+! dun wan no scroolbaa
+URxvt*scrollBar: false
+! set up manual scroll
+! do not scroll with output
+URxvt*scrollTtyOutput: false
+URxvt*saveLines:0
+
+! scroll back to the bottom on keypress
+URxvt*scrollTtyKeypress: true
+
+! dun wan no border
+URxvt*borderLess:        false
+URxvt*internalBorder:       0
+URxvt*externalBorder:       0
+
+!set up url clicking scroll wheel support,
+URxvt.perl-ext-common: default,matcher,-option-popup
+URxvt.url-launcher:    palemoon
+URxvt.matcher.button:  1
+
+!Blue Underline
+URxvt.underlineColor:  #0088ff
+URxvt.cutchars:        "`()'*<>[]{|│}"
+
+URxvt*visualBell:false
+URxvt*urgentOnBell: true
+
+! URxvt terminal color theme
+! set up colors and transparancy
+URxvt*transparent:   true
+
+! URxvt*.shading: 0 to 99 darkens, 101 to 200 lightens
+URxvt*shading:       80
+URxvt*background:    #555560
+URxvt*tintColor:     #22222F
+URxvt*foreground:    #EEEEFF
+URxvt*cursorColor:   #55AAAA
+!! Bold uses actual color
+URxvt*intensityStyles:true
+
+!! black dark/light
+URxvt*color0:        #111111
+URxvt*color8:        #444444
+
+!! red dark/light
+URxvt*color1:        #CC8888
+URxvt*color9:        #FF5555
+
+!! green dark/light
+URxvt*color2:        #88CC88
+URxvt*color10:       #55FF55
+
+!! yellow dark/light
+URxvt*color3:        #CCCC88
+URxvt*color11:       #FFFF55
+
+!! blue dark/light
+URxvt*color4:        #8888CC
+URxvt*color12:       #5555FF
+
+!! magenta dark/light
+URxvt*color5:        #CC88CC
+URxvt*color13:       #FF55FF
+
+!! cyan dark/light
+URxvt*color6:        #88CCCC
+URxvt*color14:       #55FFFF
+
+!! white dark/light
+URxvt*color7:        #CCCCCC
+URxvt*color15:       #FFFFFF
+!! vim:set filetype=xdefaults:
