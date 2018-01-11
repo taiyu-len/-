@@ -1,5 +1,5 @@
 #!/bin/bash -ue
-savedir="~/www"
+savedir="$HOME/www"
 homepage="$savedir/homepage.html"
 # wget options
 : ${USER_AGENT:="Mozilla/5.0 (compatible; Konqueror/3.2; Linux)"}
@@ -43,19 +43,25 @@ do
 	fi
 done
 
-# download urls
+# remove protocal, directories, subdomain and store domains in urls
+stripped_urls=($(
+	for url in "${urls[@]}"
+	do sed -r -e 's_.*://__' -e 's_/.*__' -e 's_^.*\.([^.]*\.[^.]*)$_\1_' <<< "$url"
+	done | sort -u
+))
+urls_regex=$(IFS='|'; printf "${stripped_urls[*]}")
+options+=(--accept-regex "$urls_regex|\.($resources_regex)")
+wget "${options[@]}" "${urls[@]}" || true
+
+# store urls into homepage
 for url in "${urls[@]}"
 do
-	# strip protocol, subdirectorys, then subdomains
-	stripped_url=$(sed -r -e 's_.*://__' -e 's_/.*__' -e 's_^.*\.([^.]*\.[^.]*)$_\1_' <<< "$url")
-	accept=(--accept-regex "$stripped_url|\.($resources_regex)")
-	wget "${accept[@]}" "${options[@]}" "$url" || true
 	echo "<a href=\"$url\">" >> $homepage
 	echo "$url"              >> $homepage
 	echo "</a><br>"          >> $homepage
 done
 
-# edit homepage file
+# then edit them
 : ${EDITOR:=vi}
 if [ "$EDITOR" = vim ]
 then vim + $homepage # opens homepage at bottom
