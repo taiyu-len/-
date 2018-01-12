@@ -1,4 +1,4 @@
-""""""""""""""""""""""""""""""""""" Vim """""""""""""""""""""""""""""""""""""""{
+"""""""""""""""""""""""""""" Vim """"""""""""""""""""""""""""""""{
 "{ Enable plugins
 filetype plugin indent on
 syntax enable
@@ -36,7 +36,7 @@ set viminfofile=~/.vim/viminfo
 let s:plugins["vim-obsession"] = "tpope"
 "}
 "}
-""""""""""""""""""""""""""""""""""" Editing """""""""""""""""""""""""""""""""""{
+"""""""""""""""""""""""""""" Editing """"""""""""""""""""""""""""{
 " config for input, operators, etc. no fancy Mappings
 "{ Mouse
 set mouse=a " Enable mouse in all modes
@@ -164,7 +164,7 @@ set tildeop
 nnoremap <silent><leader>ss :set spell<cr>1z=:set nospell<cr>
 "}
 "}
-""""""""""""""""""""""""""""""""""" Motion """"""""""""""""""""""""""""""""""""{
+"""""""""""""""""""""""""""" Motion """""""""""""""""""""""""""""{
 " config for navigating the document, using motion keys, etc
 "{ Cursor
 " configure movement of cursor
@@ -206,7 +206,7 @@ let g:sexp_filetypes = 'clojure,scheme,lisp,timl,c,cpp'
 let g:sexp_enable_insert_mode_mappings=0
 "}
 "}
-""""""""""""""""""""""""""""""""""" Display """""""""""""""""""""""""""""""""""{
+"""""""""""""""""""""""""""" Display """"""""""""""""""""""""""""{
 "{ Text
 set showmatch " show matching pair under cursor
 set list
@@ -233,9 +233,13 @@ function! VIMRC_fold_function() abort
 	elseif (&foldmethod ==? "syntax")
 		let l:end = substitute(getline(v:foldend), '^\s*\([])}]\|\w\+\).*$', '\1', '')
 	endif
-	let l:foldstring = printf("%s...%s  ", substitute(getline(v:foldstart), '\t', l:tab, 'g'), l:end)
-	return printf("%s%s[%5d  ]", l:foldstring, repeat(' ',70 - strwidth(l:foldstring)), v:foldend-v:foldstart)
+	let l:lines = printf("[%4d  ]", v:foldend - v:foldstart)
+	let l:width = max([40, &textwidth, g:vimrc_foldwidth])
+	let l:strlen = l:width - strdisplaywidth("..." . l:end . l:lines)
+	let l:foldstr = printf("%." . l:strlen . "S...%s", substitute(getline(v:foldstart), '\t', l:tab, 'g'), l:end)
+	return printf("%-" . (l:width  - strdisplaywidth(l:lines)) . "S%s", l:foldstr, l:lines)
 endfunction "}
+let g:vimrc_foldwidth=80
 set foldtext=VIMRC_fold_function()
 set foldmethod=syntax
 set foldclose=
@@ -328,7 +332,7 @@ augroup END
 colorscheme slate
 "}
 "}
-""""""""""""""""""""""""""""""""""" ManPages """"""""""""""""""""""""""""""""""{
+"""""""""""""""""""""""""""" ManPages """""""""""""""""""""""""""{
 let s:plugins["vim-man"] = "vim-utils"
 set keywordprg=:Man
 augroup VIMRC_manpages
@@ -338,7 +342,7 @@ augroup VIMRC_manpages
 	" XXX set keyword for other programs if needed
 augroup END
 "}
-""""""""""""""""""""""""""""""""""" Command """""""""""""""""""""""""""""""""""{
+"""""""""""""""""""""""""""" Command """"""""""""""""""""""""""""{
 "{ Wild menu
 set wildmenu
 set wildchar=<TAB>
@@ -346,7 +350,7 @@ set wildignorecase
 set wildmode=list:longest
 "}
 "}
-""""""""""""""""""""""""""""""""""" Load Packages """""""""""""""""""""""""""""{
+"""""""""""""""""""""""""""" Load Packages """"""""""""""""""""""{
 for addon in keys(s:plugins)
 	execute "packadd! " . fnameescape(addon)
 endfor

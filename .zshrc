@@ -87,7 +87,7 @@ bindkey '^z' grml-zsh-fg
 autoload -Uz bracketed-paste-url-magic
 zle -N bracketed-paste bracketed-paste-url-magic
 #}
-#{ ..... => ../../../..
+#{ .... => ../../..
 function rationalise-dot {
 	if [[ $LBUFFER = *.. ]]
 	then LBUFFER+=/..
@@ -197,4 +197,4 @@ autoload run-help
 #}
 
 daily_message
-# vim: foldmarker={,} foldmethod=marker
+# vim: foldmarker=#{,#} foldmethod=marker
