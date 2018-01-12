@@ -1,13 +1,13 @@
 #!/bin/bash -ue
-savedir="$HOME/www"
-homepage="$savedir/homepage.html"
+savedir=${WWWSAVEDIR:-"$HOME/www"}
+homepage=${WWWHOMEPAGE:-"$savedir/homepage.html"}
+useragent=${USER_AGENT:-"Mozilla/5.0 (compatible; Konqueror/3.2; Linux)"}
 # wget options
-: ${USER_AGENT:="Mozilla/5.0 (compatible; Konqueror/3.2; Linux)"}
 options+=(--directory-prefix="$savedir")     # directory to store mirroring
 options+=(--no-verbose --show-progress) # less spam
 options+=(--force-directories)          # always use directories
 options+=(--execute=robots=off)         # ignore robots.txt
-options+=(--user-agent="$USER_AGENT")
+options+=(--user-agent="$useragent")
 options+=(--no-check-certificate)       # ignore certificates
 options+=(--adjust-extension)           # fix extensions
 # unfortunately required as not having it breaks websites with pages like
@@ -21,7 +21,7 @@ options+=(--timestamping)               # dont redownload files that havnt chang
 options+=(--convert-links)              # convert links for local use
 options+=(--page-requisites)            # download all prerequisites for local use
 options+=(--span-hosts)                 # get prerequisites from other sites
-options+=(--rejected-log=dl-log)        # log rejections
+options+=(--rejected-log=$savedir/log)  # log rejections
 options+=(--ignore-case)                # ignore case for resource extensions
 if [ "$(basename "$0")" = wwwmirror ]   # use mirror if this script is called with that name
 then options+=(--mirror)
@@ -51,6 +51,8 @@ stripped_urls=($(
 ))
 urls_regex=$(IFS='|'; printf "${stripped_urls[*]}")
 options+=(--accept-regex "$urls_regex|\.($resources_regex)")
+
+# Download all urls
 wget "${options[@]}" "${urls[@]}" || true
 
 # store urls into homepage
