@@ -2,6 +2,8 @@
 data.location=~/.task
 include ~/.task/context
 reserved.lines=2
+recurrence.confirmation=no
+
 
 color=on
 #include /usr/share/doc/task/rc/light-16.theme

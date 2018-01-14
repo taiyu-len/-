@@ -1,5 +1,5 @@
-#!/bin/bash
-revert() {
+#!/usr/bin/env bash
+function revert() {
 	xset dpms 600 600 600
 }
 trap revert SIGHUP SIGINT SIGTERM

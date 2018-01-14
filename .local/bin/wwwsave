@@ -1,4 +1,7 @@
-#!/bin/bash -ue
+#!/usr/bin/env bash
+set -o nounset
+set -o errexit
+
 savedir=${WWWSAVEDIR:-"$HOME/www"}
 homepage=${WWWHOMEPAGE:-"$savedir/homepage.html"}
 useragent=${USER_AGENT:-"Mozilla/5.0 (compatible; Konqueror/3.2; Linux)"}

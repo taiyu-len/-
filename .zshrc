@@ -112,6 +112,7 @@ compinit
 compdef _gnu_generic zenity
 compdef wwwsave=wget
 compdef wwwsave=wget
+compdef '_files -g "*.swf"' flashplayer
 #}
 #{ KeyBinds
 #{ Map Ctrl-Z to call fg
@@ -161,7 +162,7 @@ function {
 		keyfile=$(zkbd_file)
 	fi
 	if [[ $? == 0 ]]
-	then source "${keyfile}"
+	then source "$keyfile"
 	else printf 'Failed to setup keys using zkbd.\n'
 	fi
 	unfunction zkbd_file
@@ -214,20 +215,18 @@ function track() {
 	while [[ "$1" = @* ]]
 	do tags+="${1/@/}"; shift
 	done
-	if ! hash ${1:?Requires at least one function to call} &>/dev/null
+	if ! hash "${1:?Requires at least one function to call}" &>/dev/null || [ -x "$1" && ! -d "$1" ]
 	then echo "Requires a valid function to call" >&2; return 1
 	fi
 	timew start "${tags:-$(basename $1)}"
 	"$@"
 	timew stop
 }
-
-function tat {
-	tmux new-session -As "${@:-$(basename $PWD)}"
-}
-function tsplit {
-	tmux split-window "$@"
-}
+#{ Tmux
+function tat() { tmux new-session -As "${@:-$(basename $PWD)}"; }
+function tdt() { tmux detach; }
+function tsplit() { tmux split-window "$@"; }
+#}
 #{ neat curl things
 function wttr {
 	curl "wttr.in/${*}"
@@ -241,6 +240,11 @@ unalias run-help &> /dev/null
 autoload run-help
 #}
 #}
-
-daily_message
+#{ message
+daily_message $[$(tput cols) - 6] |
+	if [[ "$TERM" = *256color ]]
+	then lensay
+	else lensay <(printf '$balloon$')
+	fi
+#}
 # vim: foldmarker=#{,#} foldmethod=marker

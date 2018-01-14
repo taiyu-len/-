@@ -1,13 +1,15 @@
-#!/bin/bash -u
-# Downloads from vimeo properly using youtube-dl
+#!/usr/bin/env bash
+set -o nounset
+set -o errexit
+set -o pipefail
 
-# for some reason it always tries to fix files even if they have already been downloaded
+# for some reason ytdl always tries to fix files even when they have already been fully downloaded
 ytdl_opt+=(--fixup never)
 
-# youtube-dl never succeeds at retrying fragments, will try all remaining fragments
+# ytdl never succeeds at retrying fragments, it will try all remaining fragments
 # and then ``finishes'' the download preventing it from being continued later.
 hash youtube-dl && youtube-dl "${ytdl_opt[@]}" "$@" | {
 	while read line
-	do [[ "$line" = *Retrying\ fragment* ]] && exit 143 || printf "%s\n" "$line"
+	do echo "$line" && [[ "$line" = *Retrying\ fragment* ]] && exit 143
 	done
 }

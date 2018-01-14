@@ -23,7 +23,8 @@ set exrc   " run .exrc files
 set secure " safely
 set backup
 set backupdir=.
-set backupskip=/tmp/*
+let &backupskip = escape(expand('$HOME'), '\') . '/.local/bin/*'
+set backupskip+=/tmp/*
 set undofile
 set undodir=~/.vim/undo
 set swapfile
@@ -107,6 +108,7 @@ set shiftwidth=0 " make <Tab> inserts tab.
 "{ Auto pairs
 let s:plugins["delimitMate"] = "Raimondi"
 let delimitMate_expand_cr = 1
+let delimitMate_expand_space = 1
 "}
 "{ basic mappings
 "{ remap backspace/delete keys
