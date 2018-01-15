@@ -34,7 +34,7 @@ URxvt*borderLess:        false
 URxvt*internalBorder:       0
 URxvt*externalBorder:       0
 
-URxvt.perl-ext-common: default,-option-popup,-selection-popup,confirm-paste
+URxvt.perl-ext-common: default,matcher,-option-popup,-selection-popup,confirm-paste
 URxvt.url-launcher:    palemoon
 
 !Blue Underline
