@@ -35,6 +35,7 @@ set viminfofile=~/.vim/viminfo
 "}
 "{ Session
 let s:plugins["vim-obsession"] = "tpope"
+let s:plugins["vim-prosession"] = "dhruvasagar"
 "}
 "}
 """""""""""""""""""""""""""" Editing """"""""""""""""""""""""""""{
@@ -354,7 +355,9 @@ set wildmode=list:longest
 "}
 """""""""""""""""""""""""""" Load Packages """"""""""""""""""""""{
 for addon in keys(s:plugins)
-	execute "packadd! " . fnameescape(addon)
+	" vim-prosession doesnt work when using
+	" packadd!
+	execute "packadd " . fnameescape(addon)
 endfor
 "}
 " vim: foldmarker=\"{,\"}: foldlevel=0: foldmethod=marker

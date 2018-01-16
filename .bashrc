@@ -108,8 +108,9 @@ then
 	HISTIGNORE="$(IFS=:; printf %s "${ign_cmds[*]}")"
 	HISTCONTROL=ignoreboth
 	HISTTIMEFORMAT=%s
+	HISTFILE="$HOME/.bash_history"
 fi #}
-HISTSIZE=50000000
+HISTSIZE=1000000
 unset ign_cmds
 #}
 #{ Prompt
@@ -118,7 +119,7 @@ then
 	ZLE_RPROMPT_INDENT=0
 	if [[ $TERM == "linux" ]]
 	then
-		PS1="%(1j.%j .)%> "
+		PS1="%(1j.%j .)>  "
 		RPS1="< %~ "
 	else
 		PS1="%B%F{w}%K{b}%S%(1j.%j .)%s%k%b%f "
@@ -282,15 +283,6 @@ then
 	#}
 fi
 #}
-#{ Less termcaps
-export LESS_TERMCAP_mb=$(tput blink;tput setaf 11) # Begin Blinking in yellow
-export LESS_TERMCAP_md=$(tput bold; tput setaf 9)  # Begin bold in red
-export LESS_TERMCAP_us=$(tput smul; tput setaf 4)  # Begin underline in blue
-export LESS_TERMCAP_ue=$(tput rmul; tput op)       # End underline
-export LESS_TERMCAP_me=$(tput sgr0)                # Turn off bold, blink, underline
-export LESS_TERMCAP_so=$(tput smso)                # Begin standout
-export LESS_TERMCAP_se=$(tput rmso)                # End standout
-#}
 #{ Aliases
 ## allows aliases to be passed into sudo.
 alias sudo="sudo "
@@ -299,11 +291,19 @@ alias mv="mv -i"
 alias cp="cp -i"
 alias rm="rm -i"
 #}
+#{ Use color
+alias dir='dir --color=auto'
+alias vdir='vdir --color=auto'
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+alias diff='diff --color=auto'
+#}
 #{ ls
-ls_common=(--color=auto --human-readable --ignore-backups )
-alias ls="ls    ${ls_common[@]}"
-alias ll="ls -l ${ls_common[@]}"
-alias la="ls -a ${ls_common[@]}"
+ls_common=(--color=auto --human-readable)
+alias ls="ls -B ${ls_common[*]}"
+alias ll="ls -l ${ls_common[*]}"
+alias la="ls -A ${ls_common[*]}"
 unset ls_common
 #}
 #{ timew
@@ -343,11 +343,6 @@ then
 fi #}
 #}
 #{ Functions
-function diff() {
-	git diff "$@"
-}
-is zsh compdef diff=diff
-
 #{ Timew tracking function
 function track() {
 	local tags=()
@@ -382,7 +377,13 @@ function hless() {
 }
 
 function lensay() {
-	ponysay --file "${1:-$HOME/.local/share/ponysay/ponies/len.pony}" --bubble think --wrap i
+	local ponycmd=()
+	if [[ "$TERM" = *256color ]]
+	then ponycmd+=(ponythink --bubble=think --file="$HOME/.local/share/catsay/len.cat")
+	else ponycmd+=(ponysay   --bubble=linux --file="$HOME/.local/share/catsay/nul.cat")
+	fi
+	ponycmd+=(--wrap=i)
+	"${ponycmd[@]}" "$@"
 }
 
 function mkcd() {
@@ -400,4 +401,5 @@ then
 fi
 
 #}
+unset is
 # vim: foldmarker=#{,#} foldmethod=marker filetype=zsh

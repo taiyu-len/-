@@ -1,9 +1,1 @@
-#{ message
-daily_message $[$(tput cols) - 6] |
-	if [[ "$TERM" = *256color ]]
-	then lensay
-	else lensay <(printf '$balloon$')
-	fi
-#}
-# vim: foldmarker=#{,#} foldmethod=marker
-
+DM_COLUMNS=$[COLUMNS-6] daily_message | lensay

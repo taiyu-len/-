@@ -41,51 +41,53 @@ URxvt.url-launcher:    palemoon
 URxvt.underlineColor:  #0088ff
 URxvt.cutchars:        "`()'*<>[]{|│}"
 
-URxvt*visualBell:false
-URxvt*urgentOnBell: true
+URxvt*visualBell:     false
+URxvt*urgentOnBell:   true
 
 ! URxvt terminal color theme
 ! set up colors and transparancy
 URxvt*transparent:   true
 
 ! URxvt*.shading: 0 to 99 darkens, 101 to 200 lightens
-URxvt*shading:       80
-URxvt*background:    #555560
-URxvt*tintColor:     #22222F
-URxvt*foreground:    #EEEEFF
 URxvt*cursorColor:   #55AAAA
-!! Bold uses actual color
+
 URxvt*intensityStyles:true
 
-!! black dark/light
-URxvt*color0:        #111111
-URxvt*color8:        #444444
+URxvt*shading:       30
+URxvt*tintColor:     #55555F
+!! default bg/fg
+URxvt*background:    [50]#000000
+URxvt*foreground:    [80]#FFFFFF
 
-!! red dark/light
-URxvt*color1:        #CC8888
-URxvt*color9:        #FF5555
+! black dark/light
+URxvt*color0:        [50]#000000
+URxvt*color8:        [80]#444444
 
-!! green dark/light
-URxvt*color2:        #88CC88
-URxvt*color10:       #55FF55
+! red dark/light
+URxvt*color1:        [80]#CC8888
+URxvt*color9:        [80]#FF5555
 
-!! yellow dark/light
-URxvt*color3:        #CCCC88
-URxvt*color11:       #FFFF55
+! green dark/light
+URxvt*color2:        [80]#88CC88
+URxvt*color10:       [80]#55FF55
 
-!! blue dark/light
-URxvt*color4:        #8888CC
-URxvt*color12:       #5555FF
+! yellow dark/light
+URxvt*color3:        [80]#CCCC88
+URxvt*color11:       [80]#FFFF55
 
-!! magenta dark/light
-URxvt*color5:        #CC88CC
-URxvt*color13:       #FF55FF
+! blue dark/light
+URxvt*color4:        [80]#8888CC
+URxvt*color12:       [80]#5555FF
 
-!! cyan dark/light
-URxvt*color6:        #88CCCC
-URxvt*color14:       #55FFFF
+! magenta dark/light
+URxvt*color5:        [80]#CC88CC
+URxvt*color13:       [80]#FF55FF
 
-!! white dark/light
-URxvt*color7:        #CCCCCC
-URxvt*color15:       #FFFFFF
+! cyan dark/light
+URxvt*color6:        [80]#88CCCC
+URxvt*color14:       [80]#55FFFF
+
+! white dark/light
+URxvt*color7:        [80]#CCCCCC
+URxvt*color15:       [80]#FFFFFF
 !! vim:set filetype=xdefaults:
