@@ -57,9 +57,9 @@
 #}
 #}
 #{ shell test
-if [[ "$0" = *zsh ]] && [ "$ZSH_NAME" ]
+if { [[ "$0" =~ zsh ]] || [[ "$(basename "$0")" = .zshrc ]] } && [ "$ZSH_NAME" ]
 then function is() { [ $1 = zsh  ] && { shift; "$@"; }; }
-elif [[ "$0" = *bash ]] && [ "$BASH" ]
+elif { [[ "$0" =~ bash ]] || [[ "$(basename "$0")" = .bashrc ]] && [ "$BASH" ]
 then function is() { [ $1 = bash ] && { shift; "$@"; }; }
 else function is() { false; }
 fi
@@ -84,6 +84,7 @@ fi #}
 #}
 #{ History
 ign_cmds=(ls cd "cd -" pwd exit date "* --help" "* -h")
+HISTSIZE=1000000
 if is zsh #{
 then
 	# Infinite history size,
@@ -110,21 +111,20 @@ then
 	HISTTIMEFORMAT=%s
 	HISTFILE="$HOME/.bash_history"
 fi #}
-HISTSIZE=1000000
 unset ign_cmds
 #}
 #{ Prompt
 if is zsh #{
 then
 	ZLE_RPROMPT_INDENT=0
-	if [[ $TERM == "linux" ]]
-	then
-		PS1="%(1j.%j .)>  "
-		RPS1="< %~ "
-	else
-		PS1="%B%F{w}%K{b}%S%(1j.%j .)%s%k%b%f "
-		RPS1="%B%F{w}%K{b}%S %~ %s%k%f"
+	
+	if [[ "$TERM" == "linux" ]]
+		# horrible hack to work around linux term
+	then PS_PREFIX="%S%B%K{black}%F{white}" PS_SUFFIX="%f%k%b%s" PS1_SUFFIX=" "
+	else PS_PREFIX="%K{15}%F{16}%B" PS_SUFFIX="%b%f%k"
 	fi
+	PS1="$PS_PREFIX%(1j.%j.) $PS_SUFFIX $PS1_SUFFIX"
+	RPS1="$PS_PREFIX %~ $PS_SUFFIX"
 	#}
 elif is bash #{
 then PS1='\w \$ '
@@ -299,6 +299,10 @@ alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias diff='diff --color=auto'
 #}
+#{ human readable
+alias df='df -h'
+alias du='du -h'
+#}
 #{ ls
 ls_common=(--color=auto --human-readable)
 alias ls="ls -B ${ls_common[*]}"
@@ -349,7 +353,7 @@ function track() {
 	while [[ "$1" = @* ]]
 	do tags+=("${1/@/}"); shift
 	done
-	if ! hash "${1:?Requires a function to call}" &> /dev/null || [ -x "$1" && ! -d "$1" ]
+	if ! hash "${1:?Requires a function to call}" &> /dev/null && { [ -d "$1" ] || [ ! -x "$1" ] }
 	then echo "Requires a valid function to call" >&2; return 1
 	fi
 	timew start "${tags[@]:-$(basename $1)}"
@@ -378,7 +382,7 @@ function hless() {
 
 function lensay() {
 	local ponycmd=()
-	if [[ "$TERM" = *256color ]]
+	if [[ "$TERM" =~ 256color ]]
 	then ponycmd+=(ponythink --bubble=think --file="$HOME/.local/share/catsay/len.cat")
 	else ponycmd+=(ponysay   --bubble=linux --file="$HOME/.local/share/catsay/nul.cat")
 	fi
@@ -401,5 +405,8 @@ then
 fi
 
 #}
-unset is
+if is zsh
+then unfunction is
+else unset is
+fi
 # vim: foldmarker=#{,#} foldmethod=marker filetype=zsh

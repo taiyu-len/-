@@ -16,6 +16,7 @@ fi
 #Load xresource file
 [[ -f ~/.config/X11/Xresources ]] && xrdb -merge ~/.config/X11/Xresources
 [[ -f ~/.config/X11/urxvt      ]] && xrdb -merge ~/.config/X11/urxvt
+[[ -f ~/.config/X11/colors      ]] && xrdb -merge ~/.config/X11/colors
 ## swap caps and escape, and let caps be used as Ctrl when pressed with another
 [[ -f ~/.config/X11/Xmodmap    ]] && xmodmap     ~/.config/X11/Xmodmap
 xcape -e 'Control_L=Escape;Control_R=Escape'
