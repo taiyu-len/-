@@ -1,5 +1,5 @@
 """""""""""""""""""""""""""" Vim """"""""""""""""""""""""""""""""{
-"{ Enable plugins
+"{ plugins
 filetype plugin indent on
 syntax enable
 " let s:plugins["name"] = "author"
@@ -16,6 +16,11 @@ endfunction "}
 " Reloads vimrc, updating the function, call the function
 command! PackUpdate source $MYVIMRC | call VIMRC_run_minpac() | call minpac#update()
 command! PackClean  source $MYVIMRC | call VIMRC_run_minpac() | call minpac#clean()
+command! -bang PackAdd for name in keys(s:plugins) | execute "packadd<bang> " . fnameescape(name) | endfor
+augroup VIMRC_PackAdd
+	autocmd!
+	autocmd VimEnter * PackAdd
+augroup END
 "}
 "{ Files And Paths
 " Where vim puts things
@@ -244,6 +249,7 @@ function! VIMRC_fold_function() abort
 endfunction "}
 let g:vimrc_foldwidth=80
 set foldtext=VIMRC_fold_function()
+set foldmarker={,}
 set foldmethod=syntax
 set foldclose=
 set foldopen+=insert
@@ -352,12 +358,5 @@ set wildchar=<TAB>
 set wildignorecase
 set wildmode=list:longest
 "}
-"}
-"""""""""""""""""""""""""""" Load Packages """"""""""""""""""""""{
-for addon in keys(s:plugins)
-	" vim-prosession doesnt work when using
-	" packadd!
-	execute "packadd " . fnameescape(addon)
-endfor
 "}
 " vim: foldmarker=\"{,\"}: foldlevel=0: foldmethod=marker

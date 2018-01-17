@@ -9,12 +9,12 @@
 # |/etc/bash.bashrc|           |    A      |      |
 # +----------------+-----------+-----------+------+
 # |~/.bashrc       |           |    B  <------------- You are here
-# +----------------+-----------+-----------+------+
-# |~/.bash_profile |   B1      |           |      | Executes the first
-# +----------------+-----------+-----------+------+ file found
-# |~/.bash_login   |   B2      |           |      |   |
-# +----------------+-----------+-----------+------+   |
-# |~/.profile      |   B3 <---------------------------' i use this one
+# +----------------+-----------+-----------+------+   configures the shell for interactive use
+# |~/.bash_profile |   B1      |           |      |-.
+# +----------------+-----------+-----------+------+ |
+# |~/.bash_login   |   B2      |           |      |-+-Executes the first file found
+# +----------------+-----------+-----------+------+ |
+# |~/.profile      |   B3 <- this one is used ------'  sets global exports.
 # +----------------+-----------+-----------+------+
 # |BASH_ENV        |           |           |  A   |
 # +----------------+-----------+-----------+------+
@@ -57,9 +57,9 @@
 #}
 #}
 #{ shell test
-if { [[ "$0" =~ zsh ]] || [[ "$(basename "$0")" = .zshrc ]] } && [ "$ZSH_NAME" ]
+if  [[ "$0" =~ zsh || "$(basename "$0")" = .zshrc ]]  && [ "$ZSH_NAME" ]
 then function is() { [ $1 = zsh  ] && { shift; "$@"; }; }
-elif { [[ "$0" =~ bash ]] || [[ "$(basename "$0")" = .bashrc ]] && [ "$BASH" ]
+elif [[ "$0" =~ bash || "$(basename "$0")" = .bashrc ]] && [ "$BASH" ]
 then function is() { [ $1 = bash ] && { shift; "$@"; }; }
 else function is() { false; }
 fi
@@ -117,14 +117,26 @@ unset ign_cmds
 if is zsh #{
 then
 	ZLE_RPROMPT_INDENT=0
-	
+	setopt PROMPT_SUBST
+	function my_git_status() { #{
+		local branch=$(git branch 2>/dev/null | sed -n 's/^* //;T;p;q')
+		local m d a
+		while read change; do
+			case "${change:0:1}" in
+			M) ((++m)) ;;
+			D) ((++d)) ;;
+			A) ((++a)) ;;
+			esac
+		done < <(git status -s --porcelain=v1 2>/dev/null)
+		printf "%s" "${branch:+│ $branch ${m:+%F{blu\}$m }${a:+%F{g\}$a }${d:+%F{r\}$d }}"
+	} #}
 	if [[ "$TERM" == "linux" ]]
 		# horrible hack to work around linux term
-	then PS_PREFIX="%S%B%K{black}%F{white}" PS_SUFFIX="%f%k%b%s" PS1_SUFFIX=" "
-	else PS_PREFIX="%K{15}%F{16}%B" PS_SUFFIX="%b%f%k"
+	then PS_PREFIX='%S%B%K{black}%F{white}' PS_SUFFIX='%f%k%b%s' PS1_SUFFIX=" "
+	else PS_PREFIX='%K{15}%F{16}%B' PS_SUFFIX='%b%f%k'
 	fi
 	PS1="$PS_PREFIX%(1j.%j.) $PS_SUFFIX $PS1_SUFFIX"
-	RPS1="$PS_PREFIX %~ $PS_SUFFIX"
+	RPS1="$PS_PREFIX"' %~ $(my_git_status)'"$PS_SUFFIX"
 	#}
 elif is bash #{
 then PS1='\w \$ '
@@ -353,7 +365,7 @@ function track() {
 	while [[ "$1" = @* ]]
 	do tags+=("${1/@/}"); shift
 	done
-	if ! hash "${1:?Requires a function to call}" &> /dev/null && { [ -d "$1" ] || [ ! -x "$1" ] }
+	if ! hash "${1:?Requires a function to call}" &> /dev/null && [ -d "$1" -o ! -x "$1" ]
 	then echo "Requires a valid function to call" >&2; return 1
 	fi
 	timew start "${tags[@]:-$(basename $1)}"
@@ -394,6 +406,16 @@ function mkcd() {
 	mkdir -p "$*"; cd "$*" || exit
 }
 is zsh compdef mkcd=mkdir
+
+# fuzzy cd lookup
+hash fzf 2>/dev/null &&
+	function fzcd() {
+		local dir
+		dir=$(find "${1:-.}" -path '*/\.*' -prune \
+			-o -type d -print 2> /dev/null | fzf +m) &&
+		cd $dir
+	} &&
+	is zsh compdef fzcd=cd
 
 function tmpcd() {
 	cd $(mktemp -d)
