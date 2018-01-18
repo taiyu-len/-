@@ -17,10 +17,6 @@ endfunction "}
 command! PackUpdate source $MYVIMRC | call VIMRC_run_minpac() | call minpac#update()
 command! PackClean  source $MYVIMRC | call VIMRC_run_minpac() | call minpac#clean()
 command! -bang PackAdd for name in keys(s:plugins) | execute "packadd<bang> " . fnameescape(name) | endfor
-augroup VIMRC_PackAdd
-	autocmd!
-	autocmd VimEnter * PackAdd
-augroup END
 "}
 "{ Files And Paths
 " Where vim puts things
@@ -46,7 +42,7 @@ let s:plugins["vim-prosession"] = "dhruvasagar"
 """""""""""""""""""""""""""" Editing """"""""""""""""""""""""""""{
 " config for input, operators, etc. no fancy Mappings
 "{ Mouse
-set mouse=a " Enable mouse in all modes
+set mouse= " mouse has annoying behavior so disabling for now
 "}
 "{ Leader Keys
 let mapleader = " "
@@ -359,4 +355,5 @@ set wildignorecase
 set wildmode=list:longest
 "}
 "}
+PackAdd
 " vim: foldmarker=\"{,\"}: foldlevel=0: foldmethod=marker

@@ -119,16 +119,18 @@ then
 	ZLE_RPROMPT_INDENT=0
 	setopt PROMPT_SUBST
 	function my_git_status() { #{
-		local branch=$(git branch 2>/dev/null | sed -n 's/^* //;T;p;q')
-		local m d a
-		while read change; do
-			case "${change:0:1}" in
-			M) ((++m)) ;;
-			D) ((++d)) ;;
-			A) ((++a)) ;;
-			esac
-		done < <(git status -s --porcelain=v1 2>/dev/null)
-		printf "%s" "${branch:+│ $branch ${m:+%F{blu\}$m }${a:+%F{g\}$a }${d:+%F{r\}$d }}"
+		local b c s # branch_name, has changes to be commited, status of uncommited files
+		typeset -A s
+		{
+			local line
+			read line && b=$(sed -n 's/^## \(.*\)\.\.\..*/\1/;T;p' <<< $line)
+			[ "$b" ] && while IFS= read line; do
+				[ "${line:0:1}" != ' ' -a "${line:0:1}" != '?' ] && c=+
+				((++s[${line:1:1}]))
+			done
+		} < <(git status -bs --porcelain=v1 2>/dev/null)
+		local B="%F{blu}" R="%F{r}" G="%F{g}"
+		printf "%s" "${b:+│ $c$b ${s[M]:+$B$s[M] }${s[A]:+$G$s[A] }${s[D]:+$R$s[D] }}"
 	} #}
 	if [[ "$TERM" == "linux" ]]
 		# horrible hack to work around linux term
@@ -314,6 +316,7 @@ alias diff='diff --color=auto'
 #{ human readable
 alias df='df -h'
 alias du='du -h'
+alias wget='wget -q --show-progress'
 #}
 #{ ls
 ls_common=(--color=auto --human-readable)
@@ -378,10 +381,9 @@ function tat() { tmux new-session -As "${@:-$(basename $PWD)}"; }
 function tdt() { tmux detach; }
 function tsplit() { tmux split-window "$@"; }
 #}
-#
 #{ neat curl things
 function wttr {
-	curl "wttr.in/${*}"
+	curl "wttr.in/$*"
 }
 function cheat.sh {
 	curl "cheat.sh/$*"

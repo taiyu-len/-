@@ -9,14 +9,17 @@ set -o errexit
 : ${DM_SHOW_LUCKYITEM=t}
 # set output width
 : ${DM_COLUMNS=$(tput cols)}
-cols=$DM_COLUMNS
+if test 0 -gt "$_"
+then cols="$[$(tput cols)+_]"
+else cols="$_"
+fi
 
 function greetmsg() {
 	local greeting="${greeting[$RANDOM % ${#greeting[@]}]}"
 	local dots=$(printf "%.s." $(seq $cols))
 	# Select greeting at random
-	local msg="${greeting#*%}"
-	msg="${msg@E}"
+	: "${greeting#*%}"
+	local msg="${_@E}"
 	case "${greeting%%%*}" in
 		$th) echo "Today's horoscope:" ;;
 		$tl) echo "Today's lucky item:" ;;

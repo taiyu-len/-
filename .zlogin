@@ -1,1 +1,1 @@
-DM_COLUMNS=$[COLUMNS-6] daily_message | lensay
+DM_COLUMNS=-6 daily_message | lensay
