@@ -83,8 +83,9 @@ then
 fi #}
 #}
 #{ History
-ign_cmds=(ls cd "cd -" pwd exit date "* --help" "* -h")
+ign_cmds=(ls cd "cd -" pwd exit date "* --help" "* -h" jobs fg bg htop ps)
 HISTSIZE=1000000
+HISTFILE=
 if is zsh #{
 then
 	# Infinite history size,
@@ -125,20 +126,17 @@ then
 			local line
 			read line && b=$(sed -n 's/^## \(.*\)\.\.\..*/\1/;T;p' <<< $line)
 			[ "$b" ] && while IFS= read line; do
-				[ "${line:0:1}" != ' ' -a "${line:0:1}" != '?' ] && c=+
+				[[ ! "${line:0:1}" =~ '[ ?!]' ]] && c=+
 				((++s[${line:1:1}]))
 			done
 		} < <(git status -bs --porcelain=v1 2>/dev/null)
 		local B="%F{blu}" R="%F{r}" G="%F{g}"
 		printf "%s" "${b:+│ $c$b ${s[M]:+$B$s[M] }${s[A]:+$G$s[A] }${s[D]:+$R$s[D] }}"
 	} #}
-	if [[ "$TERM" == "linux" ]]
-		# horrible hack to work around linux term
-	then PS_PREFIX='%S%B%K{black}%F{white}' PS_SUFFIX='%f%k%b%s' PS1_SUFFIX=" "
-	else PS_PREFIX='%K{15}%F{16}%B' PS_SUFFIX='%b%f%k'
-	fi
-	PS1="$PS_PREFIX%(1j.%j.) $PS_SUFFIX $PS1_SUFFIX"
+	PS_PREFIX='%B%K{black}%F{white}' PS_SUFFIX='%f%k%b'
+	PS1="$PS_PREFIX%(1j.%j.)│$PS_SUFFIX $PS1_SUFFIX"
 	RPS1="$PS_PREFIX"' %~ $(my_git_status)'"$PS_SUFFIX"
+	[[ "$TERM" == "linux" ]] && PS1+=' '
 	#}
 elif is bash #{
 then PS1='\w \$ '
@@ -256,7 +254,6 @@ then
 		[[ -f ~/.zkbd/${TERM}-${DISPLAY}          ]] && printf '%s' ~/".zkbd/${TERM}-${DISPLAY}"          && return 0
 		return 1
 	}
-
 	mkdir -p ~/.zkbd
 	keyfile=$(zkbd_file)
 	if [[ $? == 1 ]]
@@ -273,7 +270,6 @@ then
 	#}
 	#{ set mappings
 	bindkey -v # vim mode
-
 	[ "${key[Home]}"           ]  && bindkey "${key[Home]}"           beginning-of-line
 	[ "${key[End]}"            ]  && bindkey "${key[End]}"            end-of-line
 	[ "${key[Insert]}"         ]  && bindkey "${key[Insert]}"         overwrite-mode
@@ -294,6 +290,9 @@ then
 	[ "${key[Ctrl-Delete]}"    ]  && bindkey "${key[Ctrl-Delete]}"    delete-word
 	[ "${key[Alt-H]}"          ]  && bindkey "${key[Alt-H]}"          run-help
 	[ "${key[Shift-Tab]}"      ]  && bindkey "${key[Shift-Tab]}"      reverse-menu-complete
+	#}
+	#{ run-help
+	bindkey -v "h" run-help
 	#}
 fi
 #}
@@ -325,6 +324,11 @@ alias ll="ls -l ${ls_common[*]}"
 alias la="ls -A ${ls_common[*]}"
 unset ls_common
 #}
+#{ git
+for i in status commit merge pull push fetch grep log diff mv rm blame
+do alias g$i="git $i"
+done; unset i
+##}
 #{ timew
 alias start="timew start"
 alias stop="timew stop"

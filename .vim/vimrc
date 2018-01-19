@@ -214,11 +214,7 @@ let g:sexp_enable_insert_mode_mappings=0
 "{ Text
 set showmatch " show matching pair under cursor
 set list
-if has("multi_byte")
-	set listchars=tab:│‧,trail:•,conceal:δ,precedes:←,extends:→
-else
-	set listchars=tab:\|\ ,trail:.,conceal:%,precedes:^,extends:$
-endif
+set listchars=tab:│•,trail:•,conceal:δ,precedes:←,extends:→
 "}
 "{ Margin
 set number         " Show current line number
@@ -294,6 +290,7 @@ function! VIMRC_LLFugitive() abort
 endfunction
 "}
 "{ Actual light line config
+" TODO replace
 let g:lightline = {}
 let g:lightline.colorscheme = 'solarized'
 let g:lightline.active = {
@@ -306,8 +303,6 @@ let g:lightline.component_function.column    = 'VIMRC_LLColumn'
 let g:lightline.component_function.readonly  = 'VIMRC_LLReadonly'
 let g:lightline.component_function.gitbranch = 'VIMRC_LLFugitive'
 let g:lightline.component_function_visible_condition = { 'gitbranch': 'call VIMRC_LLFugitive()'}
-let g:lightline.separator = { 'left': '', 'right': '' }
-let g:lightline.subseparator = { 'left': '', 'right': '' }
 let g:lightline.mode_map = {
 	\ 'n'     : 'N', 'i' : 'I', 'R'     : 'R',
 	\ 'v'     : 'V', 'V' : 'V', '\<C-v>': 'V',
@@ -345,6 +340,13 @@ augroup VIMRC_manpages
 	autocmd FileType man  setlocal nolist
 	autocmd FileType help setlocal keywordprg=:help
 	" XXX set keyword for other programs if needed
+augroup END
+"}
+"""""""""""""""""""""""""""" Git """"""""""""""""""""""""""""""""{
+let s:plugins["vim-fugitive"] = "tpope"
+augroup VIMRC_fugitive
+	autocmd!
+	autocmd BufReadPost fugitive://* set bufhidden=delete
 augroup END
 "}
 """""""""""""""""""""""""""" Command """"""""""""""""""""""""""""{
