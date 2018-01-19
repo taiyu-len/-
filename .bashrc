@@ -325,7 +325,7 @@ alias la="ls -A ${ls_common[*]}"
 unset ls_common
 #}
 #{ git
-for i in status commit merge pull push fetch grep log diff mv rm blame
+for i in status commit merge pull push fetch grep log diff mv rm blame add
 do alias g$i="git $i"
 done; unset i
 ##}

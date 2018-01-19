@@ -214,11 +214,13 @@ let g:sexp_enable_insert_mode_mappings=0
 "{ Text
 set showmatch " show matching pair under cursor
 set list
-set listchars=tab:│•,trail:•,conceal:δ,precedes:←,extends:→
+set listchars=tab:│•,trail:•,nbsp:•,conceal:δ,precedes:←,extends:→
 "}
-"{ Margin
+"{ Columns
 set number         " Show current line number
 set relativenumber " and relative number for rest of lines
+set textwidth=80
+set colorcolumn=+1
 "}
 "{ Folding
 "{ fancy fold function
@@ -233,13 +235,12 @@ function! VIMRC_fold_function() abort
 	elseif (&foldmethod ==? "syntax")
 		let l:end = substitute(getline(v:foldend), '^\s*\([])}]\|\w\+\).*$', '\1', '')
 	endif
-	let l:lines = printf("[%4d  ]", v:foldend - v:foldstart)
-	let l:width = max([40, &textwidth, g:vimrc_foldwidth])
-	let l:strlen = l:width - strdisplaywidth("..." . l:end . l:lines)
-	let l:foldstr = printf("%." . l:strlen . "S...%s", substitute(getline(v:foldstart), '\t', l:tab, 'g'), l:end)
-	return printf("%-" . (l:width  - strdisplaywidth(l:lines)) . "S%s", l:foldstr, l:lines)
+	let l:lines = printf("│ %*d", len(line('$')), v:foldend - v:foldstart)
+	let l:width = max([40, &textwidth])
+	let l:strlen = l:width - strdisplaywidth("..." . l:end)
+	let l:foldstr = printf("%.*S...%s", l:strlen, substitute(getline(v:foldstart), '\t', l:tab, 'g'), l:end)
+	return printf("%-*S%s", l:width, l:foldstr, l:lines)
 endfunction "}
-let g:vimrc_foldwidth=80
 set foldtext=VIMRC_fold_function()
 set foldmarker={,}
 set foldmethod=syntax
@@ -254,65 +255,38 @@ set concealcursor=
 "{ Window
 set winminheight=0
 set winminwidth=0
-if has("multi_byte") "{
-	set fillchars=stl:━,stlnc:─,vert:┃,fold:\ ,diff:\ 
-else
-	set fillchars=stl:-,stlnc:-,vert:\|,fold:/,diff:/
-endif "}
+set fillchars=stl:=,stlnc:\ ,vert:│,fold:\ ,diff:\ 
 "}
 "{ Status
 set errorbells
 set ruler
 set laststatus=2
-set noshowmode
-"{ Lightline
-let s:plugins["lightline.vim"] = "itchyny"
-let s:plugins["vim-fugitive"] = "tpope"
-"{ align column with numbers in margin
-function! VIMRC_LLColumn() abort
-	let l:max_width = max([len(line('$')), &numberwidth-1])
-	let l:col_width = len(col('.'))
-	return repeat(' ', l:max_width - l:col_width - 1) . col('.')
+"{ Print column number aligned with margin numbers
+function! VIMRC_ShowsSigns() abort
+	return 2 * (&signcolumn == "yes" || (&signcolumn != "no" && has_key(getbufinfo(bufname(''))[0], "signs")))
+endfunction
+function! VIMRC_Column() abort
+	" width of numbers in margin
+	let l:max_width = (&number ? max([len(line('$')), &numberwidth-1]) : 0)
+	let l:max_width += &foldcolumn + VIMRC_ShowsSigns()
+	let l:padding = max([3, l:max_width]) - len(col('.'))
+	return repeat(" ", l:padding) . col('.')
 endfunction
 "}
-"{ use nice readonly symbol
-function! VIMRC_LLReadonly() abort
-	return &readonly && &filetype !=# 'help' ? '' : ''
-endfunction
-"}
-"{ Show git status
-function! VIMRC_LLFugitive() abort
-	if exists('*fugitive#head')
-		let l:branch = fugitive#head()
-		return l:branch !=# '' ? ' '.l:branch : ''
-	endif
-	return ''
-endfunction
-"}
-"{ Actual light line config
-" TODO replace
-let g:lightline = {}
-let g:lightline.colorscheme = 'solarized'
-let g:lightline.active = {
-	\ 'left' : [['column', 'mode', 'paste'], ['filename', 'modified', 'readonly']],
-	\ 'right': [['filetype'], ['gitbranch']] }
-let g:lightline.inactive = {
-	\ 'right': [['filetype'], ['gitbranch']] }
-let g:lightline.component_function = {}
-let g:lightline.component_function.column    = 'VIMRC_LLColumn'
-let g:lightline.component_function.readonly  = 'VIMRC_LLReadonly'
-let g:lightline.component_function.gitbranch = 'VIMRC_LLFugitive'
-let g:lightline.component_function_visible_condition = { 'gitbranch': 'call VIMRC_LLFugitive()'}
-let g:lightline.mode_map = {
-	\ 'n'     : 'N', 'i' : 'I', 'R'     : 'R',
-	\ 'v'     : 'V', 'V' : 'V', '\<C-v>': 'V',
-	\ 'c'     : 'C', 's' : 's', 'S'     : 'S',
-	\ '\<C-s>': 'S', 't' : 'T',
-	\ }
-"}
-"}
+set statusline=
+set statusline+=%{VIMRC_Column()}
+" -filename if not modifable, +filename if modified,
+" !filename if modified but readonly
+set statusline+=\ │\ %{!&modifiable?'-':!&modified?'':&readonly?'!':'+'}%t
+set statusline+=\ │\ #%n
+set statusline+=\ │\ %{&filetype}
+set statusline+=\ │\ %=
+set statusline+=\ │\ %<%F
+set statusline+=\ │\ %{fugitive#head()}\  
+
 "}
 "{ Theme
+" TODO theme
 set background="dark"
 "{ Colorscheme overrides, because they all seem to suck
 function! VIMRC_set_highlight() abort
