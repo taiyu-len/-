@@ -208,6 +208,7 @@ let s:plugins["vim-sexp"] = "guns"
 let s:plugins["vim-sexp-mappings-for-regular-people"] = "tpope"
 let g:sexp_filetypes = 'clojure,scheme,lisp,timl,c,cpp'
 let g:sexp_enable_insert_mode_mappings=0
+let s:plugins["vim-unimpaired"] = "tpope"
 "}
 "}
 """""""""""""""""""""""""""" Display """"""""""""""""""""""""""""{
@@ -215,12 +216,21 @@ let g:sexp_enable_insert_mode_mappings=0
 set showmatch " show matching pair under cursor
 set list
 set listchars=tab:│•,trail:•,nbsp:•,conceal:δ,precedes:←,extends:→
+augroup VIMRC_FixText "{
+	autocmd!
+	autocmd FileType man setlocal nolist
+augroup END "}
 "}
 "{ Columns
 set number         " Show current line number
 set relativenumber " and relative number for rest of lines
 set textwidth=80
 set colorcolumn=+1
+augroup VIMRC_FixColumn "{
+	autocmd!
+	autocmd FileType help,man setlocal colorcolumn=
+	autocmd BufReadPost quickfix setlocal colorcolumn=
+augroup END "}
 "}
 "{ Folding
 "{ fancy fold function
@@ -236,11 +246,12 @@ function! VIMRC_fold_function() abort
 		let l:end = substitute(getline(v:foldend), '^\s*\([])}]\|\w\+\).*$', '\1', '')
 	endif
 	let l:lines = printf("│ %*d", len(line('$')), v:foldend - v:foldstart)
-	let l:width = max([40, &textwidth])
+	let l:width = max([40, &textwidth, g:vimrc_foldwidth])
 	let l:strlen = l:width - strdisplaywidth("..." . l:end)
 	let l:foldstr = printf("%.*S...%s", l:strlen, substitute(getline(v:foldstart), '\t', l:tab, 'g'), l:end)
 	return printf("%-*S%s", l:width, l:foldstr, l:lines)
 endfunction "}
+let g:vimrc_foldwidth=80
 set foldtext=VIMRC_fold_function()
 set foldmarker={,}
 set foldmethod=syntax
@@ -275,51 +286,43 @@ function! VIMRC_Column() abort
 endfunction
 "}
 "{ Print string if non empty
-function VIMRC_status(fmt, str) abort
+function! PrintIf(fmt, str) abort
 	return empty(a:str) ? '' : printf(a:fmt, a:str)
+endfunction
+"}
+"{ Print modifed status of the file
+function! VIMRC_Modified() abort
+	return ! &modifiable ? '-' :
+	\      ! &modified   ? '' :
+	\        &readonly   ? '!' : '+'
 endfunction
 "}
 "}
 let s:plugins["vim-fugitive"] = "tpope"
-set statusline=
-set statusline+=%{VIMRC_Column()}
-" -filename if not modifable, +filename if modified,
-" !filename if modified but readonly
+set statusline=%{VIMRC_Column()}
 set statusline+= │ #%n
-set statusline+= │ %{!&modifiable?'-':!&modified?'':&readonly?'!':'+'}%t
-set statusline+=%{VIMRC_status(' │ %s',&filetype)}
+set statusline+= │ %{VIMRC_Modified()}%t
+set statusline+=%{PrintIf(' │ %s',&filetype)}
 set statusline+= │ %=
 set statusline+= │ %<%F
-set statusline+=%{VIMRC_status(' │ %s',fugitive#head())}
+set statusline+=%{PrintIf(' │ %s',fugitive#head())}
 set statusline+= 
-"}
-"{ Theme
-" TODO theme
-set background="dark"
-"{ Colorscheme overrides, because they all seem to suck
-function! VIMRC_set_highlight() abort
-	highlight Folded     cterm=none ctermfg=145  ctermbg=none
-	highlight SpecialKey cterm=bold              ctermbg=None
-	" Because all diff colorschemes are unreadable garbage
-	highlight DiffAdd    NONE cterm=underline ctermbg=22
-	highlight DiffChange NONE cterm=underline
-	highlight DiffText   NONE cterm=underline ctermbg=17
-	highlight DiffDelete NONE                 ctermbg=52 ctermfg=52
-endfunction
-augroup VIMRC_highlight
+augroup VIMRC_FixStatus
 	autocmd!
-	autocmd ColorScheme * call VIMRC_set_highlight()
+	autocmd BufReadPost quickfix setlocal statusline=%{VIMRC_Column()} │ %{&filetype}
+	autocmd BufReadPost quickfix setlocal statusline+= │ %=%<%{exists('w:quickfix_title')?'\ '.w:quickfix_title:''}
 augroup END
 "}
-colorscheme slate
+"{ Theme
+set background="dark"
+colorscheme kuro
 "}
 "}
-"""""""""""""""""""""""""""" ManPages """""""""""""""""""""""""""{
+"""""""""""""""""""""""""""" Help """""""""""""""""""""""""""""""{
 let s:plugins["vim-man"] = "vim-utils"
 set keywordprg=:Man
-augroup VIMRC_manpages
+augroup VIMRC_FixHelp
 	autocmd!
-	autocmd FileType man  setlocal nolist
 	autocmd FileType help setlocal keywordprg=:help
 	" XXX set keyword for other programs if needed
 augroup END
@@ -337,6 +340,13 @@ set wildmenu
 set wildchar=<TAB>
 set wildignorecase
 set wildmode=list:longest
+"}
+"{ Mappings
+augroup VIMRC_mappings
+	autocmd!
+	autocmd FileType vim nnoremap <buffer> <silent> <leader>e :exe getline('.')<CR>
+	autocmd FileType vim vnoremap <buffer> <silent> <leader>e :<C-w>exe join(getline("'<","'>"), '<Bar>')<CR>
+augroup END
 "}
 "}
 PackAdd
