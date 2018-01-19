@@ -60,30 +60,30 @@ Rxvt.color0:        [50]#000000
 Rxvt.color8:        [50]#555555
 
 ! red dark/light
-Rxvt.color1:        [50]#FF8888
+Rxvt.color1:        [70]#FF8888
 Rxvt.color9:        [80]#FF8888
 
 ! green dark/light
-Rxvt.color2:        [50]#88FF88
+Rxvt.color2:        [70]#88FF88
 Rxvt.color10:       [80]#88FF88
 
 ! yellow dark/light
-Rxvt.color3:        [50]#FFFF88
+Rxvt.color3:        [70]#FFFF88
 Rxvt.color11:       [80]#FFFF88
 
 ! blue dark/light
-Rxvt.color4:        [50]#8888FF
+Rxvt.color4:        [70]#8888FF
 Rxvt.color12:       [80]#8888FF
 
 ! magenta dark/light
-Rxvt.color5:        [50]#FF88FF
+Rxvt.color5:        [70]#FF88FF
 Rxvt.color13:       [80]#FF88FF
 
 ! cyan dark/light
-Rxvt.color6:        [50]#88FFFF
+Rxvt.color6:        [70]#88FFFF
 Rxvt.color14:       [80]#88FFFF
 
 ! white dark/light
-Rxvt.color7:        #CCCCCC
+Rxvt.color7:        [70]#FFFFFF
 Rxvt.color15:       #FFFFFF
 !! vim:set filetype=xdefaults:

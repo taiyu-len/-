@@ -261,7 +261,8 @@ set fillchars=stl:=,stlnc:\ ,vert:│,fold:\ ,diff:\
 set errorbells
 set ruler
 set laststatus=2
-"{ Print column number aligned with margin numbers
+"{ Helperfunctions
+"{ Column
 function! VIMRC_ShowsSigns() abort
 	return 2 * (&signcolumn == "yes" || (&signcolumn != "no" && has_key(getbufinfo(bufname(''))[0], "signs")))
 endfunction
@@ -273,17 +274,24 @@ function! VIMRC_Column() abort
 	return repeat(" ", l:padding) . col('.')
 endfunction
 "}
+"{ Print string if non empty
+function VIMRC_status(fmt, str) abort
+	return empty(a:str) ? '' : printf(a:fmt, a:str)
+endfunction
+"}
+"}
+let s:plugins["vim-fugitive"] = "tpope"
 set statusline=
 set statusline+=%{VIMRC_Column()}
 " -filename if not modifable, +filename if modified,
 " !filename if modified but readonly
-set statusline+=\ │\ %{!&modifiable?'-':!&modified?'':&readonly?'!':'+'}%t
-set statusline+=\ │\ #%n
-set statusline+=\ │\ %{&filetype}
-set statusline+=\ │\ %=
-set statusline+=\ │\ %<%F
-set statusline+=\ │\ %{fugitive#head()}\  
-
+set statusline+= │ #%n
+set statusline+= │ %{!&modifiable?'-':!&modified?'':&readonly?'!':'+'}%t
+set statusline+=%{VIMRC_status(' │ %s',&filetype)}
+set statusline+= │ %=
+set statusline+= │ %<%F
+set statusline+=%{VIMRC_status(' │ %s',fugitive#head())}
+set statusline+= 
 "}
 "{ Theme
 " TODO theme
