@@ -127,6 +127,7 @@ then
 			read line && b=$(sed -n 's/^## \(.*\)\.\.\..*/\1/;T;p' <<< $line)
 			[ "$b" ] && while IFS= read line; do
 				[[ ! "${line:0:1}" =~ '[ ?!]' ]] && c=+
+				[[ "${line:0:1}" == 'A' ]] && ((++s[A]))
 				((++s[${line:1:1}]))
 			done
 		} < <(git status -bs --porcelain=v1 2>/dev/null)

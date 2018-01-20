@@ -1,0 +1,185 @@
+#!/usr/bin/env bash
+# TODO Rewrite to be more modular
+# TODO Save all metadata associated with it
+# TODO Better Options
+
+set -o errexit
+DEBUG="${DEBUG+t}"
+[ "$DEBUG" ] && set -x
+
+function pexit() {
+	{
+	printf "%s\n" "$@"
+	[ "$DEBUG" ] && printf "%s\n" "link=${link-unset}" "site=${site-unset}"
+	[ "$DEBUG" ] && printf "%s\n" "name=${name-unset}" "pages=${pages-unset}"
+	} >&2;
+	exit 1;
+}
+if [ "$#" -eq 0 ]
+then
+	pexit "usage: $(basename "$0") <urls>..."
+fi
+
+function process_urls() {
+while [ "$*" ]
+do
+	link="$1"
+	local wref="--referer=$link"
+	if
+		get_site &&
+		# download given url into fd 10
+		exec 10< <("${curl[@]}" -G "$1" || true) &&
+		# process the page from fd 10, setting required variables
+		# and prints urls to fd 11
+		process_$site
+	then
+		# setup directories
+		echo "Downloading $name from $site now. ${pages:-unknown} pages"
+		mkdir -p "${SAVEDIR-${SAVEDIR_PREFIX-/tmp}/$site/$name}"
+		cd       "${SAVEDIR-${SAVEDIR_PREFIX-/tmp}/$site/$name}"
+		local url
+		case ${rename_images[$site]} in
+		0 ) # Donot rename
+			{
+				# read a url first, breaking loop if there are truly no more
+				while IFS= read -u11 url
+				do
+					local urls=($url)
+					# read urls into array until we timeout or there are no more
+					while read -u11 -t .5 url; do urls+=($url); done
+					# download all urls
+					"${wget[@]}"  "$wref" "${urls[@]}" || true
+				done
+			} <&11
+		;;
+		1 ) # rename completely.
+			local i=1
+			while IFS= read -u11 url
+			do "${wget[@]}" "$wref" "$url" "-O$(printf "%03d" $i).jpg" && ((++i))
+			done
+		;;
+		2 ) # Rename with numbered prefix
+			local i=1
+			while IFS= read -u11 url
+			do "${wget[@]}" "$wref" "$url" "-O$(printf "%03d" $i)_$(basename $url)" && ((++i))
+			done
+		;;
+		esac
+		# read it
+		sxiv -r . &
+		# close fd
+		exec 11<&-
+	fi
+	exec 10<&-
+	# move onto the next
+	shift
+done
+}
+
+#{ default wget options
+wget=(wget)
+wget+=(--tries 0)
+wget+=(--timeout 60)
+wget+=(--continue)
+wget+=(--quiet)
+wget+=(--show-progress)
+wget+=(--progress=bar:force)
+#}
+#{ default curl options
+curl=(curl)
+curl+=(--retry 100)
+curl+=(--silent)
+#}
+function get_site() {
+	case "$link" in
+	( *gameofscanlation.moe/*  ) site=gos_moe     ;;
+	( *readms.net/*            ) site=mangastream ;;
+	( *mngcow.co/*             ) site=mangacow    ;;
+	( *webtoons.com/*          ) site=webtoons    ;;
+	( *otscans.com/foolslide/* ) site=foolslide   ;;
+	( *imgur.com/a/*           ) site=imgur       ;;
+	( *imgur.com/*             ) site=imgursolo   ;;
+	( *                        ) pexit "unknown url" ;;
+	esac
+}
+#{ Processing data
+# uses name between <title> and some extra parsing
+declare -A name_regex
+name_regex[gos_moe]="(.*)\ \|"
+name_regex[mangacow]="(.* - Chapter [^-]*) -"
+name_regex[webtoons]="(.*)<\/title>"
+name_regex[mangastream]="(.*)\ -"
+name_regex[foolslide]="(.*::.*) :: "
+
+# if 1, urls are printed along with a filename to use.
+declare -A rename_images
+rename_images[gos_moe]=1
+rename_images[mangacow]=0
+rename_images[webtoons]=1
+rename_images[mangastream]=0
+rename_images[foolslide]=0
+# TODO save related metadata.
+rename_images[imgur]=2
+rename_images[imgursolo]=0
+#}
+#{ Process helper function
+# extract title from fd 10
+function process_title() {
+	name=$(sed -nr -e "/<title>/{s/.*<title>${name_regex[$site]}.*/\1/;T;p;q}" <&10)
+	[ "$name" ] || pexit "unable to get name from url"
+}
+
+# prints arguments to fd 11, sets $pages
+function urls_from_args() {
+	local urls=("$@")
+	pages=${#urls[@]}
+	[ $pages -gt 0 ] || pexit "unable to parse image urls from url"
+	exec 11< <(printf "%s\n" "${urls[@]}")
+}
+
+# downloads pages and prints extracted urls to fd 11
+function urls_generate() {
+	exec 11< <(
+		for (( i=0; i <= $pages; ++i ))
+		do "${curl[@]}" -G "$1/$i" | sed -nr "$2"
+		done
+	)
+}
+#}
+#{ Processing function
+function process_gos_moe() {
+	process_title || return 1
+	urls_from_args $(sed -nr "/alt=\"$name/{s/.*src=\"([^\"]*)\".*/\1/;p}" <&10 )
+}
+function process_webtoons() {
+	process_title || return 1
+	urls_from_args $(sed -nr '/class="_images"/{s/.*data-url="([^"]*)".*/\1/;p}' <&10)
+}
+function process_mangacow() {
+	process_title || return 1
+	urls_from_args $(tr ';' '\n' <&10 | sed -nr '/arr_img.push/{s/.*"([^"]*)".*/\1/;p}')
+}
+function process_mangastream() {
+	process_title || return 1
+	pages=$(sed -nr '/a href.*Last Page/{s|.*/([0-9]*)">Last Page.*|\1|;p;q}' <&10)
+	urls_generate "$(dirname "$link")" '/id="manga-page"/{s/.*src="([^"]*)".*/http:\1/;p;q}'
+}
+function process_foolslide() {
+	process_title || return 1
+	pages=$(sed -nr "/tbtitle dropdown_parent dropdown_right/{s/.*>([0-9]*) .*/\1/;p;q}" <&10)
+	urls_generate "$link/page/$i" '\,content/comics/,{s/.*src="([^"]*)".*/\1/;p;q}'
+}
+function process_imgur() {
+	name=$(basename $link)
+	# find line in album which contains all the metadata.
+	urls_from_args $(perl -ne 'if (/item:/) { s/^.*"images"://; print "https://i.imgur.com/$1$2\n" while s|"hash":"([^"]*)".*?"ext":"([^"]*)"||; last }' <&10)
+}
+function process_imgursolo() {
+	name=$(basename $link)
+	# find line in album which contains all the metadata.
+	urls_from_args $(perl -ne 'if (/item:/) { print "https://i.imgur.com/$1$2\n" if s|"hash":"([^"]*)".*?"ext":"([^"]*)"||; last }' <&10)
+}
+#}
+
+process_urls "$@"
+# vim: foldmethod=marker foldmarker={,}
