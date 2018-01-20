@@ -2,6 +2,7 @@
 highlight Normal               NONE ctermfg=7 cterm=bold
 highlight Bold                 NONE           cterm=bold
 highlight!link ErrorMsg        Error
+highlight SpecialKey           NONE ctermfg=0 cterm=bold
 "}
 "{ Columns
 highlight ColorColumn          NONE ctermbg=0
@@ -48,7 +49,6 @@ highlight Include              NONE ctermfg=3 cterm=bold
 highlight Type                 NONE ctermfg=1
 highlight! link Structure      Type
 highlight Special              NONE ctermfg=6 cterm=bold
-highlight SpecialKey           NONE ctermfg=6
 highlight Underlined           NONE           cterm=underline
 highlight! link Ignore         Normal
 highlight Error                NONE ctermfg=7 ctermbg=1 cterm=bold

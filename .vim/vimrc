@@ -35,6 +35,7 @@ set viewdir=~/.vim/view
 set viminfofile=~/.vim/viminfo
 "}
 "{ Session
+set hidden
 let s:plugins["vim-obsession"] = "tpope"
 let s:plugins["vim-prosession"] = "dhruvasagar"
 "}
