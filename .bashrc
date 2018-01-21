@@ -117,7 +117,8 @@ unset ign_cmds
 #{ Prompt
 if is zsh #{
 then
-	ZLE_RPROMPT_INDENT=0
+	[[ $TERM =~ (screen|rxvt) ]]
+	ZLE_RPROMPT_INDENT=$?
 	setopt PROMPT_SUBST
 	function my_git_status() { #{
 		local b c s # branch_name, has changes to be commited, status of uncommited files
@@ -135,7 +136,7 @@ then
 		printf "%s" "${b:+│ $c$b ${s[M]:+$B$s[M] }${s[A]:+$G$s[A] }${s[D]:+$R$s[D] }}"
 	} #}
 	PS_PREFIX='%B%K{black}%F{white}' PS_SUFFIX='%f%k%b'
-	PS1="$PS_PREFIX%(1j.%j.)│$PS_SUFFIX $PS1_SUFFIX"
+	PS1="$PS_PREFIX%(1j.%j.)│$PS_SUFFIX "
 	RPS1="$PS_PREFIX"' %~ $(my_git_status)'"$PS_SUFFIX"
 	[[ "$TERM" == "linux" ]] && PS1+=' '
 	#}
