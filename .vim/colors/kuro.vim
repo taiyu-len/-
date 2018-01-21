@@ -23,7 +23,7 @@ highlight!link Folded          Comment
 highlight DiffAdd              NONE ctermfg=0 ctermbg=2 cterm=underline,bold
 highlight DiffChange           NONE                     cterm=underline
 highlight DiffText             NONE ctermfg=0 ctermbg=4 cterm=underline,bold
-highlight DiffDelete           NONE ctermfg=0 ctermbg=1
+highlight DiffDelete           NONE ctermfg=7 ctermbg=1 cterm=bold
 "}
 "{ Borders
 highlight KR_Border            NONE ctermfg=4 ctermbg=0 cterm=bold
@@ -54,5 +54,9 @@ highlight!link Ignore          Normal
 highlight Error                NONE ctermfg=7 ctermbg=1 cterm=bold
 highlight Todo                 NONE ctermfg=0 ctermbg=6
 "}
+"{ Git Diff
+highlight!link DiffRemoved DiffDelete
+highlight!link DiffAdded   DiffAdd
+""}
 " vim: foldmarker=\"{,\"}: foldlevel=0: foldmethod=marker
 
