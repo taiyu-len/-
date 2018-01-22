@@ -139,6 +139,8 @@ then
 	PS1="$PS_PREFIX%(1j.%j.)│$PS_SUFFIX "
 	RPS1="$PS_PREFIX"' %~ $(my_git_status)'"$PS_SUFFIX"
 	[[ "$TERM" == "linux" ]] && PS1+=' '
+	PS2="$PS_PREFIX"%_" │$PS_SUFFIX "
+	PS3="$PS_PREFIX"?#" │$PS_SUFFIX "
 	#}
 elif is bash #{
 then PS1='\w \$ '

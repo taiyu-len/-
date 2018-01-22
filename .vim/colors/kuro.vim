@@ -4,15 +4,6 @@ highlight Bold                 NONE           cterm=bold
 highlight!link ErrorMsg        Error
 highlight SpecialKey           NONE ctermfg=6
 "}
-"{ Columns
-highlight ColorColumn          NONE ctermbg=0
-highlight!link CursorColumn    ColorColumn
-highlight!link CursorLine      ColorColumn
-highlight FoldColumn           NONE ctermbg=0 ctermfg=6
-highlight SignColumn           NONE ctermbg=0
-highlight LineNr               NONE ctermfg=6
-highlight CursorLineNr         NONE ctermbg=0 ctermfg=6 cterm=bold
-"}
 "{ Visual
 highlight Visual               NONE ctermbg=0 cterm=underline,bold
 "}
@@ -24,6 +15,15 @@ highlight DiffAdd              NONE ctermfg=0 ctermbg=2 cterm=underline,bold
 highlight DiffChange           NONE                     cterm=underline
 highlight DiffText             NONE ctermfg=0 ctermbg=4 cterm=underline,bold
 highlight DiffDelete           NONE ctermfg=7 ctermbg=1 cterm=bold
+"}
+"{ Columns
+highlight ColorColumn          NONE ctermbg=0
+highlight!link CursorColumn    ColorColumn
+highlight!link CursorLine      ColorColumn
+highlight FoldColumn           NONE ctermbg=0 ctermfg=6
+highlight SignColumn           NONE ctermbg=0
+highlight LineNr               NONE ctermfg=6
+highlight CursorLineNr         NONE ctermbg=0 ctermfg=6 cterm=bold
 "}
 "{ Borders
 highlight KR_Border            NONE ctermfg=4 ctermbg=0 cterm=bold
@@ -59,4 +59,3 @@ highlight!link DiffRemoved DiffDelete
 highlight!link DiffAdded   DiffAdd
 ""}
 " vim: foldmarker=\"{,\"}: foldlevel=0: foldmethod=marker
-

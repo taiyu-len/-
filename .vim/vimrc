@@ -148,6 +148,7 @@ imap  <C-O>
 "}
 "{ Formatting
 set autoindent
+set cinoptions=
 set cinoptions+=Ls " placement of labels will be shifted one over.
 set cinoptions+=:0 " indent of case: inside switch
 set cinoptions+=l1 " case{\n.body.} no alignment inside body. just indent
@@ -160,6 +161,12 @@ set cinoptions+=(0,u0,U1 " for Proper alignment
 set cinoptions+=Ws "
 set cinoptions+=ks
 set cinoptions+=m1 " parenthesis acts like brace
+
+set formatoptions=ro " Insert comment leader after newline
+set formatoptions+=j " Remove comment leader when joining lines
+set formatoptions+=q " Format comments when using gq
+set formatoptions+=w " Soft line break
+set formatoptions+=l " donot break existing long lines
 set formatoptions+=nj
 "}
 "{ Operators
@@ -216,7 +223,7 @@ let s:plugins["vim-unimpaired"] = "tpope"
 "{ Text
 set showmatch " show matching pair under cursor
 set list
-set listchars=tab:│•,trail:•,nbsp:•,conceal:δ,precedes:←,extends:→
+set listchars=eol:$,tab:│•,trail:•,extends:→,precedes:←,conceal:δ,nbsp:•
 augroup VIMRC_FixText "{
 	autocmd!
 	autocmd FileType man setlocal nolist
@@ -225,7 +232,6 @@ augroup END "}
 "{ Columns
 set number         " Show current line number
 set relativenumber " and relative number for rest of lines
-set textwidth=80
 set colorcolumn=+1
 augroup VIMRC_FixColumn "{
 	autocmd!
@@ -346,8 +352,17 @@ set wildmode=list:longest
 augroup VIMRC_mappings
 	autocmd!
 	autocmd FileType vim nnoremap <buffer> <silent> <leader>e :exe getline('.')<CR>
-	autocmd FileType vim vnoremap <buffer> <silent> <leader>e :<C-w>exe join(getline("'<","'>"), '<Bar>')<CR>
+	" Doesnt work for functions definitions, but handles commented lines well
+	autocmd FileType vim vnoremap <buffer> <silent> <leader>e :<c-u>call VIMRC_exe_range()<CR>
 augroup END
+"{ Helper functions
+function! VIMRC_exe_range() abort
+	for line in getline("'<", "'>")
+		exe line
+	endfor
+endfunction
+"}
+
 "}
 "}
 PackAdd
