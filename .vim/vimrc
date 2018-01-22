@@ -226,7 +226,7 @@ set list
 set listchars=eol:$,tab:│•,trail:•,extends:→,precedes:←,conceal:δ,nbsp:•
 augroup VIMRC_FixText "{
 	autocmd!
-	autocmd FileType man setlocal nolist
+	autocmd FileType man,netrw setlocal nolist
 augroup END "}
 "}
 "{ Columns
@@ -241,11 +241,39 @@ augroup END "}
 "}
 "{ Folding
 "{ fancy fold function
+"{ Expand tabs in a line
+" because netrw help uses tabs
+function! VIMRC_expand(line, tab) abort
+	let l:line = a:line
+	let l:newline = ''
+	while strlen(l:line) > 0
+		if l:line[0] == "\t"
+			let l:newline .= strcharpart(a:tab, 0, &tabstop - (strdisplaywidth(l:newline) % &tabstop))
+			let l:line = strpart(l:line, 1)
+			while l:line[0] == "\t"
+				let l:newline .= a:tab
+				let l:line = strpart(l:line, 1)
+			endwhile
+		else
+			let l:tabidx = stridx(l:line, "\t", 1)
+			if l:tabidx > 0
+				let l:newline .= strpart(l:line, 0, l:tabidx)
+				let l:line = strpart(l:line, l:tabidx)
+			else | return l:newline . l:line
+			endif
+		endif
+	endwhile
+	return l:newline
+endfunction
+"}
 function! VIMRC_fold_function() abort
-	let l:tabidx = stridx(&listchars, "tab:")
-	let l:tabs = l:tabidx == -1 ? " " : strcharpart(&listchars[l:tabidx+4:], 0, 1)
-	let l:tabe = l:tabidx == -1 ? " " : strcharpart(&listchars[l:tabidx+4:], 1, 1)
-	let l:tab = l:tabs . repeat(l:tabe, &tabstop-1)
+	if &list
+		let l:tabidx = stridx(&listchars, "tab:")
+		let l:tabs = l:tabidx == -1 ? " " : strcharpart(&listchars[l:tabidx+4:], 0, 1)
+		let l:tabe = l:tabidx == -1 ? " " : strcharpart(&listchars[l:tabidx+4:], 1, 1)
+		let l:tab = l:tabs . repeat(l:tabe, &tabstop-1)
+	else | let l:tab = repeat(" ", &tabstop)
+	endif
 	let l:end = ''
 	if (&foldmethod ==? "marker")
 		let l:end = split(&foldmarker, ',')[1]
@@ -255,10 +283,14 @@ function! VIMRC_fold_function() abort
 	let l:lines = printf("│ %*d", len(line('$')), v:foldend - v:foldstart)
 	let l:width = max([40, &textwidth, g:vimrc_foldwidth])
 	let l:strlen = l:width - strdisplaywidth("..." . l:end)
-	let l:foldstr = printf("%.*S...%s", l:strlen, substitute(getline(v:foldstart), '\t', l:tab, 'g'), l:end)
+	if exists('g:vimrc_foldexpand') && g:vimrc_foldexpand > 0
+		let l:foldstr = printf("%.*S...%s", l:strlen, VIMRC_expand(getline(v:foldstart), l:tab), l:end)
+	else | let l:foldstr = printf("%.*S...%s", l:strlen, substitute(getline(v:foldstart), '\t', l:tab, 'g'), l:end)
+	endif
 	return printf("%-*S%s", l:width, l:foldstr, l:lines)
 endfunction "}
 let g:vimrc_foldwidth=80
+" let g:vimrc_foldexpand
 set foldtext=VIMRC_fold_function()
 set foldmarker={,}
 set foldmethod=syntax
@@ -312,12 +344,12 @@ set statusline+= │ %{VIMRC_Modified()}%t
 set statusline+=%{PrintIf(' │ %s',&filetype)}
 set statusline+= │ %=
 set statusline+= │ %<%F
-set statusline+=%{PrintIf(' │ %s',fugitive#head())}
-set statusline+= 
+set statusline+=%{PrintIf(' │ %s',fugitive#head())} 
 augroup VIMRC_FixStatus
 	autocmd!
-	autocmd BufReadPost quickfix setlocal statusline=%{VIMRC_Column()} │ %{&filetype}
-	autocmd BufReadPost quickfix setlocal statusline+= │ %=%<%{exists('w:quickfix_title')?'\ '.w:quickfix_title:''}
+	autocmd BufReadPost quickfix setlocal statusline= %{&filetype} │ %=%<
+	autocmd BufReadPost quickfix setlocal statusline+=%{exists('w:quickfix_title')?'\ '.w:quickfix_title:''}
+	autocmd BufReadPost netrw setlocal statusline= netrw │ %F %=%{PrintIf(' │ %s ',fugitive#head())}
 augroup END
 "}
 "{ Theme
@@ -340,6 +372,14 @@ augroup VIMRC_fugitive
 	autocmd!
 	autocmd BufReadPost fugitive://* set bufhidden=delete
 augroup END
+"}
+"""""""""""""""""""""""""""" Netrw """"""""""""""""""""""""""""""{
+let s:plugins["vim-vinegar"] = "tpope"
+let g:netrw_http_cmd = "curl"
+let g:netrw_liststyle = 4
+let g:netrw_hide = 1
+let g:netrw_list_hide = "\\~$"
+let g:netrw_sizestyle = "h"
 "}
 """""""""""""""""""""""""""" Command """"""""""""""""""""""""""""{
 "{ Wild menu

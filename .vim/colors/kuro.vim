@@ -2,7 +2,8 @@
 highlight Normal               NONE ctermfg=7 cterm=bold
 highlight Bold                 NONE           cterm=bold
 highlight!link ErrorMsg        Error
-highlight SpecialKey           NONE ctermfg=6
+highlight SpecialKey           NONE ctermfg=3
+highlight NonText              NONE ctermfg=3 cterm=bold
 "}
 "{ Visual
 highlight Visual               NONE ctermbg=0 cterm=underline,bold
@@ -27,7 +28,7 @@ highlight CursorLineNr         NONE ctermbg=0 ctermfg=6 cterm=bold
 "}
 "{ Borders
 highlight KR_Border            NONE ctermfg=4 ctermbg=0 cterm=bold
-highlight KR_BorderNC          NONE ctermfg=7 ctermbg=0 cterm=NONE
+highlight KR_BorderNC          NONE ctermfg=4 ctermbg=0
 highlight!link StatusLine      KR_Border
 highlight!link StatusLineNC    KR_BorderNC
 highlight!link VertSplit       KR_BorderNC

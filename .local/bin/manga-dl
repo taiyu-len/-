@@ -4,20 +4,36 @@
 # TODO Better Options
 
 set -o errexit
-DEBUG="${DEBUG+t}"
-[ "$DEBUG" ] && set -x
-
+set -o nounset
 function pexit() {
 	{
 	printf '%s\n' "$@"
-	[ "$DEBUG" ] && printf '%s\n' "link=${link-unset}" "site=${site-unset}"
-	[ "$DEBUG" ] && printf '%s\n' "name=${name-unset}" "pages=${pages-unset}"
+	[ "$debug" ] && printf '%s\n' "link=${link-unset}" "site=${site-unset}"
+	[ "$debug" ] && printf '%s\n' "name=${name-unset}" "pages=${pages-unset}"
 	} >&2;
 	exit 1;
 }
+function show_help() {
+	printf "%s\n" "usage: $(basename "$0") -h[elp]] -q[uiet] -d[ebug] <urls>..."
+}
+
+while getopts ":dqh" opt
+do
+	case "$opt" in
+	q) quiet=true;;
+	d) debug=true;;
+	h) show_help;;
+	*) echo "Discarding unknown option: $opt";;
+	esac
+done
+shift $[$OPTIND - 1]
+: ${debug=}
+: ${quiet=}
+
+[ "$debug" ] && set -x
+
 if [ "$#" -eq 0 ]
-then
-	pexit "usage: $(basename "$0") <urls>..."
+then show_help; exit 1
 fi
 
 function process_urls() {
@@ -34,7 +50,7 @@ do
 		"process_$site"
 	then
 		# setup directories
-		echo "Downloading $name from $site now. ${pages:-unknown} pages"
+		[ ! "$quiet" ] && echo "Downloading $name from $site now. ${pages:-unknown} pages"
 		mkdir -p "${SAVEDIR-${SAVEDIR_PREFIX-/tmp}/$site/$name}"
 		cd       "${SAVEDIR-${SAVEDIR_PREFIX-/tmp}/$site/$name}"
 		local url
@@ -82,8 +98,8 @@ wget+=(--tries 0)
 wget+=(--timeout 60)
 wget+=(--continue)
 wget+=(--quiet)
-wget+=(--show-progress)
-wget+=('--progress=bar:force')
+[ ! "$quiet" ] && wget+=(--show-progress)
+[ ! "$quiet" ] && wget+=('--progress=bar:force')
 #}
 #{ default curl options
 curl=(curl)
