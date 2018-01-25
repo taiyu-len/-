@@ -4,6 +4,8 @@ export PATH="$HOME/.local/bin":"$PATH"
 export EDITOR=vim
 export BROWSER=w3m
 export TERMINAL=start-urxvtc
+export MAIL="$HOME/.mail"
+export MAILCHECK=$[60*15]
 #}
 #{ Files
 export ZSHRC="$HOME/.zshrc"

@@ -20,18 +20,13 @@ command! -bang PackAdd for name in keys(s:plugins) | execute "packadd<bang> " . 
 "}
 "{ Files And Paths
 " Where vim puts things
-set exrc   " run .exrc files
-set secure " safely
-set backup
-set backupdir=.
+set secure
+set backup   backupdir=.
 let &backupskip = escape(expand('$HOME'), '\') . '/.local/bin/*'
+set undofile undodir=~/.vim/undo
 set backupskip+=/tmp/*
-set undofile
-set undodir=~/.vim/undo
-set swapfile
 set directory=~/.vim/swap//
 set path=.,/usr/include,,include;,
-set viewdir=~/.vim/view
 set viminfofile=~/.vim/viminfo
 "}
 "{ Session
@@ -42,14 +37,10 @@ let s:plugins["vim-prosession"] = "dhruvasagar"
 "}
 """""""""""""""""""""""""""" Editing """"""""""""""""""""""""""""{
 " config for input, operators, etc. no fancy Mappings
-"{ Mouse
 set mouse= " mouse has annoying behavior so disabling for now
-"}
-"{ Leader Keys
 let mapleader = " "
 let localmapleader = ","
-"}
-"{ Arrow keys
+"{ Setup Arrow keys for different terminals
 if &term == 'screen-256color'
 	map  [1;2A <S-Up>
 	map  [1;2B <S-Down>
@@ -105,14 +96,7 @@ elseif &term == 'rxvt-unicode-256color'
 	map! [3^ <C-delete>
 endif
 "}
-"{ Tabs
 set shiftwidth=0 " make <Tab> inserts tab.
-"}
-"{ Auto pairs
-let s:plugins["delimitMate"] = "Raimondi"
-let delimitMate_expand_cr = 1
-let delimitMate_expand_space = 1
-"}
 "{ basic mappings
 "{ remap backspace/delete keys
 map  <BS>       X
@@ -139,8 +123,11 @@ vmap <S-Down>  <Down>
 vmap <S-Right> <Right>
 vmap <S-Left>  <Left>
 "}
-"{ Give Y better behavior
 map Y y$
+"{ Auto Pairing pairs
+let s:plugins["delimitMate"] = "Raimondi"
+let delimitMate_expand_cr = 1
+let delimitMate_expand_space = 1
 "}
 "{ Suspend in insert mode
 imap  <C-O>
@@ -168,6 +155,8 @@ set formatoptions+=q " Format comments when using gq
 set formatoptions+=w " Soft line break
 set formatoptions+=l " donot break existing long lines
 set formatoptions+=nj
+
+set textwidth=80
 "}
 "{ Operators
 set tildeop
@@ -185,10 +174,8 @@ set backspace=indent,eol,start " enable backspace
 set virtualedit=onemore,block  " allow cursor one past the line, and anywhere in block mode
 "}
 "{ Search
-set ignorecase  " ignore case by default
-set smartcase   " unless there are upper case characters searched
-set incsearch
-set wrapscan
+set ignorecase smartcase
+set incsearch wrapscan
 set magic
 " Only show highlight
 augroup VIMRC_incsearch_highlight
@@ -232,12 +219,7 @@ augroup END "}
 "{ Columns
 set number         " Show current line number
 set relativenumber " and relative number for rest of lines
-set colorcolumn=+1
-augroup VIMRC_FixColumn "{
-	autocmd!
-	autocmd FileType help,man setlocal colorcolumn=
-	autocmd BufReadPost quickfix setlocal colorcolumn=
-augroup END "}
+set colorcolumn=+0
 "}
 "{ Folding
 "{ fancy fold function
@@ -281,7 +263,7 @@ function! VIMRC_fold_function() abort
 		let l:end = substitute(getline(v:foldend), '^\s*\([])}]\|\w\+\).*$', '\1', '')
 	endif
 	let l:lines = printf("│ %*d", len(line('$')), v:foldend - v:foldstart)
-	let l:width = max([40, &textwidth, g:vimrc_foldwidth])
+	let l:width = max([60, &textwidth]) - 1
 	let l:strlen = l:width - strdisplaywidth("..." . l:end)
 	if exists('g:vimrc_foldexpand') && g:vimrc_foldexpand > 0
 		let l:foldstr = printf("%.*S...%s", l:strlen, VIMRC_expand(getline(v:foldstart), l:tab), l:end)
@@ -289,7 +271,6 @@ function! VIMRC_fold_function() abort
 	endif
 	return printf("%-*S%s", l:width, l:foldstr, l:lines)
 endfunction "}
-let g:vimrc_foldwidth=80
 " let g:vimrc_foldexpand
 set foldtext=VIMRC_fold_function()
 set foldmarker={,}
@@ -303,8 +284,7 @@ set conceallevel=2
 set concealcursor=
 "}
 "{ Window
-set winminheight=0
-set winminwidth=0
+set winminheight=0 winminwidth=0
 set fillchars=stl:^,stlnc:-,vert:│,fold:\ ,diff:-
 "}
 "{ Status
@@ -389,6 +369,7 @@ set wildignorecase
 set wildmode=list:longest
 "}
 "{ Mappings
+cnoremap <C-Backspace> <C-w>
 augroup VIMRC_mappings
 	autocmd!
 	autocmd FileType vim nnoremap <buffer> <silent> <leader>e :exe getline('.')<CR>
