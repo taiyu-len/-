@@ -58,10 +58,10 @@
 #}
 #{ shell test
 if  [[ "$0" =~ zsh || "$(basename "$0")" = .zshrc ]]  && [ "$ZSH_NAME" ]
-then function is() { [ $1 = zsh  ] && { shift; "$@"; }; }
+then is() { [ $1 = zsh  ] && { shift; "$@"; }; }
 elif [[ "$0" =~ bash || "$(basename "$0")" = .bashrc ]] && [ "$BASH" ]
-then function is() { [ $1 = bash ] && { shift; "$@"; }; }
-else function is() { false; }
+then is() { [ $1 = bash ] && { shift; "$@"; }; }
+else is() { false; }
 fi
 #}
 #{ Options
@@ -120,7 +120,7 @@ then
 	[[ $TERM =~ (screen|rxvt) ]]
 	ZLE_RPROMPT_INDENT=$?
 	setopt PROMPT_SUBST
-	function my_git_status() { #{
+	my_git_status() { #{
 		local b c s # branch_name, has changes to be commited, status of uncommited files
 		typeset -A s
 		{
@@ -223,7 +223,7 @@ if is zsh
 then
 	#{ Map Ctrl-Z to call fg
 	# via http://git.grml.org/?p=grml-etc-core.git;a=blob_plain;f=etc/zsh/zshrc;hb=HEAD
-	function grml-zsh-fg() {
+	grml-zsh-fg() {
 		if (( ${#jobstates} )); then
 			zle .push-input
 			[[ -o hist_ignore_space ]] && BUFFER=' ' || BUFFER=''
@@ -241,7 +241,7 @@ then
 	zle -N bracketed-paste bracketed-paste-url-magic
 	#}
 	#{ .... => ../../..
-	function rationalise-dot {
+	rationalise-dot() {
 		if [[ $LBUFFER = *.. ]]
 		then LBUFFER+=/..
 		else LBUFFER+=.
@@ -253,7 +253,7 @@ then
 	#{ Fix special characters
 	typeset -A key
 	autoload zkbd
-	function zkbd_file {
+	zkbd_file() {
 		[[ -f ~/.zkbd/${TERM}-${VENDOR}-${OSTYPE} ]] && printf '%s' ~/".zkbd/${TERM}-${VENDOR}-${OSTYPE}" && return 0
 		[[ -f ~/.zkbd/${TERM}-${DISPLAY}          ]] && printf '%s' ~/".zkbd/${TERM}-${DISPLAY}"          && return 0
 		return 1
@@ -371,7 +371,7 @@ fi #}
 #}
 #{ Functions
 #{ Timew tracking function
-function track() {
+track() {
 	local tags=()
 	while [[ "$1" = @* ]]
 	do tags+=("${1/@/}"); shift
@@ -385,24 +385,24 @@ function track() {
 }
 #}
 #{ Tmux
-function tat() { tmux new-session -As "${@:-$(basename $PWD)}"; }
-function tdt() { tmux detach; }
-function tsplit() { tmux split-window "$@"; }
+tat() { tmux new-session -As "${@:-$(basename $PWD)}"; }
+tdt() { tmux detach; }
+tsplit() { tmux split-window "$@"; }
 #}
 #{ neat curl things
-function wttr {
+wttr() {
 	curl "wttr.in/$*"
 }
-function cheat.sh {
+cheat.sh() {
 	curl "cheat.sh/$*"
 }
 #}
 
-function hless() {
+hless() {
 	highlight -Oansi "$@" | less -R
 }
 
-function lensay() {
+lensay() {
 	local ponycmd=()
 	if [[ "$TERM" =~ 256color ]]
 	then ponycmd+=(ponythink --bubble=think --file="$HOME/.local/share/catsay/len.cat")
@@ -412,14 +412,14 @@ function lensay() {
 	"${ponycmd[@]}" "$@"
 }
 
-function mkcd() {
-	mkdir -p "$*"; cd "$*" || exit
+mkcd() {
+	mkdir -p "$*" && cd "$_"
 }
 is zsh compdef mkcd=mkdir
 
 # fuzzy cd lookup
 hash fzf 2>/dev/null &&
-	function fzcd() {
+	fzcd() {
 		local dir
 		dir=$(find "${1:-.}" -path '*/\.*' -prune \
 			-o -type d -print 2> /dev/null | fzf +m) &&
@@ -427,7 +427,7 @@ hash fzf 2>/dev/null &&
 	} &&
 	is zsh compdef fzcd=cd
 
-function tmpcd() {
+tmpcd() {
 	cd $(mktemp -d)
 }
 if is zsh

@@ -5,7 +5,7 @@
 
 set -o errexit
 set -o nounset
-function pexit() {
+pexit() {
 	{
 	printf '%s\n' "$@"
 	[ "$debug" ] && printf '%s\n' "link=${link-unset}" "site=${site-unset}"
@@ -13,7 +13,7 @@ function pexit() {
 	} >&2;
 	exit 1;
 }
-function show_help() {
+show_help() {
 	printf "%s\n" "usage: $(basename "$0") -h[elp]] -q[uiet] -d[ebug] <urls>..."
 }
 
@@ -36,10 +36,9 @@ if [ "$#" -eq 0 ]
 then show_help; exit 1
 fi
 
-function process_urls() {
-while [ "$*" ]
+process_urls() {
+for link
 do
-	link="$1"
 	local wref="--referer=$link"
 	if
 		get_site &&
@@ -106,7 +105,7 @@ curl=(curl)
 curl+=(--retry 100)
 curl+=(--silent)
 #}
-function get_site() {
+get_site() {
 	case "$link" in
 	( *gameofscanlation.moe/*  ) site=gos_moe     ;;
 	( *readms.net/*            ) site=mangastream ;;
@@ -140,13 +139,13 @@ rename_images[imgursolo]=0
 #}
 #{ Process helper function
 # extract title from fd 10
-function process_title() {
+process_title() {
 	name=$(sed -nr -e "/<title>/{s/.*<title>${name_regex[$site]}.*/\\1/;T;p;q}" <&10)
 	[ "$name" ] || pexit "unable to get name from url"
 }
 
 # prints arguments to fd 11, sets $pages
-function urls_from_args() {
+urls_from_args() {
 	local urls=("$@")
 	pages=${#urls[@]}
 	[ "$pages" -gt 0 ] || pexit "unable to parse image urls from url"
@@ -154,7 +153,7 @@ function urls_from_args() {
 }
 
 # downloads pages and prints extracted urls to fd 11
-function urls_generate() {
+urls_generate() {
 	exec 11< <(
 		for (( i=0; i <= "$pages"; ++i ))
 		do "${curl[@]}" -G "$1/$i" | sed -nr "$2"
@@ -163,38 +162,38 @@ function urls_generate() {
 }
 #}
 #{ Processing function
-function process_gos_moe() {
+process_gos_moe() {
 	process_title || return 1
 	mapfile -t args < <(sed -nr "/alt=\"$name/{s/.*src=\"([^\"]*)\".*/\\1/;p}" <&10 )
 	urls_from_args "${args[@]}"
 }
-function process_webtoons() {
+process_webtoons() {
 	process_title || return 1
 	mapfile -t args < <(sed -nr '/class="_images"/{s/.*data-url="([^"]*)".*/\1/;p}' <&10)
 	urls_from_args "${args[@]}"
 }
-function process_mangacow() {
+process_mangacow() {
 	process_title || return 1
 	mapfile -t args < <(tr ';' '\n' <&10 | sed -nr '/arr_img.push/{s/.*"([^"]*)".*/\1/;p}')
 	urls_from_args "${args[@]}"
 }
-function process_mangastream() {
+process_mangastream() {
 	process_title || return 1
 	pages=$(sed -nr '/a href.*Last Page/{s|.*/([0-9]*)">Last Page.*|\1|;p;q}' <&10)
 	urls_generate "$(dirname "$link")" '/id="manga-page"/{s/.*src="([^"]*)".*/http:\1/;p;q}'
 }
-function process_foolslide() {
+process_foolslide() {
 	process_title || return 1
 	pages=$(sed -nr "/tbtitle dropdown_parent dropdown_right/{s/.*>([0-9]*) .*/\\1/;p;q}" <&10)
 	urls_generate "$link/page/$i" '\,content/comics/,{s/.*src="([^"]*)".*/\1/;p;q}'
 }
-function process_imgur() {
+process_imgur() {
 	name=$(basename "$link")
 	# find line in album which contains all the metadata.
 	mapfile -t args < <(perl -ne 'if (/item:/) { s/^.*"images"://; print "https://i.imgur.com/$1$2\n" while s|"hash":"([^"]*)".*?"ext":"([^"]*)"||; last }' <&10)
 	urls_from_args "${args[@]}"
 }
-function process_imgursolo() {
+process_imgursolo() {
 	name=$(basename "$link")
 	# find line in album which contains all the metadata.
 	mapfile -t args < <(perl -ne 'if (/item:/) { print "https://i.imgur.com/$1$2\n" if s|"hash":"([^"]*)".*?"ext":"([^"]*)"||; last }' <&10)
