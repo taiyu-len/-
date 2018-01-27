@@ -2,8 +2,8 @@
 highlight Normal               NONE ctermfg=7 cterm=bold
 highlight Bold                 NONE           cterm=bold
 highlight!link ErrorMsg        Error
-highlight SpecialKey           NONE ctermfg=3
-highlight NonText              NONE ctermfg=3 cterm=bold
+highlight!link SpecialKey      Comment
+highlight!link NonText         Comment
 "}
 "{ Visual
 highlight Visual               NONE ctermbg=0 cterm=underline,bold
@@ -37,7 +37,7 @@ highlight!link TabLine         KR_BorderNC
 highlight!link TabLineFill     KR_BorderNC
 "}
 "{ Syntax
-highlight Comment              NONE ctermfg=3
+highlight Comment              NONE ctermfg=8 cterm=bold
 highlight Constant             NONE ctermfg=2 cterm=bold
 highlight String               NONE ctermfg=2
 highlight Identifier           NONE ctermfg=2

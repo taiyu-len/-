@@ -57,7 +57,7 @@ Rxvt.foreground:        #FFFFFF
 
 ! black dark/light
 Rxvt.color0:        [50]#000000
-Rxvt.color8:        [50]#555555
+Rxvt.color8:        [70]#888888
 
 ! red dark/light
 Rxvt.color1:        [70]#FF8888

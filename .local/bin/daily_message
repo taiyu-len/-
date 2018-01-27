@@ -14,7 +14,7 @@ then cols="$[$(tput cols)+_]"
 else cols="$_"
 fi
 
-function greetmsg() {
+greetmsg() {
 	local greeting="${greeting[$RANDOM % ${#greeting[@]}]}"
 	local dots=$(printf "%.s." $(seq $cols))
 	# Select greeting at random
@@ -36,7 +36,7 @@ th="horoscope"
 tl="luckyitem"
 tm="message"
 
-function center() {
+center() {
 	while read line
 	do
 		local displen="$(printf "$line" | wc -L)"
