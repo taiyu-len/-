@@ -1,5 +1,5 @@
-#{ Startup Order
-#{ Bash
+#{{{ Startup Order
+#{{{ Bash
 # +----------------+-----------+-----------+------+
 # |                |Interactive|Interactive|Script|
 # |                |login      |non-login  |      |
@@ -24,8 +24,8 @@
 # +----------------+-----------+-----------+------+
 # |~/.bash_logout  |    C      |           |      |
 # +----------------+-----------+-----------+------+
-#}
-#{ Zsh
+#}}}
+#{{{ Zsh
 # +----------------+-----------+-----------+------+
 # |                |Interactive|Interactive|Script|
 # |                |login      |non-login  |      |
@@ -54,18 +54,18 @@
 # +----------------+-----------+-----------+------+
 # |/etc/zlogout    |    J      |           |      |
 # +----------------+-----------+-----------+------+
-#}
-#}
-#{ shell test
+#}}}
+#}}}
+#{{{ shell test
 if  [[ "$0" =~ zsh || "$(basename "$0")" = .zshrc ]]  && [ "$ZSH_NAME" ]
 then is() { [ $1 = zsh  ] && { shift; "$@"; }; }
 elif [[ "$0" =~ bash || "$(basename "$0")" = .bashrc ]] && [ "$BASH" ]
 then is() { [ $1 = bash ] && { shift; "$@"; }; }
 else is() { false; }
 fi
-#}
-#{ Options
-if is zsh #{
+#}}}
+#{{{ Options
+if is zsh #{{{
 then
 	source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 	REPORTTIME=60 # print statistics for commands longer then 60 seconds
@@ -80,13 +80,13 @@ then
 
 	setopt AUTOCD # type directory name to change to it
 	setopt EXTENDEDGLOB # regular expresssion globbing
-fi #}
-#}
-#{ History
+fi #}}}
+#}}}
+#{{{ History
 ign_cmds=(ls cd "cd -" pwd exit date "* --help" "* -h" jobs fg bg htop ps)
 HISTSIZE=1000000
 HISTFILE=
-if is zsh #{
+if is zsh #{{{
 then
 	# Infinite history size,
 	# enables start, end meta data.
@@ -104,23 +104,23 @@ then
 	setopt HIST_VERIFY
 	setopt HIST_BEEP
 	setopt HIST_REDUCE_BLANKS
-	#}
-elif is bash #{
+	#}}}
+elif is bash #{{{
 then
 	HISTIGNORE="$(IFS=:; printf %s "${ign_cmds[*]}")"
 	HISTCONTROL=ignoreboth
 	HISTTIMEFORMAT=%s
 	HISTFILE="$HOME/.bash_history"
-fi #}
+fi #}}}
 unset ign_cmds
-#}
-#{ Prompt
-if is zsh #{
+#}}}
+#{{{ Prompt
+if is zsh #{{{
 then
 	[[ $TERM =~ (screen|rxvt) ]]
 	ZLE_RPROMPT_INDENT=$?
 	setopt PROMPT_SUBST
-	my_git_status() { #{
+	my_git_status() { #{{{
 		local b c s # branch_name, has changes to be commited, status of uncommited files
 		typeset -A s
 		{
@@ -134,19 +134,19 @@ then
 		} < <(git status -bs --porcelain=v1 2>/dev/null)
 		local B="%F{blu}" R="%F{r}" G="%F{g}"
 		printf "%s" "${b:+│ $c$b ${s[M]:+$B$s[M] }${s[A]:+$G$s[A] }${s[D]:+$R$s[D] }}"
-	} #}
+	} #}}}
 	PS_PREFIX='%B%K{black}%F{white}' PS_SUFFIX='%f%k%b'
 	PS1="$PS_PREFIX%(1j.%j.)│$PS_SUFFIX "
 	RPS1="$PS_PREFIX"' %~ $(my_git_status)'"$PS_SUFFIX"
 	[[ "$TERM" == "linux" ]] && PS1+=' '
 	PS2="$PS_PREFIX"%_" │$PS_SUFFIX "
 	PS3="$PS_PREFIX"?#" │$PS_SUFFIX "
-	#}
-elif is bash #{
+	#}}}
+elif is bash #{{{
 then PS1='\w \$ '
-fi #}
-#}
-#{ Completions
+fi #}}}
+#}}}
+#{{{ Completions
 if is zsh
 then
 	# : completion : function : completer : command : argument : tag
@@ -154,7 +154,7 @@ then
 	# Completers to use.
 	#zstyle ':completion:*' completer _expand _extensions _complete _ignored _correct _approximate _files
 	zstyle ':completion:*' completer _extensions _expand _prefix _complete _ignored _correct _approximate
-	#{ Display
+	#{{{ Display
 	# Use colors for results
 	zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS} # enable colors
 	# Messages
@@ -171,29 +171,29 @@ then
 	# Display more information for man pages
 	zstyle ':completion:*:manuals'    separate-sections true
 	zstyle ':completion:*:manuals.*'  insert-sections   true
-	#}
-	#{ Selection
+	#}}}
+	#{{{ Selection
 	# Use menu by default
 	zstyle ':completion:*'       menu select
 	# use first menu choice right away
 	zstyle ':completion:*:man:*' menu yes select
-	#}
-	#{ Generating
+	#}}}
+	#{{{ Generating
 	# lowercase matches uppercase. aka smartcase
 	zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 	# allow to match all or a matching file
 	zstyle ':completion:*:expand:*' tag-order 'all-expansions expansions'
 	# on processes completion complete all user processes
 	zstyle ':completion:*:processes' command 'ps -a'
-	#}
-	#{ Corrections
+	#}}}
+	#{{{ Corrections
 	# allow 1 error per 3 characters
 	zstyle -e ':completion:*:approximate:' max-errors 'reply=($(((3+$#PREFIX+$#SUFFIX)/3)) numeric)'
 	zstyle    ':completion:*:expand:' keep-prefix true
 	# ignore functions starting with _ when approximate matching
 	zstyle  ':completion:*:(^approximate*):*:functions' ignored-patterns '_*'
-	#}
-	#{ Filtering
+	#}}}
+	#{{{ Filtering
 	# ignore cd ../$pwd
 	zstyle ':completion:*:cd:*'   ignore-parents parent pwd
 	zstyle ':completion:*:mkcd:*' ignore-parents parent pwd
@@ -203,11 +203,11 @@ then
 	zstyle ':completion:*:complete:-command-::commands' ignored-patterns='*\~'
 	# disable usings hosts file because its huge
 	zstyle ':completion:*' hosts off
-	#}
-	#{ Cache
+	#}}}
+	#{{{ Cache
 	zstyle ':completion:*' use-cache on
 	zstyle ':completion:*:complete:*' cache-path "$HOME/.zsh/cache"
-	#}
+	#}}}
 
 	autoload -Uz compinit
 	compinit
@@ -217,11 +217,11 @@ then
 	compdef wwwsave=wget
 	compdef '_files -g "*.swf"' flashplayer
 fi
-#}
-#{ KeyBinds
+#}}}
+#{{{ KeyBinds
 if is zsh
 then
-	#{ Map Ctrl-Z to call fg
+	#{{{ Map Ctrl-Z to call fg
 	# via http://git.grml.org/?p=grml-etc-core.git;a=blob_plain;f=etc/zsh/zshrc;hb=HEAD
 	grml-zsh-fg() {
 		if (( ${#jobstates} )); then
@@ -235,12 +235,12 @@ then
 	}
 	zle -N grml-zsh-fg
 	bindkey '^z' grml-zsh-fg
-	#}
-	#{ Fix pasted urls
+	#}}}
+	#{{{ Fix pasted urls
 	autoload -Uz bracketed-paste-url-magic
 	zle -N bracketed-paste bracketed-paste-url-magic
-	#}
-	#{ .... => ../../..
+	#}}}
+	#{{{ .... => ../../..
 	rationalise-dot() {
 		if [[ $LBUFFER = *.. ]]
 		then LBUFFER+=/..
@@ -249,8 +249,8 @@ then
 	}
 	zle -N rationalise-dot
 	bindkey . rationalise-dot
-	#}
-	#{ Fix special characters
+	#}}}
+	#{{{ Fix special characters
 	typeset -A key
 	autoload zkbd
 	zkbd_file() {
@@ -271,8 +271,8 @@ then
 	fi
 	unset zkbd_file
 	unset keyfile
-	#}
-	#{ set mappings
+	#}}}
+	#{{{ set mappings
 	bindkey -v # vim mode
 	[ "${key[Home]}"           ]  && bindkey "${key[Home]}"           beginning-of-line
 	[ "${key[End]}"            ]  && bindkey "${key[End]}"            end-of-line
@@ -294,83 +294,83 @@ then
 	[ "${key[Ctrl-Delete]}"    ]  && bindkey "${key[Ctrl-Delete]}"    delete-word
 	[ "${key[Alt-H]}"          ]  && bindkey "${key[Alt-H]}"          run-help
 	[ "${key[Shift-Tab]}"      ]  && bindkey "${key[Shift-Tab]}"      reverse-menu-complete
-	#}
-	#{ run-help
+	#}}}
+	#{{{ run-help
 	bindkey -v "h" run-help
-	#}
+	#}}}
 fi
-#}
-#{ Aliases
+#}}}
+#{{{ Aliases
 ## allows aliases to be passed into sudo.
 alias sudo="sudo "
-#{ safety
+#{{{ safety
 alias mv="mv -i"
 alias cp="cp -i"
 alias rm="rm -i"
-#}
-#{ Use color
+#}}}
+#{{{ Use color
 alias dir='dir --color=auto'
 alias vdir='vdir --color=auto'
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias diff='diff --color=auto'
-#}
-#{ human readable
+#}}}
+#{{{ human readable
 alias df='df -h'
 alias du='du -h'
 alias wget='wget -q --show-progress'
-#}
-#{ ls
+#}}}
+#{{{ ls
 ls_common=(--color=auto --human-readable)
 alias ls="ls -B ${ls_common[*]}"
 alias ll="ls -l ${ls_common[*]}"
 alias la="ls -A ${ls_common[*]}"
 unset ls_common
-#}
-#{ git
+#}}}
+#{{{ git
 for i in status commit merge pull push fetch grep log diff mv rm blame add
 do alias g$i="git $i"
 done; unset i
-##}
-#{ timew
+##}}}
+#{{{ timew
 alias start="timew start"
 alias stop="timew stop"
 alias cont="timew continue"
-#}
-#{ cpu settings
+#}}}
+#{{{ cpu settings
 alias cpumin="sudo cpupower frequency-set -u 800MHz"
 alias cpumed="sudo cpupower frequency-set -u 1.60GHz"
 alias cpumax="sudo cpupower frequency-set -u 2.53GHz"
-#}
-#{ cmd | uploader
+#}}}
+#{{{ cmd | uploader
 alias ix="curl -F 'f:1=<-' ix.io"
 alias sprunge.us="curl -F 'sprunge=<-' http://sprunge.us"
-#}
-#{ readline wrappers
+#}}}
+#{{{ readline wrappers
 alias dc="rlwrap dc"
 alias racket="rlwrap racket"
-#}
-#{ Locale Aliases
+#}}}
+#{{{ Locale Aliases
 alias JP='LANG="ja_JP.UTF8" '
-#}
-#{ misc
+#}}}
+#{{{ misc
 alias hl='highlight -O ansi'
 alias mnt='udisksctl mount -b'
 alias unmnt='udisksctl unmount -b'
 alias bget="wget --header='User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:36.0) Gecko/20100101 Firefox/36.0' --header='Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' --header='Accept-Language: en,ja;q=0.7,en-US;q=0.3' --header='Content-Type: application/x-www-form-urlencoded'"
-#}
-#{ Suffix Alias
+#}}}
+#{{{ Suffix Alias
 if is zsh
 then
 	alias -s {png,jpg,jpeg,gif}=feh
 	alias -s {3gp,avi,mkv,mp4,webm}=mpv
 	alias -s {pdf,epub}=mupdf
 	alias -s exe=wine
-fi #}
-#}
-#{ Functions
-#{ Timew tracking function
+fi #}}}
+#}}}
+#{{{ Functions
+#{{{ Timew tracking function
 track() {
 	local tags=()
 	while [[ "$1" = @* ]]
@@ -383,20 +383,20 @@ track() {
 	"$@"
 	timew stop
 }
-#}
-#{ Tmux
+#}}}
+#{{{ Tmux
 tat() { tmux new-session -As "${@:-$(basename $PWD)}"; }
 tdt() { tmux detach; }
 tsplit() { tmux split-window "$@"; }
-#}
-#{ neat curl things
+#}}}
+#{{{ neat curl things
 wttr() {
 	curl "wttr.in/$*"
 }
 cheat.sh() {
 	curl "cheat.sh/$*"
 }
-#}
+#}}}
 
 hless() {
 	highlight -Oansi "$@" | less -R
@@ -436,9 +436,11 @@ then
 	autoload run-help
 fi
 
-#}
+#}}}
+#{{{ Cleanup
 if is zsh
 then unfunction is
 else unset is
 fi
-# vim: foldmarker=#{,#} foldmethod=marker filetype=zsh
+#}}}
+# vim: foldmethod=marker filetype=zsh

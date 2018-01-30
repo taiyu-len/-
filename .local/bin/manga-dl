@@ -91,7 +91,7 @@ do
 done
 }
 
-#{ default wget options
+#{{{ default wget options
 wget=(wget)
 wget+=(--tries 0)
 wget+=(--timeout 60)
@@ -99,12 +99,12 @@ wget+=(--continue)
 wget+=(--quiet)
 [ ! "$quiet" ] && wget+=(--show-progress)
 [ ! "$quiet" ] && wget+=('--progress=bar:force')
-#}
-#{ default curl options
+#}}}
+#{{{ default curl options
 curl=(curl)
 curl+=(--retry 100)
 curl+=(--silent)
-#}
+#}}}
 get_site() {
 	case "$link" in
 	( *gameofscanlation.moe/*  ) site=gos_moe     ;;
@@ -117,7 +117,7 @@ get_site() {
 	( *                        ) pexit "unknown url" ;;
 	esac
 }
-#{ Processing data
+#{{{ Processing data
 # uses name between <title> and some extra parsing
 declare -A name_regex
 name_regex[gos_moe]='(.*)\ \|'
@@ -136,8 +136,8 @@ rename_images[foolslide]=0
 # TODO save related metadata.
 rename_images[imgur]=2
 rename_images[imgursolo]=0
-#}
-#{ Process helper function
+#}}}
+#{{{ Process helper function
 # extract title from fd 10
 process_title() {
 	name=$(sed -nr -e "/<title>/{s/.*<title>${name_regex[$site]}.*/\\1/;T;p;q}" <&10)
@@ -160,8 +160,8 @@ urls_generate() {
 		done
 	)
 }
-#}
-#{ Processing function
+#}}}
+#{{{ Processing function
 process_gos_moe() {
 	process_title || return 1
 	mapfile -t args < <(sed -nr "/alt=\"$name/{s/.*src=\"([^\"]*)\".*/\\1/;p}" <&10 )
@@ -199,7 +199,7 @@ process_imgursolo() {
 	mapfile -t args < <(perl -ne 'if (/item:/) { print "https://i.imgur.com/$1$2\n" if s|"hash":"([^"]*)".*?"ext":"([^"]*)"||; last }' <&10)
 	urls_from_args "${args[@]}"
 }
-#}
+#}}}
 
 process_urls "$@"
 # vim: foldmethod=marker foldmarker={,}

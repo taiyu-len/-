@@ -31,7 +31,7 @@ greetmsg() {
 }
 trap greetmsg EXIT
 
-#{ Helpers
+#{{{ Helpers
 th="horoscope"
 tl="luckyitem"
 tm="message"
@@ -46,9 +46,9 @@ center() {
 		#printf "%*s%s%*s\n" "$left" "" "$line" "$right" ""
 	done
 }
-#}
-#{ Greetings
-if [ "$DM_SHOW_HOROSCOPE" ] #{
+#}}}
+#{{{ Greetings
+if [ "$DM_SHOW_HOROSCOPE" ] #{{{
 then
 	greeting+=("$th%So-so!")
 	greeting+=("$th%Here and there!")
@@ -63,8 +63,8 @@ then
 	greeting+=("$th%Relaxed!")
 	greeting+=("$th%Smile wide!")
 	greeting+=("$th%Busy!")
-fi #}
-if [ "$DM_SHOW_LUCKYITEM" ] #{
+fi #}}}
+if [ "$DM_SHOW_LUCKYITEM" ] #{{{
 then
 	greeting+=("$tl%Doujinshi.")
 	greeting+=("$tl%Who cares if you share it.")
@@ -106,8 +106,8 @@ then
 	greeting+=("$tl%Mushroom dress.")
 	greeting+=("$tl%Letter.")
 	greeting+=("$tl%Moon.")
-fi #}
-if [ "$DM_SHOW_MESSAGES"  ] #{
+fi #}}}
+if [ "$DM_SHOW_MESSAGES"  ] #{{{
 then
 	greeting+=("$tm%The Scenario Director's self-portrait, the 'Monster Mushroom.'\nThis is an old anime character.\nThe Director drew it from memory.\nAnd so it became his self-portrait.\nDid you know that?")
 	greeting+=("$tm%Besides 'TYPE-MOON,' the other candidate\nfor the circle name was 'Ambushing Knights.'\nIt's a relief that one wasn't chosen...")
@@ -268,7 +268,7 @@ then
 	#greeting+=("$tm%[Lunacy]\n... on that blindingly bright day...\n... on that very day of... summer?\n............\nSomehow that doesn't work at all...")
 	#greeting+=("$tm%[Lunacy]\nYou sleep with your little sister, and you sleep with me too?\nScratch that, you sleep with anything that moves...")
 	#greeting+=("$tm%[Lunacy]\nBREAK THE PLUS-DISK!\n... Still looking for translators, by the way.")
-fi #}
+fi #}}}
 
-#}
-# vim: foldmarker=#{,#} foldmethod=marker
+#}}}
+# vim: foldmethod=marker
