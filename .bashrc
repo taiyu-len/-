@@ -428,7 +428,7 @@ hash fzf 2>/dev/null &&
 	is zsh compdef fzcd=cd
 
 tmpcd() {
-	cd $(mktemp -d)
+	cd "$(mktemp -d "${*:-tmp}.XXXXXXXXX")"
 }
 if is zsh
 then
