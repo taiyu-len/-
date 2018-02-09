@@ -2,6 +2,7 @@
 #{{{ paths and programs
 export PATH="$HOME/.local/bin":"$PATH"
 export EDITOR=vim
+export GIT_EDITOR=vi
 export BROWSER=w3m
 export TERMINAL=start-urxvtc
 export MAIL="$HOME/.mail"
@@ -15,6 +16,7 @@ export VIMRC="$HOME/.vim/vimrc"
 #{{{ Colors
 eval $(dircolors ~/.dircolors)
 export GCC_COLORS="warning=01;33" # use yellow warning
+export S_COLORS=auto
 #{{{ Less
 export LESS=-irRS~
 export LESSSECURE=1

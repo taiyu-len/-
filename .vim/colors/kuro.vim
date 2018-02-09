@@ -37,7 +37,7 @@ highlight!link TabLine         KR_BorderNC
 highlight!link TabLineFill     KR_BorderNC
 "}}}
 "{{{ Syntax
-highlight Comment              NONE ctermfg=8 cterm=bold
+highlight Comment              NONE ctermfg=0 cterm=bold
 highlight Constant             NONE ctermfg=2 cterm=bold
 highlight String               NONE ctermfg=2
 highlight Identifier           NONE ctermfg=2

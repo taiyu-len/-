@@ -1,3 +1,48 @@
+!! TODO fix some stuff
+Xft.lcdfilter: lcddefault
+Xft.hintstyle: hintslight
+Xft.hinting:   1
+Xft.antialias: 1
+!!{{{ Global Colors
+*.cursorColor:   #5555AA
+
+!! default bg/fg
+*.background:    #000000
+*.foreground:    #FFFFFF
+
+! black dark/light
+*.color0:        #000000
+*.color8:        #555555
+
+! red dark/light
+*.color1:        #FF8888
+*.color9:        #FF8888
+
+! green dark/light
+*.color2:        #88FF88
+*.color10:       #88FF88
+
+! yellow dark/light
+*.color3:        #FFFF88
+*.color11:       #FFFF88
+
+! blue dark/light
+*.color4:        #8888FF
+*.color12:       #8888FF
+
+! magenta dark/light
+*.color5:        #FF88FF
+*.color13:       #FF88FF
+
+! cyan dark/light
+*.color6:        #88FFFF
+*.color14:       #88FFFF
+
+! white dark/light
+*.color7:        #CCCCCC
+*.color15:       #FFFFFF
+!!}}}
+!!{{{ Rxvt
 !set up triple click grabs logical line
 Rxvt.tripleclickwords:       false
 
@@ -14,43 +59,37 @@ Rxvt.iso14755: false
 Rxvt.iso14755_52: false
 
 ! set up fading on no focus
-Rxvt.fadeColor:     #666
+Rxvt.fading: 20%
 
 ! set pastable tabs
 Rxvt.pastableTabs:  true
 
-! dun wan no scroolbaa
+! No Scrolling
 Rxvt.scrollBar: false
-! set up manual scroll
-! do not scroll with output
 Rxvt.scrollTtyOutput: false
 Rxvt.saveLines:0
-
-! scroll back to the bottom on keypress
 Rxvt.scrollTtyKeypress: true
 
-! dun wan no border
-Rxvt.borderLess:        false
-Rxvt.internalBorder:       0
-Rxvt.externalBorder:       0
+! No Borders
+Rxvt.borderLess:     false
+Rxvt.internalBorder: 0
+Rxvt.externalBorder: 0
 
 Rxvt.perl-ext-common: default,matcher,-option-popup,-selection-popup,confirm-paste
 Rxvt.url-launcher:    palemoon
 
-!Blue Underline
-Rxvt.underlineColor:  #0088ff
 Rxvt.cutchars:        "`()'*<>[]{|│}"
 
 Rxvt.visualBell:     false
 Rxvt.urgentOnBell:   true
 
-! URxvt terminal color theme
+!!{{{ Colors
 Rxvt.transparent:    true
 
 Rxvt.intensityStyles:true
 
-Rxvt.tintColor:     #222222
-*.cursorColor:      #5555AA
+Rxvt.tintColor:         #222222
+Rxvt.underlineColor:    #0088ff
 !! default bg/fg
 Rxvt.background:    [50]#000000
 Rxvt.foreground:        #FFFFFF
@@ -86,4 +125,6 @@ Rxvt.color14:       [80]#88FFFF
 ! white dark/light
 Rxvt.color7:        [70]#FFFFFF
 Rxvt.color15:       #FFFFFF
-!! vim:set filetype=xdefaults:
+!!}}}
+!!}}}
+! vim:foldmethod=marker foldmarker={{{,}}}

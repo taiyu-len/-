@@ -1,3 +1,6 @@
+" TODO
+" Clean up vimrc. make it more lightweight with a way to to start with a minimal 
+" vimrc
 "{{{ Vim
 "{{{ plugins
 filetype plugin indent on
@@ -26,7 +29,7 @@ let &backupskip = escape(expand('$HOME'), '\') . '/.local/bin/*'
 set undofile undodir=~/.vim/undo
 set backupskip+=/tmp/*
 set directory=~/.vim/swap//
-set path=.,/usr/include,,include;,
+set path+=include
 set viminfofile=~/.vim/viminfo
 "}}}
 "{{{ Session
@@ -367,9 +370,17 @@ set wildchar=<TAB>
 set wildignorecase
 set wildmode=list:longest
 "}}}
+"}}}
+"{{{ Buffer
+let s:plugins["a.vim"] = "vim-scripts"
+nnoremap <leader>b :ls<cr>:b<space>
+nnoremap <leader>sb :ls<cr>:sb<space>
+nnoremap gb :bnext<cr>
+nnoremap gB :bprevious<cr>
+"}}}
 "{{{ Mappings
 cnoremap <C-Backspace> <C-w>
-augroup VIMRC_mappings
+augroup VIMRC_file_mappings
 	autocmd!
 	autocmd FileType vim nnoremap <buffer> <silent> <leader>e :exe getline('.')<CR>
 	" Doesnt work for functions definitions, but handles commented lines well
@@ -381,8 +392,6 @@ function! VIMRC_exe_range() abort
 		exe line
 	endfor
 endfunction
-"}}}
-
 "}}}
 "}}}
 PackAdd

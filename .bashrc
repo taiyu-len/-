@@ -345,6 +345,7 @@ alias cpumax="sudo cpupower frequency-set -u 2.53GHz"
 #}}}
 #{{{ cmd | uploader
 alias ix="curl -F 'f:1=<-' ix.io"
+alias myix="curl -nF 'f:1=<-' ix.io"
 alias sprunge.us="curl -F 'sprunge=<-' http://sprunge.us"
 #}}}
 #{{{ readline wrappers
@@ -355,10 +356,12 @@ alias racket="rlwrap racket"
 alias JP='LANG="ja_JP.UTF8" '
 #}}}
 #{{{ misc
+alias info="info --vi-keys"
 alias hl='highlight -O ansi'
 alias mnt='udisksctl mount -b'
 alias unmnt='udisksctl unmount -b'
 alias bget="wget --header='User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:36.0) Gecko/20100101 Firefox/36.0' --header='Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' --header='Accept-Language: en,ja;q=0.7,en-US;q=0.3' --header='Content-Type: application/x-www-form-urlencoded'"
+alias hc="herbstclient"
 #}}}
 #{{{ Suffix Alias
 if is zsh
@@ -428,7 +431,8 @@ hash fzf 2>/dev/null &&
 	is zsh compdef fzcd=cd
 
 tmpcd() {
-	cd "$(mktemp -p /tmp -d "${*:-tmp}.XXXXXXXXX")"
+	cd "$(mktemp -p /tmp ${*:+-d "$*.XXXXXXXXX"})"
+	echo "$_"
 }
 if is zsh
 then
