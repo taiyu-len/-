@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#TODO dynamic tags/layouts/etc
+#TODO better tags/layouts/etc
 cmds=()
 hc() { cmds+=(";" "$@"); }
 Mod=Mod4 # use Super as modifier key
@@ -14,6 +14,8 @@ hc attr theme.urgent.color     '#884444'
 hc attr theme.background_color '#222244'
 hc attr theme.border_width 4
 hc attr theme.floating.border_width 8
+hc set frame_border_normal_color '#222244'
+hc set frame_border_active_color '#333366'
 
 hc set always_show_frame 0
 hc set frame_transparent_width 0
@@ -28,9 +30,8 @@ hc set tree_style '╾│ ├└╼─┐'
 #}}}
 #{{{ keybinds
 hc keyunbind --all
-hc keybind "$Mod-Shift-q" quit
+hc keybind "$Mod-Shift-q" close
 hc keybind "$Mod-Shift-r" reload
-hc keybind "$Mod-Shift-c" close
 hc keybind "$Mod-Return"  spawn ${TERMINAL:-xterm}
 hc keybind "$Mod-d"       spawn dmenu-launch
 
@@ -102,15 +103,14 @@ hc mousebind $Mod-Button2 zoom
 hc mousebind $Mod-Button3 resize
 #}}}
 #{{{ tags
-tag_names=( {1..9} )
-tag_keys=( {1..9} 0 )
-for i in ${!tag_names[@]} ; do
-	hc add "${tag_names[$i]}"
-	key="${tag_keys[$i]}"
-	if [ "$key" ] ; then 
-		hc keybind "$Mod-$key" use_index "$i"
-		hc keybind "$Mod-Shift-$key" move_index "$i"
-	fi
+tags=(1:term 2:media 3:www)
+tags+=(7:doc 8:anki 9:www)
+hc silent rename default "${tags[1]}"
+for tag in "${tags[@]}" ; do
+	key="${tag:0:1}"
+	hc add "$tag"
+	hc keybind "$Mod-$key" use "$tag"
+	hc keybind "$Mod-Shift-$key" move "$tag"
 done
 #}}}
 #{{{ rules
@@ -119,6 +119,13 @@ hc rule windowtype~'_NET_WM_WINDOW_TYPE_(DIALOG|UTILITY|SPLASH)' pseudotile=on
 hc rule windowtype='_NET_WM_WINDOW_TYPE_DIALOG' focus=on
 hc rule windowtype~'_NET_WM_WINDOW_TYPE_(NOTIFICATION|DOCK|DESKTOP)' manage=off
 hc rule focus=on # normally focus new clients
+hc rule class=feh pseudotile=on tag=2:media
+hc rule class=Sxiv pseudotile=on tag=2:media
+hc rule class=Anki tag=8:anki
+hc rule class=Firefox tag=9:www
+hc rule class=Palemoon  tag=9:www
+hc rule class=MuPDF class=llpp class=zathura tag=7:doc
+
 #}}}
 #{{{ Monitors
 hc set swap_monitors_to_get_tag 0
@@ -126,6 +133,7 @@ hc detect_monitors
 #}}}
 #{{{ Panel
 herbstclient chain "${cmds[@]}"
+
 # start panel on every monitor
 panel=~/.config/herbstluftwm/panel.sh
 [ -x "$panel" ] || panel=/etc/xdg/herbstluftwm/panel.sh

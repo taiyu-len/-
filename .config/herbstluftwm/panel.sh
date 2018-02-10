@@ -1,198 +1,230 @@
 #!/usr/bin/env bash
-
-hc() { "${herbstclient_command[@]:-herbstclient}" "$@" ;}
+#{{{ Setup
+hc() { herbstclient "$@" ;}
 monitor=${1:-0}
-geometry=( $(herbstclient monitor_rect "$monitor") )
-if [ -z "$geometry" ] ;then
-    echo "Invalid monitor $monitor"
-    exit 1
+geometry=( $(hc monitor_rect "$monitor") )
+if [ -z "${geometry[*]}" ]; then
+	echo "Invalid monitor $monitor"
+	exit 1
 fi
-# geometry has the format W H X Y
 x=${geometry[0]}
 y=${geometry[1]}
-panel_width=${geometry[2]}
-panel_height=14
+w=${geometry[2]}
+h=16
+
 #font="-xos4-terminus-medium-r-normal-*-12-140-72-72-c-80-iso10646-1"
 font="-*-fixed-medium-*-*-*-12-*-*-*-*-*-*-*"
 #font="-gnu-unifont-*-*-*-*-*-*-*-*-*-*-*-*"
-bgcolor=$(hc get frame_border_normal_color)
-selbg=$(hc get window_border_active_color)
-selfg='#cccccc'
 
-####
-# Try to find textwidth binary.
-# In e.g. Ubuntu, this is named dzen2-textwidth.
+# panel: default color for panel elements.
+# focus: color for currently focused elements
+# other: color for focused elements on other monitors
+# alert: color for urgent tags
+defaultbg=$(hc get frame_border_normal_color)
+defaultfg="#cccccc"
+panelbg="^bg()"
+focusbg="^bg($(hc get window_border_active_color))"
+otherbg="^bg($(hc get window_border_normal_color))"
+alertbg="^bg($(hc get window_border_urgent_color))"
+panelfg="^fg()"
+focusfg="^fg(#ffffff)"
+otherfg="^fg(#aaaaaa)"
+alertfg="^fg(#000000)"
+
+#{{{ Textwidth function
 if hash textwidth &> /dev/null ; then
-    textwidth="textwidth";
+	textwidth="textwidth";
 elif hash dzen2-textwidth &> /dev/null ; then
-    textwidth="dzen2-textwidth";
+	textwidth="dzen2-textwidth";
 else
-    echo "This script requires the textwidth tool of the dzen2 project."
-    exit 1
+	echo "This script requires the textwidth tool of the dzen2 project."
+	exit 1
 fi
-####
+#}}}
+#{{{ dzen2 function
 # true if we are using the svn version of dzen2
 # depending on version/distribution, this seems to have version strings like
 # "dzen-" or "dzen-x.x.x-svn"
 if dzen2 -v 2>&1 | head -n 1 | grep -q '^dzen-\([^,]*-svn\|\),'; then
-    dzen2_svn="true"
+	dzen2_svn="true"
 else
-    dzen2_svn=""
+	dzen2_svn=""
 fi
-
+#}}}
+#{{{ uniq_linebuffered function
 if awk -Wv 2>/dev/null | head -1 | grep -q '^mawk'; then
-    # mawk needs "-W interactive" to line-buffer stdout correctly
-    # http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=593504
-    uniq_linebuffered() {
-      awk -W interactive '$0 != l { print ; l=$0 ; fflush(); }' "$@"
-    }
+	# mawk needs "-W interactive" to line-buffer stdout correctly
+	# http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=593504
+	uniq_linebuffered() {
+		awk -W interactive '$0 != l { print ; l=$0 ; fflush(); }' "$@"
+	}
 else
-    # other awk versions (e.g. gawk) issue a warning with "-W interactive", so
-    # we don't want to use it there.
-    uniq_linebuffered() {
-      awk '$0 != l { print ; l=$0 ; fflush(); }' "$@"
-    }
+	# other awk versions (e.g. gawk) issue a warning with "-W interactive", so
+	# we don't want to use it there.
+	uniq_linebuffered() {
+		awk '$0 != l { print ; l=$0 ; fflush(); }' "$@"
+	}
 fi
+#}}}
+#}}}
+#{{{ Event Generator function.
+# based on different input data (mpc, date, hlwm hooks, ...)
+# this generates events, formed like this:
+#     <eventname>\t<data> [...]
+# e.g.
+#     date    ^fg(#efefef)18:33^fg(#909090), 2013-10-^fg(#efefef)29
+event_generator() {
+	unset pids
+	date_generator() {
+		printf "date\t$focusfg%(%H:%M$otherfg, %Y-%m-$focusfg%d%)T\n"
+		sleep $((61 - $(printf "%(%S)T")))
+	}
+	ipaddr_generator() {
+		ip -br addr | awk '
+		BEGIN { printf "ipaddr\t" }
+		$2 == "UP" {
+			print "'$focusfg'" $1 ":^fg(#99ef99)" substr($3, 0, index($3, "/")-1)
+		}
+		END { print "" }'
+		sleep 20s
+	}
+	add_job() {
+		while true; do "$@"
+		done > >(uniq_linebuffered) &
+		pids+=($!)
+	}
+	add_job date_generator
+	add_job ipaddr_generator
 
-hc pad $monitor $panel_height
+	hc --idle
+	kill "${pids[@]}"
+}
+#}}}
+#{{{ initialize eventloop data
+update_tags() {
+	IFS=$'\t' read -ra tags <<< "$(hc tag_status "$monitor")"
+}
+event_init() {
+	update_tags
+	visible=true
+	date=
+	ipaddr=
+	windowtitle=
+	separator=" $focusfg| "
+}
+#}}}
+#{{{ handle event and set event data
+handle_event() {
+	cmd=("$@")
+	case "${cmd[0]}" in
+	focus_changed|window_title_changed) windowtitle="${cmd[*]:2}" ;;
+	date) date="${cmd[*]:1}" ;;
+	ipaddr) ipaddr="${cmd[*]:1}" ;;
+	tag*) update_tags ;;
+	quit_panel|reload) exit ;;
+	togglehidepanel) #{{{
+		if [ "${cmd[1]}" -ne "$monitor" ] ; then
+			return
+		fi
+		currentidx=$(hc attr monitors.focus.index)
+		if [ "${cmd[1]}" = "current" ] && [ "$currentidx" -ne "$monitor" ] ; then
+			return
+		fi
+		echo "^togglehide()"
+		if "$visible" ; then
+			visible=false
+			hc pad "$monitor" 0
+		else
+			visible=true
+			hc pad "$monitor" "$h"
+		fi
+		;; #}}}
+	esac
+}
+#}}}
+#{{{ event consumer
+event_consumer() {
+	# wait for first event and handle it.
+	if IFS=$'\t' read -ra cmd ; then
+		handle_event "${cmd[@]}"
+		# read in more events until we timeout.
+		while IFS=$'\t' read -t .1 -ra cmd ; do
+			handle_event "${cmd[@]}"
+		done
+	else
+		return 1
+	fi
+}
+#}}}
+#{{{ Panel Update
+#{{{ Panel tags
+if [ "$dzen2_svn" ] ; then
+	_print_tag() {
+		# clickable tags if using SVN dzen
+		printf %s "^ca(1,herbstclient and "
+		printf %s ", focus_monitor \"$monitor\" "
+		printf %s ", use \"$1\") $1 ^ca()"
+	}
+else
+	_print_tag() {
+		printf "%s" " $1 "
+	}
+fi
+print_tag() {
+	case "${1:0:1}" in
+	'#') printf "%s" "$focusbg$focusfg" ;;
+	'+') printf "%s" "$otherbg$otherfg" ;;
+	':') printf "%s" "$panelbg$panelfg" ;;
+	'!') printf "%s" "$alertbg$alertfg" ;;
+	# ignore empty tags, and tags on other monitors
+	 * ) return ;;
+	esac
+	_print_tag "${1:1}"
+}
+#}}}
+append_right() {
+	for i in "$@"; do
+		[ "$i" ] && right+="$separator$i"
+	done
+}
+panel_update() {
+	for i in "${tags[@]}" ; do
+		print_tag "$i"
+	done
+	append_left "$separator"
+	printf "%s" "$separator"
+	printf "%s" "$panelbg$panelfg ${windowtitle//^/^^}"
+	right=
+	append_right "$player"
+	append_right "$ipaddr"
+	append_right "$date"
+	# filter out ^(stuff) and get an estimated text width.
+	right_text_only=$(echo -n "$right" | sed 's/\^[^(]*([^)]*)//g' )
+	right_width=$($textwidth "$font" "$right_text_only    ")
+	printf "%s" "^pa($((w - right_width)))$right"
+	# finish line
+	echo
+}
+#}}}
+#{{{ Execute
+dzen2_opts=(-fn "$font")
+dzen2_opts+=(-w "$w")
+dzen2_opts+=(-h "$h")
+dzen2_opts+=(-x "$x")
+dzen2_opts+=(-y "$y")
+scrollcmd() { printf "%s" "exec:herbstclient use_index $1 --skip-visible" ;}
+dzen2_opts+=(-e "button4=$(scrollcmd -1);button5=$(scrollcmd +1)")
+dzen2_opts+=(-ta l)
+dzen2_opts+=(-bg "$defaultbg")
+dzen2_opts+=(-fg "$defaultfg")
 
-{
-    ### Event generator ###
-    # based on different input data (mpc, date, hlwm hooks, ...) this generates events, formed like this:
-    #   <eventname>\t<data> [...]
-    # e.g.
-    #   date    ^fg(#efefef)18:33^fg(#909090), 2013-10-^fg(#efefef)29
-
-#    mpc_format=$'player\t[[^fg(##909090)%artist% - ]^fg(##efefef)%title%]'
-#    mpc current -f "$mpc_format"
-#    while true; do
-#        mpc current --wait -f "$mpc_format"
-#    done &
-#    mpcpid=$!
-
-    while true; do
-            printf $'%(date\t^fg(#efefef)%H:%M^fg(#909090), %Y-%m-^fg(#efefef)%d)T\n'
-            seconds=$(printf '%(%S)T')
-            sleep $((60-$seconds)) || break
-    done > >(uniq_linebuffered) &
-    datepid=$!
-    hc --idle
-    kill $datepid
-#    kill $mpcpid
-} 2> /dev/null | {
-    IFS=$'\t' read -ra tags <<< "$(hc tag_status $monitor)"
-    visible=true
-    date=""
-    windowtitle=""
-    while true ; do
-
-        ### Output ###
-        # This part prints dzen data based on the _previous_ data handling run,
-        # and then waits for the next event to happen.
-
-        bordercolor="#26221C"
-        separator="^bg()^fg($selbg)|"
-        # draw tags
-        for i in "${tags[@]}" ; do
-            case ${i:0:1} in
-                '#')
-                    echo -n "^bg($selbg)^fg($selfg)"
-                    ;;
-                '+')
-                    echo -n "^bg(#9CA668)^fg(#141414)"
-                    ;;
-                ':')
-                    echo -n "^bg()^fg(#ffffff)"
-                    ;;
-                '!')
-                    echo -n "^bg(#FF0675)^fg(#141414)"
-                    ;;
-                *)
-                    echo -n "^bg()^fg(#ababab)"
-                    ;;
-            esac
-            if [ ! -z "$dzen2_svn" ] ; then
-                # clickable tags if using SVN dzen
-                echo -n "^ca(1,\"${herbstclient_command[@]:-herbstclient}\" "
-                echo -n "focus_monitor \"$monitor\" && "
-                echo -n "\"${herbstclient_command[@]:-herbstclient}\" "
-                echo -n "use \"${i:1}\") ${i:1} ^ca()"
-            else
-                # non-clickable tags if using older dzen
-                echo -n " ${i:1} "
-            fi
-        done
-
-        echo -n "$separator"
-        echo -n "^bg()^fg() ${windowtitle//^/^^}"
-        # Print Right side
-        right=" "
-        [ "$player" ] && right+="$separator $player "
-        [ "$date" ] && right+="$separator $date "
-        # small adjustments
-        right_text_only=$(echo -n "$right" | sed 's/\^[^(]*([^)]*)//g' )
-        # get width of right aligned text.. and add some space..
-        width=$($textwidth "$font" "$right_text_only ")
-        echo -n "^pa($(($panel_width - $width)))$right"
-
-        echo
-
-        ### Data handling ###
-        # This part handles the events generated in the event loop, and sets
-        # internal variables based on them. The event and its arguments are
-        # read into the array cmd, then action is taken depending on the event
-        # name.
-        # "Special" events (quit_panel/togglehidepanel/reload) are also handled
-        # here.
-
-        # wait for next event
-        IFS=$'\t' read -ra cmd || break
-        # find out event origin
-        case "${cmd[0]}" in
-            tag*)
-                #echo "resetting tags" >&2
-                IFS=$'\t' read -ra tags <<< "$(hc tag_status $monitor)"
-                ;;
-            date)
-                #echo "resetting date" >&2
-                date="${cmd[@]:1}"
-                ;;
-            quit_panel)
-                exit
-                ;;
-            togglehidepanel)
-                currentmonidx=$(hc list_monitors | sed -n '/\[FOCUS\]$/s/:.*//p')
-                if [ "${cmd[1]}" -ne "$monitor" ] ; then
-                    continue
-                fi
-                if [ "${cmd[1]}" = "current" ] && [ "$currentmonidx" -ne "$monitor" ] ; then
-                    continue
-                fi
-                echo "^togglehide()"
-                if $visible ; then
-                    visible=false
-                    hc pad $monitor 0
-                else
-                    visible=true
-                    hc pad $monitor $panel_height
-                fi
-                ;;
-            reload)
-                exit
-                ;;
-            focus_changed|window_title_changed)
-                windowtitle="${cmd[@]:2}"
-                ;;
-            player)
-                player="${cmd[@]:1}"
-                ;;
-        esac
-    done
-
-    ### dzen2 ###
-    # After the data is gathered and processed, the output of the previous block
-    # gets piped to dzen2.
-
-} 2> /dev/null | dzen2 -w $panel_width -x $x -y $y -fn "$font" -h $panel_height \
-    -e 'button3=;button4=exec:herbstclient use_index -1;button5=exec:herbstclient use_index +1' \
-    -ta l -bg "$bgcolor" -fg '#efefef'
+hc pad "$monitor" "$h"
+event_generator  2>/dev/null | {
+	event_init
+	while true ; do
+		panel_update
+		event_consumer
+	done
+} 2>/dev/null | dzen2 "${dzen2_opts[@]}"
+hc pad "$monitor" 0
+# vim: foldmarker={{{,}}} foldmethod=marker
