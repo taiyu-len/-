@@ -51,20 +51,14 @@ else
 	dzen2_svn=""
 fi
 #}}}
-#{{{ uniq_linebuffered function
+#{{{ uniq function
+uniq=(awk)
 if awk -Wv 2>/dev/null | head -1 | grep -q '^mawk'; then
-	# mawk needs "-W interactive" to line-buffer stdout correctly
-	# http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=593504
-	uniq_linebuffered() {
-		awk -W interactive '$0 != l { print ; l=$0 ; fflush(); }' "$@"
-	}
-else
-	# other awk versions (e.g. gawk) issue a warning with "-W interactive", so
-	# we don't want to use it there.
-	uniq_linebuffered() {
-		awk '$0 != l { print ; l=$0 ; fflush(); }' "$@"
-	}
+    # mawk needs "-W interactive" to line-buffer stdout correctly
+    # http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=593504
+    uniq+=(-W interactive)
 fi
+uniq+=('$0 != l { print ; l=$0 ; fflush(); }')
 #}}}
 #}}}
 #{{{ Event Generator function.
@@ -77,20 +71,20 @@ event_generator() {
 	unset pids
 	date_generator() {
 		printf "date\t$focusfg%(%H:%M$otherfg, %Y-%m-$focusfg%d%)T\n"
-		sleep $((61 - $(printf "%(%S)T")))
+		sleep $((60 - $(printf "%(%S)T")))
 	}
 	ipaddr_generator() {
 		ip -br addr | awk '
 		BEGIN { printf "ipaddr\t" }
 		$2 == "UP" {
-			print "'$focusfg'" $1 ":^fg(#99ef99)" substr($3, 0, index($3, "/")-1)
+			printf "'$focusfg'" $1 ":^fg(#99ef99)" substr($3, 0, index($3, "/")-1)
 		}
 		END { print "" }'
 		sleep 20s
 	}
 	add_job() {
-		while true; do "$@"
-		done > >(uniq_linebuffered) &
+		while :; do "$@"
+		done > >(exec "${uniq[@]}")&
 		pids+=($!)
 	}
 	add_job date_generator
@@ -180,6 +174,7 @@ print_tag() {
 	 * ) return ;;
 	esac
 	_print_tag "${1:1}"
+	printf "%s" "$panelbg$panelfg"
 }
 #}}}
 append_right() {
@@ -202,7 +197,7 @@ panel_update() {
 	right_text_only=$(echo -n "$right" | sed 's/\^[^(]*([^)]*)//g' )
 	right_width=$($textwidth "$font" "$right_text_only    ")
 	printf "%s" "^pa($((w - right_width)))$right"
-	# finish line
+	# print panel
 	echo
 }
 #}}}
