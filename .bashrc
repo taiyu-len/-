@@ -432,8 +432,8 @@ hash fzf 2>/dev/null &&
 	is zsh compdef fzcd=cd
 
 tmpcd() {
-	cd "$(mktemp -p /tmp ${*:+-d "$*.XXXXXXXXX"})"
-	echo "$_"
+	cd "$(mktemp -dp /tmp ${*:+-d "$*.XXXXXXXXX"})"
+	pwd
 }
 if is zsh
 then

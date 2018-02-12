@@ -104,8 +104,8 @@ hc mousebind $Mod-Button3 resize
 #}}}
 #{{{ tags
 tags=(1:term 2:media 3:www)
-tags+=(7:doc 8:anki 9:www)
-hc silent rename default "${tags[1]}"
+tags+=(8:doc 9:anki 0:www)
+hc silent rename default "${tags[0]}"
 for tag in "${tags[@]}" ; do
 	key="${tag:0:1}"
 	hc add "$tag"
@@ -120,11 +120,14 @@ hc rule windowtype='_NET_WM_WINDOW_TYPE_DIALOG' focus=on
 hc rule windowtype~'_NET_WM_WINDOW_TYPE_(NOTIFICATION|DOCK|DESKTOP)' manage=off
 hc rule focus=on # normally focus new clients
 hc rule class=feh pseudotile=on tag=2:media
+hc rule class=mpv tag=2:media
 hc rule class=Sxiv pseudotile=on tag=2:media
-hc rule class=Anki tag=8:anki
-hc rule class=Firefox tag=9:www
-hc rule class=Palemoon  tag=9:www
-hc rule class=MuPDF class=llpp class=zathura tag=7:doc
+hc rule class=Anki tag=9:anki
+hc rule class=Firefox tag=0:www
+hc rule class="Pale moon" tag=0:www
+hc rule class=MuPDF tag=8:doc
+hc rule class=llpp tag=8:doc
+hc rule class=zathura tag=8:doc
 
 #}}}
 #{{{ Monitors

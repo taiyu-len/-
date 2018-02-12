@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# TODO. maybe take advantage of extra fancy -l feature of dzen to do fancy status
 #{{{ Setup
 hc() { herbstclient "$@" ;}
 monitor=${1:-0}
@@ -30,6 +31,7 @@ panelfg="^fg()"
 focusfg="^fg(#ffffff)"
 otherfg="^fg(#aaaaaa)"
 alertfg="^fg(#000000)"
+separator="$focusfg^r(1x$h)"
 
 #{{{ Textwidth function
 if hash textwidth &> /dev/null ; then
@@ -67,44 +69,90 @@ uniq+=('$0 != l { print ; l=$0 ; fflush(); }')
 #     <eventname>\t<data> [...]
 # e.g.
 #     date    ^fg(#efefef)18:33^fg(#909090), 2013-10-^fg(#efefef)29
+#     Should have bg,fg set first, and a space before content, should not set 
+#     fg/bg at end of content.
 event_generator() {
-	unset pids
+	local pids=()
+	header() { printf "%s\\t%s" "$1" "${2:-$panelbg} " ;}
 	date_generator() {
-		printf "date\t$focusfg%(%H:%M$otherfg, %Y-%m-$focusfg%d%)T\n"
+		printf "$(header date)$focusfg%(%H:%M$otherfg, %Y-%m-$focusfg%d)T\\n"
 		sleep $((60 - $(printf "%(%S)T")))
 	}
 	ipaddr_generator() {
 		ip -br addr | awk '
-		BEGIN { printf "ipaddr\t" }
+		BEGIN { printf "'"$(header ipaddr)"'" }
 		$2 == "UP" {
 			printf "'$focusfg'" $1 ":^fg(#99ef99)" substr($3, 0, index($3, "/")-1)
 		}
 		END { print "" }'
-		sleep 20s
+		sleep 30s
 	}
-	add_job() {
-		while :; do "$@"
+	mem_generator() {
+		free -hs5 > >(exec awk '
+		$1 == "Mem:" && $3 != mem {
+			mem = $3;
+			print "'"$(header mem)${panelfg}M:$focusfg"'" $3 "'"$otherfg"'/" $2;
+			fflush()
+		}
+		$1 == "Swap:" && $3 != swp && $3 != "0B" {
+			swp = $3;
+			print "'"$(header swap)${panelfg}S:$focusfg"'" $3 "'"$otherfg"'/" $2;
+			fflush()
+		}') & pids+=($!)
+	}
+	add_job(){
+		while :; do "$@"; sleep 1
 		done > >(exec "${uniq[@]}")&
 		pids+=($!)
 	}
 	add_job date_generator
 	add_job ipaddr_generator
+	mem_generator
 
 	hc --idle
 	kill "${pids[@]}"
 }
 #}}}
 #{{{ initialize eventloop data
-update_tags() {
-	IFS=$'\t' read -ra tags <<< "$(hc tag_status "$monitor")"
+#{{{ Panel tags
+if [ "$dzen2_svn" ] ; then
+	print_tag() {
+		# clickable tags if using SVN dzen
+		printf %s "^ca(1,herbstclient and "
+		printf %s ", focus_monitor \"$monitor\" "
+		printf %s ", use \"$1\") $1 ^ca()"
+	}
+else
+	print_tag() {
+		printf "%s" "$1"
+	}
+fi
+format_tag() {
+	case "${1:0:1}" in
+	'#') printf "%s" "$focusbg$focusfg" ;;
+	'+') printf "%s" "$otherbg$otherfg" ;;
+	':') printf "%s" "$panelbg$panelfg" ;;
+	'!') printf "%s" "$alertbg$alertfg" ;;
+	# ignore empty tags, and tags on other monitors
+	 * ) return ;;
+	esac
+	print_tag "${1:1}"
 }
+update_tags() {
+	tags=
+	while read -d $'\t' -r tag; do
+		tags+="$(format_tag "$tag")"
+	done <<< "$(hc tag_status "$monitor")"
+}
+#}}}
 event_init() {
 	update_tags
 	visible=true
 	date=
+	mem=
+	swap=
 	ipaddr=
 	windowtitle=
-	separator=" $focusfg| "
 }
 #}}}
 #{{{ handle event and set event data
@@ -112,9 +160,11 @@ handle_event() {
 	cmd=("$@")
 	case "${cmd[0]}" in
 	focus_changed|window_title_changed) windowtitle="${cmd[*]:2}" ;;
-	date) date="${cmd[*]:1}" ;;
+	date  ) date="${cmd[*]:1}" ;;
+	mem   ) mem="${cmd[*]:1}" ;;
+	swap  ) swap="${cmd[*]:1}" ;;
 	ipaddr) ipaddr="${cmd[*]:1}" ;;
-	tag*) update_tags ;;
+	tag*|urgent) update_tags ;;
 	quit_panel|reload) exit ;;
 	togglehidepanel) #{{{
 		if [ "${cmd[1]}" -ne "$monitor" ] ; then
@@ -142,7 +192,7 @@ event_consumer() {
 	if IFS=$'\t' read -ra cmd ; then
 		handle_event "${cmd[@]}"
 		# read in more events until we timeout.
-		while IFS=$'\t' read -t .1 -ra cmd ; do
+		while IFS=$'\t' read -t .05 -ra cmd ; do
 			handle_event "${cmd[@]}"
 		done
 	else
@@ -151,51 +201,23 @@ event_consumer() {
 }
 #}}}
 #{{{ Panel Update
-#{{{ Panel tags
-if [ "$dzen2_svn" ] ; then
-	_print_tag() {
-		# clickable tags if using SVN dzen
-		printf %s "^ca(1,herbstclient and "
-		printf %s ", focus_monitor \"$monitor\" "
-		printf %s ", use \"$1\") $1 ^ca()"
-	}
-else
-	_print_tag() {
-		printf "%s" " $1 "
-	}
-fi
-print_tag() {
-	case "${1:0:1}" in
-	'#') printf "%s" "$focusbg$focusfg" ;;
-	'+') printf "%s" "$otherbg$otherfg" ;;
-	':') printf "%s" "$panelbg$panelfg" ;;
-	'!') printf "%s" "$alertbg$alertfg" ;;
-	# ignore empty tags, and tags on other monitors
-	 * ) return ;;
-	esac
-	_print_tag "${1:1}"
-	printf "%s" "$panelbg$panelfg"
-}
-#}}}
 append_right() {
 	for i in "$@"; do
-		[ "$i" ] && right+="$separator$i"
+		[ "$i" ] && right+=" $separator$i"
 	done
 }
 panel_update() {
-	for i in "${tags[@]}" ; do
-		print_tag "$i"
-	done
-	append_left "$separator"
-	printf "%s" "$separator"
+	printf "%s" "$tags$separator"
 	printf "%s" "$panelbg$panelfg ${windowtitle//^/^^}"
 	right=
+	append_right "$mem"
+	append_right "$swap"
 	append_right "$player"
 	append_right "$ipaddr"
 	append_right "$date"
-	# filter out ^(stuff) and get an estimated text width.
+	# filter out ^(stuff) and get a poorly estimated text width.
 	right_text_only=$(echo -n "$right" | sed 's/\^[^(]*([^)]*)//g' )
-	right_width=$($textwidth "$font" "$right_text_only    ")
+	right_width=$($textwidth "$font" "$right_text_only        ")
 	printf "%s" "^pa($((w - right_width)))$right"
 	# print panel
 	echo
@@ -207,14 +229,16 @@ dzen2_opts+=(-w "$w")
 dzen2_opts+=(-h "$h")
 dzen2_opts+=(-x "$x")
 dzen2_opts+=(-y "$y")
-scrollcmd() { printf "%s" "exec:herbstclient use_index $1 --skip-visible" ;}
+scrollcmd() {
+	printf "%s" "exec:herbstclient and % focus_monitor $monitor % use_index $1 --skip-visible"
+}
 dzen2_opts+=(-e "button4=$(scrollcmd -1);button5=$(scrollcmd +1)")
 dzen2_opts+=(-ta l)
 dzen2_opts+=(-bg "$defaultbg")
 dzen2_opts+=(-fg "$defaultfg")
 
 hc pad "$monitor" "$h"
-event_generator  2>/dev/null | {
+event_generator 2>/dev/null | {
 	event_init
 	while true ; do
 		panel_update
