@@ -24,7 +24,7 @@
 		export XMODIFIERS='@im=uim'
 		uim-xim &
 	fi
-	hash xrandr && xrandr --output LVDS1 --left-of VGA1
+	hash xrandr && xrandr --output LVDS1 --above VGA1
 	hash xflux  && xflux -l 49 &
 	test -x "$HOME"/.fehbg && . "$_"
 	xset -b on # enable bell

@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# TODO. maybe take advantage of extra fancy -l feature of dzen to do fancy status
 #{{{ Setup
 hc() { herbstclient "$@" ;}
 monitor=${1:-0}
@@ -8,10 +7,11 @@ if [ -z "${geometry[*]}" ]; then
 	echo "Invalid monitor $monitor"
 	exit 1
 fi
-x=${geometry[0]}
-y=${geometry[1]}
+# geometry=(X Y W H)
 w=${geometry[2]}
-h=16
+h=14
+x=${geometry[0]}
+y=$((${geometry[1]} + ${geometry[3]} - $h))
 
 #font="-xos4-terminus-medium-r-normal-*-12-140-72-72-c-80-iso10646-1"
 font="-*-fixed-medium-*-*-*-12-*-*-*-*-*-*-*"
@@ -124,7 +124,7 @@ if [ "$dzen2_svn" ] ; then
 	}
 else
 	print_tag() {
-		printf "%s" "$1"
+		printf "%s" " $1 "
 	}
 fi
 format_tag() {
@@ -208,6 +208,7 @@ append_right() {
 }
 panel_update() {
 	printf "%s" "$tags$separator"
+	printf "%s" "^ca(1,herbstclient focus_monitor \"$monitor\")"
 	printf "%s" "$panelbg$panelfg ${windowtitle//^/^^}"
 	right=
 	append_right "$mem"
@@ -216,11 +217,11 @@ panel_update() {
 	append_right "$ipaddr"
 	append_right "$date"
 	# filter out ^(stuff) and get a poorly estimated text width.
-	right_text_only=$(echo -n "$right" | sed 's/\^[^(]*([^)]*)//g' )
+	right_text_only=$(echo -n "$right" | sed 's/\^[^(]*([^)]*)//g')
 	right_width=$($textwidth "$font" "$right_text_only        ")
 	printf "%s" "^pa($((w - right_width)))$right"
 	# print panel
-	echo
+	echo "^ca()"
 }
 #}}}
 #{{{ Execute
@@ -237,7 +238,7 @@ dzen2_opts+=(-ta l)
 dzen2_opts+=(-bg "$defaultbg")
 dzen2_opts+=(-fg "$defaultfg")
 
-hc pad "$monitor" "$h"
+hc pad "$monitor" 0 0 "$h"
 event_generator 2>/dev/null | {
 	event_init
 	while true ; do
@@ -245,5 +246,5 @@ event_generator 2>/dev/null | {
 		event_consumer
 	done
 } 2>/dev/null | dzen2 "${dzen2_opts[@]}"
-hc pad "$monitor" 0
+hc pad "$monitor" 0 0 0
 # vim: foldmarker={{{,}}} foldmethod=marker
