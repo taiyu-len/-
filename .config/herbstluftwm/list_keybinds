@@ -1,0 +1,5 @@
+#!/bin/sh
+herbstclient list_keybinds |
+	sed 's/\t/@@@/;s/\t/ /g;s/@@@/\t/' |
+	column -ts $'\t' |
+	rofi -dmenu -p "herbwm keybinds" > dev/null 2>&1

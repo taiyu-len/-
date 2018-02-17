@@ -129,10 +129,11 @@ Rxvt.color15:       #FFFFFF
 !!}}}
 !!}}}
 !!{{{ Rofi
-rofi.matching:fuzzy
 rofi.font:dina 8
 rofi.fake-background:background
 rofi.fake-transparency:true
+rofi.matching:fuzzy
+rofi.sort:true
 !           State: #Bg      , #fg    , #bgalt   , #hlbg  , #hlfg
 rofi.color-normal: #00000000, #cccccc, #00000000, #222244, #ffffff
 rofi.color-urgent: #00000000, #cccccc, #00000000, #222244, #ffffff
