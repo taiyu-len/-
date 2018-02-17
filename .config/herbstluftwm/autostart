@@ -35,7 +35,7 @@ hc keybind "$Mod-Shift-q" close
 hc keybind "$Mod-Shift-r" reload
 hc keybind "$Mod-Return"  spawn ${TERMINAL:-xterm}
 hc keybind "$Mod-d"       spawn dmenu-launch
-hc setenv  DMENU_OPTIONS "-fn dina:pixelsize=10 -nb #222244 -nf #CCCCCC -sb #333366 -sf #FFFFFF"
+hc keybind "$Mod-w"       spawn rofi -show window
 
 hc keybind XF86ScreenSaver      spawn slock
 hc keybind XF86AudioMute        spawn amixer set Master toggle

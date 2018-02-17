@@ -29,5 +29,5 @@
 	test -x "$HOME"/.fehbg && . "$_"
 	xset -b on # enable bell
 } >/dev/null 2>&1
-#i3
-herbstluftwm
+#exec i3
+exec herbstluftwm

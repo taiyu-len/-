@@ -10,7 +10,7 @@ then
 fi
 # geometry=(X Y W H)
 w=${geometry[2]}
-h=14
+h=10
 x=${geometry[0]}
 y=${geometry[1]}                       # top
 #y=$((geometry[1] + geometry[3] - h))  # bottom
@@ -88,6 +88,10 @@ event_generator() {
 		END { print "" }'
 		sleep 30s
 	}
+	load_generator() {
+		</proc/loadavg awk "{print \"$(header load)$focusfg\" \$1,\"$panelfg\" \$2,\"$otherfg\" \$3}"
+		sleep 2
+	}
 	mem_generator() {
 		free -hs5 > >(exec awk "
 		\$1 == \"Mem:\" && \$3 != mem {
@@ -109,6 +113,7 @@ event_generator() {
 	}
 	add_job date_generator
 	add_job ipaddr_generator
+	add_job load_generator
 	mem_generator
 
 	hc --idle
@@ -166,6 +171,7 @@ handle_event() {
 	date  ) date="${cmd[*]:1}" ;;
 	mem   ) mem="${cmd[*]:1}" ;;
 	swap  ) swap="${cmd[*]:1}" ;;
+	load  ) load="${cmd[*]:1}" ;;
 	ipaddr) ipaddr="${cmd[*]:1}" ;;
 	tag*|urgent) update_tags ;;
 	quit_panel|reload) exit ;;
@@ -214,6 +220,7 @@ panel_update() {
 	right=
 	append_right "$mem"
 	append_right "$swap"
+	append_right "$load"
 	append_right "$player"
 	append_right "$ipaddr"
 	append_right "$date"

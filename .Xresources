@@ -4,10 +4,15 @@ Xft.hintstyle: hintslight
 Xft.hinting:   1
 Xft.antialias: 1
 !!{{{ Global Colors
+*.font:           -*-dina-medium-r-*-*-10-*-*-*-*-*-*-*
+*.italicFont:     -*-dina-medium-i-*-*-10-*-*-*-*-*-*-*
+*.boldFont:       -*-dina-bold-r-*-*-10-*-*-*-*-*-*-*
+*.boldItalicFont: -*-dina-bold-i-*-*-10-*-*-*-*-*-*-*
+
 *.cursorColor:   #5555AA
 
 !! default bg/fg
-*.background:    #000000
+*.background:    #222244
 *.foreground:    #FFFFFF
 
 ! black dark/light
@@ -47,9 +52,9 @@ Xft.antialias: 1
 Rxvt.tripleclickwords:       false
 
 !Font
-Rxvt.font:     -xos4-terminus-medium-r-normal--14-140-72-72-c-80-iso10646-1
-Rxvt.boldFont: -xos4-terminus-bold-r-normal--14-140-72-72-c-80-iso10646-1
-Rxvt.letterSpace: 0
+!Rxvt.font:     -xos4-terminus-medium-r-normal--14-140-72-72-c-80-iso10646-1
+!Rxvt.boldFont: -xos4-terminus-bold-r-normal--14-140-72-72-c-80-iso10646-1
+Rxvt.letterSpace: 1
 
 !! Font keybinds
 !! 4x6. tiny font
@@ -60,6 +65,7 @@ Rxvt.iso14755_52: false
 
 ! set up fading on no focus
 Rxvt.fading: 20%
+Rxvt.shading: 15
 
 ! set pastable tabs
 Rxvt.pastableTabs:  true
@@ -88,12 +94,7 @@ Rxvt.transparent:    true
 
 Rxvt.intensityStyles:true
 
-Rxvt.tintColor:         #222222
 Rxvt.underlineColor:    #0088ff
-!! default bg/fg
-Rxvt.background:    [50]#000000
-Rxvt.foreground:        #FFFFFF
-
 ! black dark/light
 Rxvt.color0:        [50]#000000
 Rxvt.color8:        [70]#888888
@@ -126,5 +127,17 @@ Rxvt.color14:       [80]#88FFFF
 Rxvt.color7:        [70]#FFFFFF
 Rxvt.color15:       #FFFFFF
 !!}}}
+!!}}}
+!!{{{ Rofi
+rofi.matching:fuzzy
+rofi.font:dina 8
+rofi.fake-background:background
+rofi.fake-transparency:true
+!           State: #Bg      , #fg    , #bgalt   , #hlbg  , #hlfg
+rofi.color-normal: #00000000, #cccccc, #00000000, #222244, #ffffff
+rofi.color-urgent: #00000000, #cccccc, #00000000, #222244, #ffffff
+rofi.color-active: #00000000, #cccccc, #00000000, #222244, #ffffff
+!                  #bg      #border  #separator
+rofi.color-window: #CC111122, #000011, #000011
 !!}}}
 ! vim:foldmethod=marker foldmarker={{{,}}}
