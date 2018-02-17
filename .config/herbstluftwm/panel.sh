@@ -3,7 +3,8 @@
 hc() { herbstclient "$@" ;}
 monitor=${1:-0}
 geometry=( $(hc monitor_rect "$monitor") )
-if [ -z "${geometry[*]}" ]; then
+if [ -z "${geometry[*]}" ]
+then
 	echo "Invalid monitor $monitor"
 	exit 1
 fi
@@ -11,11 +12,12 @@ fi
 w=${geometry[2]}
 h=14
 x=${geometry[0]}
-y=$((${geometry[1]} + ${geometry[3]} - $h))
+y=${geometry[1]}                       # top
+#y=$((geometry[1] + geometry[3] - h))  # bottom
 
 #font="-xos4-terminus-medium-r-normal-*-12-140-72-72-c-80-iso10646-1"
-font="-*-fixed-medium-*-*-*-12-*-*-*-*-*-*-*"
-#font="-gnu-unifont-*-*-*-*-*-*-*-*-*-*-*-*"
+#font="-*-fixed-medium-*-*-*-12-*-*-*-*-*-*-*"
+font="-*-dina-medium-r-*-*-10-*-*-*-*-*-*-*"
 
 # panel: default color for panel elements.
 # focus: color for currently focused elements
@@ -34,10 +36,10 @@ alertfg="^fg(#000000)"
 separator="$focusfg^r(1x$h)"
 
 #{{{ Textwidth function
-if hash textwidth &> /dev/null ; then
-	textwidth="textwidth";
-elif hash dzen2-textwidth &> /dev/null ; then
-	textwidth="dzen2-textwidth";
+if hash textwidth >/dev/null 2>&1
+then textwidth="textwidth";
+elif hash dzen2-textwidth >/dev/null 2>&1
+then textwidth="dzen2-textwidth";
 else
 	echo "This script requires the textwidth tool of the dzen2 project."
 	exit 1
@@ -47,20 +49,19 @@ fi
 # true if we are using the svn version of dzen2
 # depending on version/distribution, this seems to have version strings like
 # "dzen-" or "dzen-x.x.x-svn"
-if dzen2 -v 2>&1 | head -n 1 | grep -q '^dzen-\([^,]*-svn\|\),'; then
-	dzen2_svn="true"
-else
-	dzen2_svn=""
+if dzen2 -v 2>&1 | head -n 1 | grep -q '^dzen-\([^,]*-svn\|\),'
+then dzen2_svn="true"
+else dzen2_svn=""
 fi
 #}}}
 #{{{ uniq function
 uniq=(awk)
-if awk -Wv 2>/dev/null | head -1 | grep -q '^mawk'; then
-    # mawk needs "-W interactive" to line-buffer stdout correctly
-    # http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=593504
-    uniq+=(-W interactive)
+# mawk needs "-W interactive" to line-buffer stdout correctly
+# http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=593504
+if awk -Wv 2>/dev/null | head -1 | grep -q '^mawk'
+then uniq+=(-W interactive)
 fi
-uniq+=('$0 != l { print ; l=$0 ; fflush(); }')
+uniq+=("\$0 != l { print ; l=\$0 ; fflush(); }")
 #}}}
 #}}}
 #{{{ Event Generator function.
@@ -88,20 +89,21 @@ event_generator() {
 		sleep 30s
 	}
 	mem_generator() {
-		free -hs5 > >(exec awk '
-		$1 == "Mem:" && $3 != mem {
-			mem = $3;
-			print "'"$(header mem)${panelfg}M:$focusfg"'" $3 "'"$otherfg"'/" $2;
+		free -hs5 > >(exec awk "
+		\$1 == \"Mem:\" && \$3 != mem {
+			mem = \$3;
+			print \"$(header mem)${panelfg}M:$focusfg\" \$3 \"$otherfg/\" \$2;
 			fflush()
 		}
-		$1 == "Swap:" && $3 != swp && $3 != "0B" {
-			swp = $3;
-			print "'"$(header swap)${panelfg}S:$focusfg"'" $3 "'"$otherfg"'/" $2;
+		\$1 == \"Swap:\" && \$3 != swp && \$3 != \"0B\" {
+			swp = \$3;
+			print \"$(header swap)${panelfg}S:$focusfg\" \$3 \"$otherfg/\" \$2;
 			fflush()
-		}') & pids+=($!)
+		}") & pids+=($!)
 	}
 	add_job(){
-		while :; do "$@"; sleep 1
+		while :
+		do "$@"; sleep 1
 		done > >(exec "${uniq[@]}")&
 		pids+=($!)
 	}
@@ -115,7 +117,8 @@ event_generator() {
 #}}}
 #{{{ initialize eventloop data
 #{{{ Panel tags
-if [ "$dzen2_svn" ] ; then
+if [ "$dzen2_svn" ]
+then
 	print_tag() {
 		# clickable tags if using SVN dzen
 		printf %s "^ca(1,herbstclient and "
@@ -140,8 +143,8 @@ format_tag() {
 }
 update_tags() {
 	tags=
-	while read -d $'\t' -r tag; do
-		tags+="$(format_tag "$tag")"
+	while read -d $'\t' -r tag
+	do tags+="$(format_tag "$tag")"
 	done <<< "$(hc tag_status "$monitor")"
 }
 #}}}
@@ -167,15 +170,12 @@ handle_event() {
 	tag*|urgent) update_tags ;;
 	quit_panel|reload) exit ;;
 	togglehidepanel) #{{{
-		if [ "${cmd[1]}" -ne "$monitor" ] ; then
-			return
-		fi
+		[ "${cmd[1]}" -ne "$monitor" ] && return
 		currentidx=$(hc attr monitors.focus.index)
-		if [ "${cmd[1]}" = "current" ] && [ "$currentidx" -ne "$monitor" ] ; then
-			return
-		fi
+		[ "${cmd[1]}" = "current" ] && [ "$currentidx" -ne "$monitor" ] && return
 		echo "^togglehide()"
-		if "$visible" ; then
+		if "$visible"
+		then
 			visible=false
 			hc pad "$monitor" 0
 		else
@@ -189,11 +189,12 @@ handle_event() {
 #{{{ event consumer
 event_consumer() {
 	# wait for first event and handle it.
-	if IFS=$'\t' read -ra cmd ; then
+	if IFS=$'\t' read -ra cmd
+	then
 		handle_event "${cmd[@]}"
 		# read in more events until we timeout.
-		while IFS=$'\t' read -t .05 -ra cmd ; do
-			handle_event "${cmd[@]}"
+		while IFS=$'\t' read -t .05 -ra cmd
+		do handle_event "${cmd[@]}"
 		done
 	else
 		return 1
@@ -202,8 +203,8 @@ event_consumer() {
 #}}}
 #{{{ Panel Update
 append_right() {
-	for i in "$@"; do
-		[ "$i" ] && right+=" $separator$i"
+	for i
+	do [ "$i" ] && right+=" $separator$i"
 	done
 }
 panel_update() {
@@ -218,7 +219,7 @@ panel_update() {
 	append_right "$date"
 	# filter out ^(stuff) and get a poorly estimated text width.
 	right_text_only=$(echo -n "$right" | sed 's/\^[^(]*([^)]*)//g')
-	right_width=$($textwidth "$font" "$right_text_only        ")
+	right_width=$($textwidth "$font" "$right_text_only ")
 	printf "%s" "^pa($((w - right_width)))$right"
 	# print panel
 	echo "^ca()"
@@ -238,13 +239,14 @@ dzen2_opts+=(-ta l)
 dzen2_opts+=(-bg "$defaultbg")
 dzen2_opts+=(-fg "$defaultfg")
 
-hc pad "$monitor" 0 0 "$h"
+hc pad "$monitor" "$h"
 event_generator 2>/dev/null | {
 	event_init
-	while true ; do
+	while true
+	do
 		panel_update
 		event_consumer
 	done
 } 2>/dev/null | dzen2 "${dzen2_opts[@]}"
-hc pad "$monitor" 0 0 0
+hc pad "$monitor" 0
 # vim: foldmarker={{{,}}} foldmethod=marker
