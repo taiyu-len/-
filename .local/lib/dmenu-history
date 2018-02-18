@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+### Dmenu History Wrapper
+error () { printf "${FUNCNAME[1]}: $1\\n" "${@:2}" >&2 ;}
+init () {
+	confd="${XDG_USER_CONFIG_DIR:-$HOME/.config}/dmenu-history"
+	context="$(basename "$0")"
+	if [ "$context" = "dmenu-history" ]
+	then
+		error "Do not call directly, call via sym-link"
+		exit 1
+	fi
+	hist="$confd/$context.history"   # History file storing recent results
+	lock="$confd/$context.lock"      # Lock file to prevent multipl contexts from running
+	conf="$confd/$context.config"    # config file to source and override options
+	default_conf="$confd/config"
+
+	mkdir -p "$confd"
+	# Options
+	size=10     # default history size
+	dm=(dmenu)  # Function that gets called via "${dm[@]}"
+}
+update_history () {
+	{
+		echo "$1"
+		head -n "$size" "$hist" | grep -Fvx "$1"
+	} > "$hist.new"
+	mv "$hist.new" "$hist"
+}
+run () {
+	# Check for lock or quit if exists
+	if [ -f "$lock" ]
+	then
+		pid=$(<"$lock")
+		if [ "$pid" ] && kill -0 "$pid" >/dev/null 2>&1
+		then
+			error "existing program with PID %s using %s." "$pid" "$lock"
+			exit 1
+		fi
+	fi
+	echo $BASHPID > "$lock"
+	trap "rm '$lock'" EXIT
+
+	# Source configuration
+	[ -f "$default_conf" ] && . "$default_conf"
+	[ -f "$conf" ] && . "$conf"
+	{
+		if [ -f "$hist" ]
+		then cat "$hist" -
+		else cat
+		fi
+	} | "${dm[@]}" "$@" | {
+		# Read in output from dmenu, and store results into history
+		readarray -t list
+		for i in "${list[@]}"
+		do [ "$i" ] && update_history "$i"
+		done
+		# Print results back out to whoever is listening
+		printf "%s\\n" "${list[@]}"
+	}
+}
+
+init
+run "$@"
+#}}}
