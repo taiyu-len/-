@@ -33,7 +33,7 @@ panelfg="^fg()"
 focusfg="^fg(#ffffff)"
 otherfg="^fg(#aaaaaa)"
 alertfg="^fg(#000000)"
-separator="$focusfg^r(1x$h)"
+separator="$focusfg|"
 
 #{{{ Textwidth function
 if hash textwidth >/dev/null 2>&1
@@ -65,51 +65,51 @@ uniq+=("\$0 != l { print ; l=\$0 ; fflush(); }")
 #}}}
 #}}}
 #{{{ Event Generator function.
-# based on different input data (mpc, date, hlwm hooks, ...)
-# this generates events, formed like this:
-#     <eventname>\t<data> [...]
-# e.g.
-#     date    ^fg(#efefef)18:33^fg(#909090), 2013-10-^fg(#efefef)29
-#     Should have bg,fg set first, and a space before content, should not set 
-#     fg/bg at end of content.
+# Generate events in the form
+# $eventname\t$eventdata...
 event_generator() {
+	# Add jobs into pids in order to kill processes.
+	# long running jobs
 	local pids=()
+	add_job() {
+		while :
+		do "$@"; sleep 1
+		done > >(exec "${uniq[@]}") &
+		pids+=($!)
+	}
 	header() { printf "%s\\t%s" "$1" "${2:-$panelbg} " ;}
 	date_generator() {
-		printf "$(header date)$focusfg%(%H:%M$otherfg, %Y-%m-$focusfg%d)T\\n"
+		printf "$(header date)$focusfg%(%H:%M$otherfg|%Y-$panelfg%m-$focusfg%d)T\\n"
 		sleep $((60 - $(printf "%(%S)T")))
 	}
 	ipaddr_generator() {
-		ip -br addr | awk '
-		BEGIN { printf "'"$(header ipaddr)"'" }
+		ip -br addr | awk -v hdr="$(header ipaddr)" -v fg="$focusfg" '
+		BEGIN { printf hdr }
 		$2 == "UP" {
-			printf "'$focusfg'" $1 ":^fg(#99ef99)" substr($3, 0, index($3, "/")-1)
+			printf fg $1 ":^fg(#99ef99)" substr($3, 0, index($3, "/")-1)
 		}
 		END { print "" }'
-		sleep 30s
+		sleep 30
 	}
 	load_generator() {
-		</proc/loadavg awk "{print \"$(header load)$focusfg\" \$1,\"$panelfg\" \$2,\"$otherfg\" \$3}"
-		sleep 2
+		</proc/loadavg awk -v h="$(header load)$focusfg" -v f1="$panelfg" -v f2="$otherfg" '{
+			print h $1, f1 $2, f2  $3
+		}'
+		sleep 5
 	}
 	mem_generator() {
-		free -hs5 > >(exec awk "
-		\$1 == \"Mem:\" && \$3 != mem {
-			mem = \$3;
-			print \"$(header mem)${panelfg}M:$focusfg\" \$3 \"$otherfg/\" \$2;
-			fflush()
-		}
-		\$1 == \"Swap:\" && \$3 != swp && \$3 != \"0B\" {
-			swp = \$3;
-			print \"$(header swap)${panelfg}S:$focusfg\" \$3 \"$otherfg/\" \$2;
-			fflush()
-		}") & pids+=($!)
-	}
-	add_job(){
-		while :
-		do "$@"; sleep 1
-		done > >(exec "${uniq[@]}")&
-		pids+=($!)
+		free -hs5 > >(exec awk -v h1="$(header mem)" -v h2="$(header swap)" \
+			-v f1="$panelfg" -v f2="$focusfg" -v f3="$otherfg" '
+			$1 == "Mem:" && $3 != mem {
+				mem = $3;
+				print h1 f1 "M:" f2 $3 f3 "/" $2;
+				fflush()
+			}
+			$1 == "Swap:" && $3 != swp && $3 != "0B" {
+				swp = $3;
+				print h2 f1 "S:" f2 $3 f3 "/" $2;
+				fflush()
+			}') & pids+=($!)
 	}
 	add_job date_generator
 	add_job ipaddr_generator
@@ -174,7 +174,7 @@ handle_event() {
 	load  ) load="${cmd[*]:1}" ;;
 	ipaddr) ipaddr="${cmd[*]:1}" ;;
 	tag*|urgent) update_tags ;;
-	quit_panel|reload) exit ;;
+	quit_panel|reload) hc pad "$monitor" 0 && exit ;;
 	togglehidepanel) #{{{
 		[ "${cmd[1]}" -ne "$monitor" ] && return
 		currentidx=$(hc attr monitors.focus.index)
@@ -214,7 +214,7 @@ append_right() {
 	done
 }
 panel_update() {
-	printf "%s" "$tags$separator"
+	printf "%s" "$tags$focusfg^r(1x$h)"
 	printf "%s" "^ca(1,herbstclient focus_monitor \"$monitor\")"
 	printf "%s" "$panelbg$panelfg ${windowtitle//^/^^}"
 	right=
@@ -226,7 +226,7 @@ panel_update() {
 	append_right "$date"
 	# filter out ^(stuff) and get a poorly estimated text width.
 	right_text_only=$(echo -n "$right" | sed 's/\^[^(]*([^)]*)//g')
-	right_width=$($textwidth "$font" "$right_text_only ")
+	right_width=$($textwidth "$font" "$right_text_only")
 	printf "%s" "^pa($((w - right_width)))$right"
 	# print panel
 	echo "^ca()"
@@ -247,13 +247,10 @@ dzen2_opts+=(-bg "$defaultbg")
 dzen2_opts+=(-fg "$defaultfg")
 
 hc pad "$monitor" "$h"
-event_generator 2>/dev/null | {
-	event_init
-	while true
-	do
-		panel_update
-		event_consumer
-	done
-} 2>/dev/null | dzen2 "${dzen2_opts[@]}"
-hc pad "$monitor" 0
+event_init
+while true
+do
+	panel_update
+	event_consumer
+done < <(event_generator) > >(dzen2 "${dzen2_opts[@]}")
 # vim: foldmarker={{{,}}} foldmethod=marker
