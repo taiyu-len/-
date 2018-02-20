@@ -125,7 +125,7 @@ then
 		typeset -A s
 		{
 			local line
-			read line && b=$(sed -n 's/^## \(.*\)\.\.\..*/\1/;T;p' <<< $line)
+			read line && b=$(sed -n 's/^## \(\(.*\)\.\.\..*\|\(.*\)\)/\2\3/;T;p' <<< $line)
 			[ "$b" ] && while IFS= read line; do
 				[[ ! "${line:0:1}" =~ '[ ?!]' ]] && c=+
 				[[ "${line:0:1}" == 'A' ]] && ((++s[A]))
@@ -401,7 +401,7 @@ cheat.sh() {
 	curl "cheat.sh/$*"
 }
 #}}}
-
+spawn() { ("$@" </dev/null &>/dev/null &) ;}
 hless() {
 	highlight -Oansi "$@" | less -R
 }
@@ -415,7 +415,7 @@ lensay() {
 	ponycmd+=(--wrap=i)
 	"${ponycmd[@]}" "$@"
 }
-
+#{{{ *cd
 mkcd() {
 	mkdir -p "$*" && cd "$_"
 }
@@ -435,12 +435,14 @@ tmpcd() {
 	cd "$(mktemp -dp /tmp ${*:+-d "$*.XXXXXXXXX"})"
 	pwd
 }
+#}}}
+#{{{ help
 if is zsh
 then
 	unalias run-help &> /dev/null
 	autoload run-help
 fi
-
+#}}}
 #}}}
 #{{{ Cleanup
 if is zsh

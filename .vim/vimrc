@@ -219,10 +219,17 @@ augroup VIMRC_FixText "{{{
 	autocmd FileType man,netrw setlocal nolist
 augroup END "}}}
 "}}}
+"{{{ Syntax
+let g:sh_no_error=1
+"}}}
 "{{{ Columns
 set number         " Show current line number
 set relativenumber " and relative number for rest of lines
 set colorcolumn=+0
+augroup VIMRC_colorcolumn
+	autocmd!
+	autocmd BufReadPost quickfix setlocal colorcolumn=0
+augroup END
 "}}}
 "{{{ Folding
 "{{{ fancy fold function
@@ -263,10 +270,10 @@ function! VIMRC_fold_function() abort
 	if (&foldmethod ==? "marker")
 		let l:end = split(&foldmarker, ',')[1]
 	elseif (&foldmethod ==? "syntax")
-		let l:end = substitute(getline(v:foldend), '^\s*\([])}]\|\w\+\).*$', '\1', '')
+		let l:end = substitute(getline(v:foldend), '^\s*\([])}]\|\w\+\|\).*$', '\1', '')
 	endif
 	let l:lines = printf("│ %*d", len(line('$')), v:foldend - v:foldstart)
-	let l:width = max([60, &textwidth]) - 1
+	let l:width = (&textwidth ? &textwidth : 80) - 1
 	let l:strlen = l:width - strdisplaywidth("..." . l:end)
 	if exists('g:vimrc_foldexpand') && g:vimrc_foldexpand > 0
 		let l:foldstr = printf("%.*S...%s", l:strlen, VIMRC_expand(getline(v:foldstart), l:tab), l:end)
@@ -280,6 +287,7 @@ set foldmethod=syntax
 set foldclose=
 set foldopen+=insert
 set foldlevelstart=0
+let g:sh_fold_enabled=7
 "}}}
 "{{{ Conceal
 set conceallevel=2
