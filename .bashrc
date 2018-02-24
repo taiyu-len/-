@@ -58,9 +58,9 @@
 #}}}
 #{{{ shell test
 if  [[ "$0" =~ zsh || "$(basename "$0")" = .zshrc ]]  && [ "$ZSH_NAME" ]
-then is() { [ $1 = zsh  ] && { shift; "$@"; }; }
+then is() { [ "$1" = zsh  ] && { shift; "$@"; }; }
 elif [[ "$0" =~ bash || "$(basename "$0")" = .bashrc ]] && [ "$BASH" ]
-then is() { [ $1 = bash ] && { shift; "$@"; }; }
+then is() { [ "$1" = bash ] && { shift; "$@"; }; }
 else is() { false; }
 fi
 #}}}
@@ -125,9 +125,9 @@ then
 		typeset -A s
 		{
 			local line
-			read line && b=$(sed -n 's/^## \(\(.*\)\.\.\..*\|\(.*\)\)/\2\3/;T;p' <<< $line)
-			[ "$b" ] && while IFS= read line; do
-				[[ ! "${line:0:1}" =~ '[ ?!]' ]] && c=+
+			read -r line && b=$(sed -n 's/^## \(\(.*\)\.\.\..*\|\(.*\)\)/\2\3/;T;p' <<< "$line")
+			[ "$b" ] && while IFS= read -r line; do
+				[[ ! "${line:0:1}" =~ [?!\ ] ]] && c=+
 				[[ "${line:0:1}" == 'A' ]] && ((++s[A]))
 				((++s[${line:1:1}]))
 			done
@@ -139,8 +139,8 @@ then
 	PS1="$PS_PREFIX%(1j.%j.)│$PS_SUFFIX "
 	RPS1="$PS_PREFIX"' %~ $(my_git_status)'"$PS_SUFFIX"
 	[[ "$TERM" == "linux" ]] && PS1+=' '
-	PS2="$PS_PREFIX"%_" │$PS_SUFFIX "
-	PS3="$PS_PREFIX"?#" │$PS_SUFFIX "
+	PS2="$PS_PREFIX%_ │$PS_SUFFIX "
+	PS3="$PS_PREFIX?# │$PS_SUFFIX "
 	#}}}
 elif is bash #{{{
 then PS1='\w \$ '
@@ -156,7 +156,7 @@ then
 	zstyle ':completion:*' completer _extensions _expand _prefix _complete _ignored _correct _approximate
 	#{{{ Display
 	# Use colors for results
-	zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS} # enable colors
+	zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}" # enable colors
 	# Messages
 	zstyle ':completion:*'              verbose true
 	zstyle ':completion:*:descriptions' format '%F{6}%B== %U%d%u ==%b%f'
@@ -224,7 +224,7 @@ then
 	#{{{ Map Ctrl-Z to call fg
 	# via http://git.grml.org/?p=grml-etc-core.git;a=blob_plain;f=etc/zsh/zshrc;hb=HEAD
 	grml-zsh-fg() {
-		if (( ${#jobstates} )); then
+		if (( "${#jobstates}" )); then
 			zle .push-input
 			[[ -o hist_ignore_space ]] && BUFFER=' ' || BUFFER=''
 			BUFFER="${BUFFER}fg"
@@ -254,22 +254,14 @@ then
 	typeset -A key
 	autoload zkbd
 	zkbd_file() {
-		[[ -f ~/.zkbd/${TERM}-${VENDOR}-${OSTYPE} ]] && printf '%s' ~/".zkbd/${TERM}-${VENDOR}-${OSTYPE}" && return 0
-		[[ -f ~/.zkbd/${TERM}-${DISPLAY}          ]] && printf '%s' ~/".zkbd/${TERM}-${DISPLAY}"          && return 0
-		return 1
+		{ test -f ~/".zkbd/${TERM}-${VENDOR}-${OSTYPE}" && printf "%s" "$_" ;} ||
+		{ test -f ~/".zkbd/${TERM}-${DISPLAY}"          && printf "%s" "$_" ;}
 	}
-	mkdir -p ~/.zkbd
-	keyfile=$(zkbd_file)
-	if [[ $? == 1 ]]
-	then
-		zkbd
-		keyfile=$(zkbd_file)
+	load_zkbd() { keyfile="$(zkbd_file)" && source "$keyfile" ;}
+	if ! load_zkbd
+	then zkbd && load_zkbd || printf 'Failed to setup keys via zkbd.\n' 1>&2
 	fi
-	if [[ $? == 0 ]]
-	then source "$keyfile"
-	else printf 'Failed to setup keys using zkbd.\n'
-	fi
-	unset zkbd_file
+	unfunction zkbd_file load_zkbd
 	unset keyfile
 	#}}}
 	#{{{ set mappings
@@ -301,8 +293,10 @@ then
 fi
 #}}}
 #{{{ Aliases
-## allows aliases to be passed into sudo.
+## Command aliases
 alias sudo="sudo "
+alias torify="torify "
+alias exec="exec "
 #{{{ safety
 alias mv="mv -i"
 alias cp="cp -i"
@@ -324,12 +318,13 @@ alias wget='wget -q --show-progress'
 #}}}
 #{{{ ls
 ls_common=(--color=auto --human-readable)
-alias ls="ls -B ${ls_common[*]}"
-alias ll="ls -l ${ls_common[*]}"
-alias la="ls -A ${ls_common[*]}"
+alias ls="\\ls -B ${ls_common[*]}"
+alias ll="\\ls -l ${ls_common[*]}"
+alias la="\\ls -A ${ls_common[*]}"
 unset ls_common
 #}}}
 #{{{ git
+alias g="git status -s"
 for i in status commit merge pull push fetch grep log diff mv rm blame add
 do alias g$i="git $i"
 done; unset i
@@ -380,16 +375,16 @@ track() {
 	while [[ "$1" = @* ]]
 	do tags+=("${1/@/}"); shift
 	done
-	if ! hash "${1:?Requires a function to call}" &> /dev/null && [ -d "$1" -o ! -x "$1" ]
+	if ! hash "${1:?Requires a function to call}" &> /dev/null && { [ -d "$1" ] || [ ! -x "$1" ]; }
 	then echo "Requires a valid function to call" >&2; return 1
 	fi
-	timew start "${tags[@]:-$(basename $1)}"
+	timew start "${tags[@]:-$(basename "$1")}"
 	"$@"
 	timew stop
 }
 #}}}
 #{{{ Tmux
-tat() { tmux new-session -As "${@:-$(basename $PWD)}"; }
+tat() { tmux new-session -As "${@:-$(basename "$PWD")}"; }
 tdt() { tmux detach; }
 tsplit() { tmux split-window "$@"; }
 #}}}
@@ -417,7 +412,7 @@ lensay() {
 }
 #{{{ *cd
 mkcd() {
-	mkdir -p "$*" && cd "$_"
+	mkdir -p "$*" &&  cd "$_"
 }
 is zsh compdef mkcd=mkdir
 
@@ -427,7 +422,7 @@ hash fzf 2>/dev/null &&
 		local dir
 		dir=$(find "${1:-.}" -path '*/\.*' -prune \
 			-o -type d -print 2> /dev/null | fzf +m) &&
-		cd $dir
+		cd "$dir"
 	} &&
 	is zsh compdef fzcd=cd
 
