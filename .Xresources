@@ -1,4 +1,3 @@
-!! TODO fix some stuff
 Xft.lcdfilter: lcddefault
 Xft.hintstyle: hintslight
 Xft.hinting:   1
@@ -9,51 +8,53 @@ Xft.antialias: 1
 *.boldFont:       -*-dina-bold-r-*-*-10-*-*-*-*-*-*-*
 *.boldItalicFont: -*-dina-bold-i-*-*-10-*-*-*-*-*-*-*
 
-*.cursorColor:   #5555AA
+*.cursorColor:   #333366
 
 !! default bg/fg
-*.background:    #222244
-*.foreground:    #FFFFFF
+*.background:    #111122
+*.foreground:    #DDDDEE
 
 ! black dark/light
-*.color0:        #000000
-*.color8:        #555555
+*.color0:        #111122
+*.color8:        #888899
 
 ! red dark/light
-*.color1:        #FF8888
-*.color9:        #FF8888
+*.color1:        #FF7777
+*.color9:        #FF7777
 
 ! green dark/light
-*.color2:        #88FF88
-*.color10:       #88FF88
+*.color2:        #77FF77
+*.color10:       #77FF77
 
 ! yellow dark/light
-*.color3:        #FFFF88
-*.color11:       #FFFF88
+*.color3:        #FFFF77
+*.color11:       #FFFF77
 
 ! blue dark/light
-*.color4:        #8888FF
-*.color12:       #8888FF
+*.color4:        #7777FF
+*.color12:       #7777FF
 
 ! magenta dark/light
-*.color5:        #FF88FF
-*.color13:       #FF88FF
+*.color5:        #FF77FF
+*.color13:       #FF77FF
 
 ! cyan dark/light
-*.color6:        #88FFFF
-*.color14:       #88FFFF
+*.color6:        #77FFFF
+*.color14:       #77FFFF
 
 ! white dark/light
-*.color7:        #CCCCCC
-*.color15:       #FFFFFF
+*.color7:        #BBBBDD
+*.color15:       #DDDDEE
 !!}}}
 !!{{{ Rxvt
 !set up triple click grabs logical line
 Rxvt.tripleclickwords:       false
 
 !Font
-!Rxvt.font:     -xos4-terminus-medium-r-normal--14-140-72-72-c-80-iso10646-1
-!Rxvt.boldFont: -xos4-terminus-bold-r-normal--14-140-72-72-c-80-iso10646-1
+Rxvt.font:           -*-dina-medium-r-*-*-10-*-*-*-*-*-*-*,-*-ipamonagothic-*-r-*-*-*-*-*-*-*-*-iso10646-*
+Rxvt.italicFont:     -*-dina-medium-i-*-*-10-*-*-*-*-*-*-*,-*-ipamonagothic-*-r-*-*-*-*-*-*-*-*-iso10646-*
+Rxvt.boldFont:       -*-dina-bold-r-*-*-10-*-*-*-*-*-*-*,-*-ipamonagothic-*-r-*-*-*-*-*-*-*-*-iso10646-*
+Rxvt.boldItalicFont: -*-dina-bold-i-*-*-10-*-*-*-*-*-*-*,-*-ipamonagothic-*-r-*-*-*-*-*-*-*-*-iso10646-*
 Rxvt.letterSpace: 1
 
 !! Font keybinds
@@ -91,41 +92,40 @@ Rxvt.urgentOnBell:   true
 
 !!{{{ Colors
 Rxvt.transparent:    true
-
 Rxvt.intensityStyles:true
 
-Rxvt.underlineColor:    #0088ff
+Rxvt.underlineColor:    #7777FF
 ! black dark/light
-Rxvt.color0:        [50]#000000
-Rxvt.color8:        [70]#888888
+Rxvt.color0:        [70]#111122
+Rxvt.color8:        [80]#888899
 
 ! red dark/light
-Rxvt.color1:        [70]#FF8888
-Rxvt.color9:        [80]#FF8888
+Rxvt.color1:        [70]#FF7777
+Rxvt.color9:        [80]#FF7777
 
 ! green dark/light
-Rxvt.color2:        [70]#88FF88
-Rxvt.color10:       [80]#88FF88
+Rxvt.color2:        [70]#77FF77
+Rxvt.color10:       [80]#77FF77
 
 ! yellow dark/light
-Rxvt.color3:        [70]#FFFF88
-Rxvt.color11:       [80]#FFFF88
+Rxvt.color3:        [70]#FFFF77
+Rxvt.color11:       [80]#FFFF77
 
 ! blue dark/light
-Rxvt.color4:        [70]#8888FF
-Rxvt.color12:       [80]#8888FF
+Rxvt.color4:        [70]#7777FF
+Rxvt.color12:       [80]#7777FF
 
 ! magenta dark/light
-Rxvt.color5:        [70]#FF88FF
-Rxvt.color13:       [80]#FF88FF
+Rxvt.color5:        [70]#FF77FF
+Rxvt.color13:       [80]#FF77FF
 
 ! cyan dark/light
-Rxvt.color6:        [70]#88FFFF
-Rxvt.color14:       [80]#88FFFF
+Rxvt.color6:        [70]#77FFFF
+Rxvt.color14:       [80]#77FFFF
 
 ! white dark/light
-Rxvt.color7:        [70]#FFFFFF
-Rxvt.color15:       #FFFFFF
+Rxvt.color7:        [70]#DDDDEE
+Rxvt.color15:       [80]#EEEEFF
 !!}}}
 !!}}}
 !!{{{ Rofi
@@ -135,10 +135,10 @@ rofi.fake-transparency:true
 rofi.matching:fuzzy
 rofi.sort:true
 !           State: #Bg      , #fg    , #bgalt   , #hlbg  , #hlfg
-rofi.color-normal: #00000000, #cccccc, #00000000, #222244, #ffffff
-rofi.color-urgent: #00000000, #cccccc, #00000000, #222244, #ffffff
-rofi.color-active: #00000000, #cccccc, #00000000, #222244, #ffffff
-!                  #bg      #border  #separator
-rofi.color-window: #CC111122, #000011, #000011
+rofi.color-normal: #00000000, #BBBBDD, #00000000, #333366, #DDDDEE
+rofi.color-urgent: #00000000, #BBBBDD, #00000000, #333366, #DDDDEE
+rofi.color-active: #00000000, #BBBBDD, #00000000, #333366, #DDDDEE
+!                  #bg        #border  #separator
+rofi.color-window: #CC111122, #111122, #111122
 !!}}}
 ! vim:foldmethod=marker foldmarker={{{,}}}

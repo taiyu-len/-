@@ -11,10 +11,10 @@
 		done
 		unset f
 	fi
-	test "$HOME/.Xresources" && xrdb -load "$_"
+	test ~/.Xresources && xrdb -load "$_"
 
 	# swap escape and capslock keys
-	test "$HOME/.Xmodmap"  && xmodmap "$_"
+	test ~/.Xmodmap  && xmodmap "$_"
 	hash xcape && xcape
 
 	# enable japanese Input
@@ -26,8 +26,10 @@
 	fi
 	hash xrandr && xrandr --output LVDS1 --above VGA1
 	hash xflux  && xflux -l 49 &
-	test -x "$HOME"/.fehbg && . "$_"
+	test -x ~/.fehbg && . "$_"
+	hash urxvtd && urxvtd -qof
 	xset -b on # enable bell
 } >/dev/null 2>&1
 #exec i3
-exec herbstluftwm
+exec bspwm
+#exec herbstluftwm

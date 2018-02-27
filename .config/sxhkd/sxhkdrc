@@ -1,0 +1,105 @@
+#{{{ WM agnostic keybinds
+## Launch prefered terminal
+super + Return
+	$\{TERMINAL:-xterm\}
+## Launch process
+super + space
+	dmenu-launch
+## Reload sxhkdrc
+super + Escape
+	pkill -USR1 -x sxhkd
+## Select window
+super + grave
+	rofi -show window
+## Manage MPC Audio
+super + XF86Audio{Play,Next,Prev,LowerVolume,RaiseVolume,Mute}
+	mpc {toggle,next,prev,volume -10,volume +10,0}
+## Show keybinds
+super + shift + slash
+	~/.config/sxhkd/show-keybinds.sh | rofi -dmenu -i -matching normal -no-sort >/dev/null
+#}}}
+#{{{ BSPWM Commands
+## Quit wm safely
+super + alt + Escape
+	[ "$(rofi -dmenu -l 0 -width -30 -p "Quit X? (type 'yes')" )" = "yes" ] && bspc quit
+#{{{ Nodes
+## Close or Kill nodes
+super + {_,shift + }w
+	[ "$(rofi -dmenu -l 0 -width -40 -p "{Close,Kill} Window? (type 'yes')")" = "yes" ] && bspc node -{c,k}
+## Set node layout to tiled,floating,fullscreen
+super + {t,shift + t,s,f}
+	bspc node -t ~{tiled,pseuo_tiled,floating,fullscreen}
+## Move node to desktop
+super + shift + {1-9,0}
+	bspc node -d '^{1-9,10}'
+## Focus or swap node in direction
+super + {_,shift + }{h,j,k,l}
+	bspc node -{f,s} {west,south,north,east}
+## Focus the node for the given path jump
+super + {p,b,comma,period}
+	bspc node -f @{parent,brother,first,second}
+## Rotate child nodes
+super + shift + {comma,period}
+	bspc node -R {270,90}
+## Flip Child nodes
+super + {shift + backslash,minus}
+	bspc node -F {vertical,horizontal}
+## Focus next or previous node
+super + {_,shift + }c
+	bspc node -f {next,prev}.local
+## Focus next or previous node in history.
+super + {_,shift +}tab
+	bspc wm -h off; \
+	bspc node -f {older,newer}; \
+	bspc wm -h on
+## Expand node edge by 5px
+super + ctrl + {h,j,k,l}
+	bspc node -z {left -5 0,bottom 0 5,top 0 -5,right 5 0}
+## Expand node edge by 25px
+super + ctrl + {Left,Up,Down,Right}
+	bspc node -z {left -25 0,bottom 0 25,top 0 -25,right 25 0}
+## Contract node edge by 5px
+super + ctrl + shift + {h,j,k,l}
+	bspc node -z {left 5 0,bottom 0 -5,top 0 5,right -5 0}
+## Contract node edge by 25px
+super + ctrl + shift + {Left,Up,Down,Right}
+	bspc node -z {left 25 0,bottom 0 -25,top 0 25,right -25 0}
+## Rebalance nodes
+super + equal
+	bspc node -E
+## Move floating node
+super + {Left,Down,Up,Right}
+	bspc node -v {-20 0,0 20,0 -20,20 0}
+#}}}
+#{{{ Preselection
+## Preselect in direction
+super + alt + {h,j,k,l}
+	bspc node -p ~{west,south,north,east}
+## Set preselect ratio
+super + alt + {1-9}
+	bspc node -o 0.{1-9}
+## Cancel preselection for node
+super + alt + space
+	bspc node -p cancel
+#}}}
+#{{{ Desktop
+## Focus to specified desktop
+super + {1-9,0}
+	bspc desktop -f '^{1-9,10}'
+## Focus next/previous Desktop
+super + {bracketleft,bracketright}
+	bspc desktop -f {prev,next}.local
+## Toggle layout between tiled and monocle
+super + m
+	bspc desktop -l next
+#}}}
+#{{{ Monitor
+## Focus next/previous Monitor
+super + BackSpace
+	bspc monitor -f next
+## Focus next/previous Monitor
+super + shift + bracket{left,right}
+	bspc monitor -f {prev,next}
+#}}}
+#}}}
+# vim: filetype=sh foldmethod=marker foldmarker={{{,}}}
