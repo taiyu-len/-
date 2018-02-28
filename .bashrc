@@ -57,10 +57,10 @@
 #}}}
 #}}}
 #{{{ shell test
-if  [[ "$0" =~ zsh || "$(basename "$0")" = .zshrc ]]  && [ "$ZSH_NAME" ]
-then is() { [ "$1" = zsh  ] && { shift; "$@"; }; }
-elif [[ "$0" =~ bash || "$(basename "$0")" = .bashrc ]] && [ "$BASH" ]
-then is() { [ "$1" = bash ] && { shift; "$@"; }; }
+if   [[ "$0" =~ zsh ]] && [ "$ZSH_NAME" ]
+then is() { [ "$1" = zsh  ] && shift && "$@" ;}
+elif [[ "$0" =~ bash ]] && [ "$BASH" ]
+then is() { [ "$1" = bash ] && shift && "$@" ;}
 else is() { false; }
 fi
 #}}}
@@ -83,7 +83,7 @@ then
 fi #}}}
 #}}}
 #{{{ History
-ign_cmds=(ls cd "cd -" pwd exit date "* --help" "* -h" jobs fg bg htop ps)
+ign_cmds=(ls cd "cd -" pwd exit date "* --help" "* -h" jobs fg bg htop ps "* /tmp")
 HISTSIZE=1000000
 HISTFILE=
 if is zsh #{{{
@@ -91,7 +91,7 @@ then
 	# Infinite history size,
 	# enables start, end meta data.
 	# use shared history between ttys
-	HISTFILE="$HOME/.zsh/history"
+	HISTFILE=~/.zsh/history
 	SAVEHIST=$HISTSIZE
 	HISTORY_IGNORE="($(IFS='|'; printf %s "${ign_cmds[*]}"))"
 	setopt BANG_HIST
@@ -101,6 +101,8 @@ then
 	setopt HIST_IGNORE_ALL_DUPS
 	setopt HIST_IGNORE_SPACE
 	setopt HIST_SAVE_NO_DUPS
+	setopt HIST_NO_FUNCTIONS
+	setopt HIST_NO_STORE # dont add history command to history
 	setopt HIST_VERIFY
 	setopt HIST_BEEP
 	setopt HIST_REDUCE_BLANKS
@@ -110,7 +112,7 @@ then
 	HISTIGNORE="$(IFS=:; printf %s "${ign_cmds[*]}")"
 	HISTCONTROL=ignoreboth
 	HISTTIMEFORMAT=%s
-	HISTFILE="$HOME/.bash_history"
+	HISTFILE=~/.bash_history
 fi #}}}
 unset ign_cmds
 #}}}
@@ -206,7 +208,7 @@ then
 	#}}}
 	#{{{ Cache
 	zstyle ':completion:*' use-cache on
-	zstyle ':completion:*:complete:*' cache-path "$HOME/.zsh/cache"
+	zstyle ':completion:*:complete:*' cache-path ~/.zsh/cache
 	#}}}
 
 	autoload -Uz compinit
@@ -224,7 +226,7 @@ then
 	#{{{ Map Ctrl-Z to call fg
 	# via http://git.grml.org/?p=grml-etc-core.git;a=blob_plain;f=etc/zsh/zshrc;hb=HEAD
 	grml-zsh-fg() {
-		if (( "${#jobstates}" )); then
+		if (( ${#jobstates} )); then
 			zle .push-input
 			[[ -o hist_ignore_space ]] && BUFFER=' ' || BUFFER=''
 			BUFFER="${BUFFER}fg"
@@ -297,6 +299,7 @@ fi
 alias sudo="sudo "
 alias torify="torify "
 alias exec="exec "
+alias command="command "
 #{{{ safety
 alias mv="mv -i"
 alias cp="cp -i"
@@ -397,15 +400,14 @@ cheat.sh() {
 }
 #}}}
 spawn() { ("$@" </dev/null &>/dev/null &) ;}
-hless() {
-	highlight -Oansi "$@" | less -R
-}
+is zsh compdef spawn=command
+hless() { highlight -Oansi "$@" | less -R ;}
 
 lensay() {
 	local ponycmd=()
 	if [[ "$TERM" =~ 256color ]]
-	then ponycmd+=(ponythink --bubble=think --file="$HOME/.local/share/catsay/len.cat")
-	else ponycmd+=(ponysay   --bubble=linux --file="$HOME/.local/share/catsay/nul.cat")
+	then ponycmd+=(ponythink --bubble think --file ~/.local/share/catsay/len.cat)
+	else ponycmd+=(ponysay   --bubble linux --file ~/.local/share/catsay/nul.cat)
 	fi
 	ponycmd+=(--wrap=i)
 	"${ponycmd[@]}" "$@"

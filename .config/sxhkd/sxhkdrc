@@ -5,6 +5,8 @@ super + Return
 ## Launch process
 super + space
 	dmenu-launch
+#super + shift + grave
+#	
 ## Reload sxhkdrc
 super + Escape
 	pkill -USR1 -x sxhkd

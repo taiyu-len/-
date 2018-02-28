@@ -1,17 +1,19 @@
 #{{{ Global Exports
 #{{{ paths and programs
-export PATH="$HOME/.local/bin":"$PATH"
+export PATH=~/.local/bin:"$PATH"
 export EDITOR=vim
 export GIT_EDITOR=vi
 export BROWSER=w3m
 export TERMINAL=start-urxvtc
-export MAIL="$HOME/.mail"
+export MAIL=~/.mail
 export MAILCHECK=$[60*15]
+export SXHKD_SHELL=sh
+export RLWRAP_HOME=~/.rlwrap
 #}}}
 #{{{ Files
-export ZSHRC="$HOME/.zshrc"
-export BASHRC="$HOME/.zshrc"
-export VIMRC="$HOME/.vim/vimrc"
+export ZSHRC=~/.zshrc
+export BASHRC=~/.bashrc
+export VIMRC=~/.vim/vimrc
 #}}}
 #{{{ Colors
 eval $(dircolors ~/.dircolors)
