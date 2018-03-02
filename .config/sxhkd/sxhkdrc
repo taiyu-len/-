@@ -58,13 +58,13 @@ super + {_,shift +}tab
 super + ctrl + {h,j,k,l}
 	bspc node -z {left -5 0,bottom 0 5,top 0 -5,right 5 0}
 ## Expand node edge by 25px
-super + ctrl + {Left,Up,Down,Right}
+super + ctrl + {Left,Down,Up,Right}
 	bspc node -z {left -25 0,bottom 0 25,top 0 -25,right 25 0}
 ## Contract node edge by 5px
 super + ctrl + shift + {h,j,k,l}
 	bspc node -z {left 5 0,bottom 0 -5,top 0 5,right -5 0}
 ## Contract node edge by 25px
-super + ctrl + shift + {Left,Up,Down,Right}
+super + ctrl + shift + {Left,Down,Up,Right}
 	bspc node -z {left 25 0,bottom 0 -25,top 0 25,right -25 0}
 ## Rebalance nodes
 super + equal

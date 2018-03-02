@@ -83,7 +83,7 @@ then
 fi #}}}
 #}}}
 #{{{ History
-ign_cmds=(ls cd "cd -" pwd exit date "* --help" "* -h" jobs fg bg htop ps "* /tmp")
+ign_cmds=(ls cd "cd -" pwd exit date "* --help" "* -h" jobs fg bg htop ps "* /tmp*")
 HISTSIZE=1000000
 HISTFILE=
 if is zsh #{{{
@@ -399,6 +399,22 @@ cheat.sh() {
 	curl "cheat.sh/$*"
 }
 #}}}
+xclip_loop() {
+	while ! read -t "${1:-1}"
+	do xclip -o
+	done | awk '$0 != last { last=$0; print; fflush(); }'
+}
+# Parallel implementation
+plll() {
+	local line
+	while read line
+	do
+		local args=("$line")
+		while read -t "1" line; do args+=("$line"); done
+		"$@" "${args[@]}"
+	done
+}
+
 spawn() { ("$@" </dev/null &>/dev/null &) ;}
 is zsh compdef spawn=command
 hless() { highlight -Oansi "$@" | less -R ;}
