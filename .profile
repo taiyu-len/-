@@ -1,6 +1,7 @@
 #{{{ Global Exports
 #{{{ paths and programs
 export PATH=~/.local/bin:"$PATH"
+export PAGER=less
 export EDITOR=vim
 export GIT_EDITOR=vi
 export BROWSER=w3m
@@ -29,7 +30,6 @@ export LESS_TERMCAP_ue=$(tput rmul; tput op)         # End underline
 export LESS_TERMCAP_me=$(tput sgr0)                  # Turn off bold, blink, underline
 export LESS_TERMCAP_so=$(tput setaf 2; tput setab 0) # Begin standout
 export LESS_TERMCAP_se=$(tput sgr0)                  # End standout
-export PAGER=less
 export MANPAGER="less -iXF"
 #}}}
 #}}}

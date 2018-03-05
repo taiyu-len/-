@@ -16,6 +16,9 @@ super + grave
 ## Manage MPC Audio
 super + XF86Audio{Play,Next,Prev,LowerVolume,RaiseVolume,Mute}
 	mpc {toggle,next,prev,volume -10,volume +10,0}
+## Lock screen
+XF86ScreenSaver
+	slock
 ## Show keybinds
 super + shift + slash
 	~/.config/sxhkd/show-keybinds.sh | rofi -dmenu -i -matching normal -no-sort >/dev/null

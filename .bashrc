@@ -352,7 +352,7 @@ alias dc="rlwrap dc"
 alias racket="rlwrap racket"
 #}}}
 #{{{ Locale Aliases
-alias JP='LANG="ja_JP.UTF8" '
+alias JP='LANG="ja_JP.UTF8" LC_ALL="ja_JP.UTF8" '
 #}}}
 #{{{ misc
 alias info="info --vi-keys"

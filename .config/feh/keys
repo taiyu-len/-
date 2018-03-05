@@ -1,0 +1,6 @@
+# disable inplace rotation
+orient_3
+orient_1
+# disable saving image
+save_image
+
