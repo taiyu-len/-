@@ -77,9 +77,14 @@ then
 	setopt INTERACTIVE_COMMENTS
 	setopt PUSHDIGNOREDUPS
 	setopt AUTOPUSHD
+	setopt NO_CLOBBER
 
 	setopt AUTOCD # type directory name to change to it
 	setopt EXTENDEDGLOB # regular expresssion globbing
+	#}}}
+elif is bash #{{{
+then
+	set -o noclobber
 fi #}}}
 #}}}
 #{{{ History
