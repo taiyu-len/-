@@ -214,10 +214,6 @@ let s:plugins["vim-unimpaired"] = "tpope"
 set showmatch " show matching pair under cursor
 set list
 set listchars=eol:$,tab:│•,trail:•,extends:→,precedes:←,conceal:δ,nbsp:•
-augroup VIMRC_FixText "{{{
-	autocmd!
-	autocmd FileType man,netrw setlocal nolist
-augroup END "}}}
 "}}}
 "{{{ Syntax
 let g:sh_no_error=1
@@ -350,11 +346,6 @@ colorscheme kuro
 "{{{ Help
 let s:plugins["vim-man"] = "vim-utils"
 set keywordprg=:Man
-augroup VIMRC_FixHelp
-	autocmd!
-	autocmd FileType help setlocal keywordprg=:help
-	" XXX set keyword for other programs if needed
-augroup END
 "}}}
 "{{{ Git
 let s:plugins["vim-fugitive"] = "tpope"
@@ -362,6 +353,9 @@ augroup VIMRC_fugitive
 	autocmd!
 	autocmd BufReadPost fugitive://* set bufhidden=delete
 augroup END
+"}}}
+"{{{ Org
+let s:plugins["vim-orgmode"] = "jceb"
 "}}}
 "{{{ Netrw
 let s:plugins["vim-vinegar"] = "tpope"
@@ -372,6 +366,7 @@ let g:netrw_list_hide = "\\~$"
 let g:netrw_sizestyle = "h"
 "}}}
 "{{{ Command
+cnoremap <C-Backspace> <C-w>
 "{{{ Wild menu
 set wildmenu
 set wildchar=<TAB>
@@ -385,22 +380,6 @@ nnoremap <leader>b :ls<cr>:b<space>
 nnoremap <leader>sb :ls<cr>:sb<space>
 nnoremap gb :bnext<cr>
 nnoremap gB :bprevious<cr>
-"}}}
-"{{{ Mappings
-cnoremap <C-Backspace> <C-w>
-augroup VIMRC_file_mappings
-	autocmd!
-	autocmd FileType vim nnoremap <buffer> <silent> <leader>e :exe getline('.')<CR>
-	" Doesnt work for functions definitions, but handles commented lines well
-	autocmd FileType vim vnoremap <buffer> <silent> <leader>e :<c-u>call VIMRC_exe_range()<CR>
-augroup END
-"{{{ Helper functions
-function! VIMRC_exe_range() abort
-	for line in getline("'<", "'>")
-		exe line
-	endfor
-endfunction
-"}}}
 "}}}
 PackAdd
 " vim: foldmarker={{{,}}}: foldlevel=0: foldmethod=marker
