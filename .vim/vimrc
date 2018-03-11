@@ -42,7 +42,7 @@ let s:plugins["vim-prosession"] = "dhruvasagar"
 " config for input, operators, etc. no fancy Mappings
 set mouse= " mouse has annoying behavior so disabling for now
 let mapleader = " "
-let localmapleader = ","
+let maplocalleader = ","
 "{{{ Setup Arrow keys for different terminals
 if &term == 'screen-256color'
 	map  [1;2A <S-Up>
@@ -268,7 +268,9 @@ function! VIMRC_fold_function() abort
 	elseif (&foldmethod ==? "syntax")
 		let l:end = substitute(getline(v:foldend), '^\s*\([])}]\|\w\+\|\).*$', '\1', '')
 	endif
-	let l:lines = printf("│ %*d", len(line('$')), v:foldend - v:foldstart)
+	let l:lines  = line('$')
+	let l:folded = v:foldend - v:foldstart+1
+	let l:lines = printf("│ %*d │ %4.1f%%", len(l:lines), l:folded, l:folded*100.0/l:lines)
 	let l:width = (&textwidth ? &textwidth : 80) - 1
 	let l:strlen = l:width - strdisplaywidth("..." . l:end)
 	if exists('g:vimrc_foldexpand') && g:vimrc_foldexpand > 0
@@ -356,6 +358,8 @@ augroup END
 "}}}
 "{{{ Org
 let s:plugins["vim-orgmode"] = "jceb"
+let g:org_todo_keywords=[['TODO(t)', 'STARTED(s)', 'DONE(d)'],
+			\['CANCELED(c)']]
 "}}}
 "{{{ Netrw
 let s:plugins["vim-vinegar"] = "tpope"
