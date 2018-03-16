@@ -371,6 +371,12 @@ let g:netrw_sizestyle = "h"
 "}}}
 "{{{ Command
 cnoremap <C-Backspace> <C-w>
+nnoremap q: <nop>
+nnoremap q/ <nop>
+nnoremap q? <nop>
+nnoremap Q: q:
+nnoremap Q/ q/
+nnoremap Q? q?
 "{{{ Wild menu
 set wildmenu
 set wildchar=<TAB>

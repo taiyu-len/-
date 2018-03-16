@@ -12,9 +12,9 @@ highlight Visual               NONE ctermbg=0 cterm=underline,bold
 highlight!link Folded          Comment
 "}}}
 "{{{ Diff
-highlight DiffAdd              NONE ctermfg=0 ctermbg=2 cterm=underline,bold
+highlight DiffAdd              NONE ctermfg=0 ctermbg=2 cterm=underline
 highlight DiffChange           NONE                     cterm=underline
-highlight DiffText             NONE ctermfg=0 ctermbg=4 cterm=underline,bold
+highlight DiffText             NONE ctermfg=0 ctermbg=4 cterm=underline
 highlight DiffDelete           NONE ctermfg=7 ctermbg=1 cterm=bold
 "}}}
 "{{{ Columns
