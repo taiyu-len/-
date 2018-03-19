@@ -406,8 +406,8 @@ cheat.sh() {
 #}}}
 xclip_loop() {
 	while ! read -t "${1:-1}"
-	do xclip -o
-	done | awk '$0 != last { last=$0; print; fflush(); }'
+	do xclip -o; echo
+	done | awk '$0 != last && $0 != "" { last=$0; print; fflush(); }'
 }
 # Parallel implementation
 plll() {
