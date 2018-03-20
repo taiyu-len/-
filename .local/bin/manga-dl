@@ -5,35 +5,30 @@
 
 set -o errexit
 set -o nounset
-pexit() {
-	{
-	printf '%s\n' "$@"
-	[ "$debug" ] && printf '%s\n' "link=${link-unset}" "site=${site-unset}"
-	[ "$debug" ] && printf '%s\n' "name=${name-unset}" "pages=${pages-unset}"
-	} >&2;
-	exit 1;
-}
+
+: "${debug=false}"
+: "${quiet=false}"
+log(){ $quiet || printf "$@" ;}
+err(){ printf "$@" >&2 ;printf "== %s\n" ${link+link="$link"} ${name+name="$name"} ${site+site="$site"} ;}
 show_help() {
-	printf "%s\n" "usage: $(basename "$0") -h[elp]] -q[uiet] -d[ebug] <urls>..."
+	printf '%s\n' "usage: $(basename "$0") -h[elp]] -q[uiet] -d[ebug] <urls>..."
 }
 
 while getopts ":dqh" opt
 do
 	case "$opt" in
-	q) quiet=true;;
-	d) debug=true;;
-	h) show_help;;
+	q) quiet=;;
+	d) debug=;;
+	h) show_help; exit;;
 	*) echo "Discarding unknown option: $opt";;
 	esac
 done
-shift $[$OPTIND - 1]
-: ${debug=}
-: ${quiet=}
+shift $((OPTIND - 1))
 
-[ "$debug" ] && set -x
+$debug && set -x
 
 if [ "$#" -eq 0 ]
-then show_help; exit 1
+then show_help; exit
 fi
 
 process_urls() {
@@ -49,7 +44,7 @@ do
 		"process_$site"
 	then
 		# setup directories
-		[ ! "$quiet" ] && echo "Downloading $name from $site now. ${pages:-unknown} pages"
+		log "Downloading $name from $site now. ${pages:-unknown} pages\\n"
 		mkdir -p "${SAVEDIR-${SAVEDIR_PREFIX-/tmp}/$site/$name}"
 		cd       "${SAVEDIR-${SAVEDIR_PREFIX-/tmp}/$site/$name}"
 		local url
@@ -97,8 +92,8 @@ wget+=(--tries 0)
 wget+=(--timeout 60)
 wget+=(--continue)
 wget+=(--quiet)
-[ ! "$quiet" ] && wget+=(--show-progress)
-[ ! "$quiet" ] && wget+=('--progress=bar:force')
+$quiet || wget+=(--show-progress)
+$quiet || wget+=('--progress=bar:force')
 #}}}
 #{{{ default curl options
 curl=(curl)
@@ -112,9 +107,10 @@ get_site() {
 	( *mngcow.co/*             ) site=mangacow    ;;
 	( *webtoons.com/*          ) site=webtoons    ;;
 	( *otscans.com/foolslide/* ) site=foolslide   ;;
+	( *reader.deathtollscans.* ) site=foolslide   ;;
 	( *imgur.com/a/*           ) site=imgur       ;;
 	( *imgur.com/*             ) site=imgursolo   ;;
-	( *                        ) pexit "unknown url" ;;
+	( *                        ) err "Unknown link: '$link'\\n"; return 1;;
 	esac
 }
 #{{{ Processing data
@@ -141,21 +137,21 @@ rename_images[imgursolo]=0
 # extract title from fd 10
 process_title() {
 	name=$(sed -nr -e "/<title>/{s/.*<title>${name_regex[$site]}.*/\\1/;T;p;q}" <&10)
-	[ "$name" ] || pexit "unable to get name from url"
+	[ "$name" ] || { err "unable to get name from url\\n"; return 1; }
 }
 
 # prints arguments to fd 11, sets $pages
 urls_from_args() {
 	local urls=("$@")
 	pages=${#urls[@]}
-	[ "$pages" -gt 0 ] || pexit "unable to parse image urls from url"
+	[ "$pages" -gt 0 ] || { err "unable to parse image urls from url\\n"; return 1; }
 	exec 11< <(printf '%s\n' "${urls[@]}")
 }
 
 # downloads pages and prints extracted urls to fd 11
 urls_generate() {
 	exec 11< <(
-		for (( i=0; i <= "$pages"; ++i ))
+		for (( i=1; i <= "$pages"; ++i ))
 		do "${curl[@]}" -G "$1/$i" | sed -nr "$2"
 		done
 	)
@@ -185,7 +181,7 @@ process_mangastream() {
 process_foolslide() {
 	process_title || return 1
 	pages=$(sed -nr "/tbtitle dropdown_parent dropdown_right/{s/.*>([0-9]*) .*/\\1/;p;q}" <&10)
-	urls_generate "$link/page/$i" '\,content/comics/,{s/.*src="([^"]*)".*/\1/;p;q}'
+	urls_generate "$(dirname "$link")" '\,content/comics/,{s/.*src="([^"]*)".*/\1/;p;q}'
 }
 process_imgur() {
 	name=$(basename "$link")
