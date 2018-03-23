@@ -56,7 +56,7 @@
 # +----------------+-----------+-----------+------+
 #}}}
 #}}}
-#{{{ shell test
+#{{{ Shell test
 if   [[ "$0" =~ zsh ]] && [ "$ZSH_NAME" ]
 then is() { [ "$1" = zsh  ] && shift && "$@" ;}
 elif [[ "$0" =~ bash ]] && [ "$BASH" ]
@@ -128,6 +128,7 @@ then
 	ZLE_RPROMPT_INDENT=$?
 	setopt PROMPT_SUBST
 	my_git_status() { #{{{
+		emulate -L zsh
 		local b c s # branch_name, has changes to be commited, status of uncommited files
 		typeset -A s
 		{
@@ -156,6 +157,7 @@ fi #}}}
 #{{{ Completions
 if is zsh
 then
+	test -e ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh && . "$_"
 	# : completion : function : completer : command : argument : tag
 	#
 	# Completers to use.
@@ -397,12 +399,8 @@ tdt() { tmux detach; }
 tsplit() { tmux split-window "$@"; }
 #}}}
 #{{{ neat curl things
-wttr() {
-	curl "wttr.in/$*"
-}
-cheat.sh() {
-	curl "cheat.sh/$*"
-}
+wttr() { curl "wttr.in/$*" ;}
+cheat.sh() { curl "cheat.sh/$*" ;}
 #}}}
 xclip_loop() {
 	while ! read -t "${1:-1}"
@@ -434,9 +432,7 @@ lensay() {
 	"${ponycmd[@]}" "$@"
 }
 #{{{ *cd
-mkcd() {
-	mkdir -p "$*" &&  cd "$_"
-}
+mkcd() { mkdir -p "$*" &&  cd "$_" ;}
 is zsh compdef mkcd=mkdir
 
 # fuzzy cd lookup
