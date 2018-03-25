@@ -1,13 +1,11 @@
-" TODO
-" Clean up vimrc. make it more lightweight with a way to to start with a minimal 
-" vimrc
 "{{{ Vim
-"{{{ plugins
+"{{{ Plugin Setup
 filetype plugin indent on
 syntax enable
-" let s:plugins["name"] = "author"
-" as in github.com/author/name.
 let s:plugins = {}
+" let s:plugins["name"] = "author"
+" as in github.com/author/name. TODO improve this
+
 function! VIMRC_run_minpac() abort "{{{
 	packadd minpac
 	call minpac#init({'jobs': '1'})
@@ -21,10 +19,9 @@ command! PackUpdate source $MYVIMRC | call VIMRC_run_minpac() | call minpac#upda
 command! PackClean  source $MYVIMRC | call VIMRC_run_minpac() | call minpac#clean()
 command! -bang PackAdd for name in keys(s:plugins) | execute "packadd<bang> " . fnameescape(name) | endfor
 "}}}
-"{{{ Files And Paths
-" Where vim puts things
+"{{{ Vim Files And Paths | Where vim saves things
 set secure
-set backup   backupdir=.
+set backup backupdir=.
 let &backupskip = escape(expand('$HOME'), '\') . '/.local/bin/*'
 set undofile undodir=~/.vim/undo
 set backupskip+=/tmp/*
@@ -32,14 +29,15 @@ set directory=~/.vim/swap//
 set path+=include
 set viminfofile=~/.vim/viminfo
 "}}}
-"{{{ Session
+"{{{ Buffers | How buffers are handled
 set hidden
+"}}}
+"}}}
+"{{{ Session | Automatic saving and resuming of sessions
 let s:plugins["vim-obsession"] = "tpope"
 let s:plugins["vim-prosession"] = "dhruvasagar"
 "}}}
-"}}}
-"{{{ Editing
-" config for input, operators, etc. no fancy Mappings
+"{{{ Editing | Config for basic input
 set mouse= " mouse has annoying behavior so disabling for now
 let mapleader = " "
 let maplocalleader = ","
@@ -79,8 +77,8 @@ elseif &term == 'dvtm-256color'
 	map! Oc <C-Right>
 	map! Od <C-Left>
 elseif &term == 'rxvt-unicode-256color'
-	map [a <S-Up>
-	map [b <S-Down>
+	map  [a <S-Up>
+	map  [b <S-Down>
 	map! [a <S-Up>
 	map! [b <S-Down>
 	set  t_%i=[c " S-Right
@@ -99,8 +97,8 @@ elseif &term == 'rxvt-unicode-256color'
 	map! [3^ <C-delete>
 endif
 "}}}
-set shiftwidth=0 " make <Tab> inserts tab.
 "{{{ basic mappings
+set shiftwidth=0 " make tab inserts <Tab>
 "{{{ remap backspace/delete keys
 map  <BS>       X
 nmap <C-BS>     db
@@ -126,7 +124,9 @@ vmap <S-Down>  <Down>
 vmap <S-Right> <Right>
 vmap <S-Left>  <Left>
 "}}}
+"{{{ Yank to end of line
 map Y y$
+"}}}
 "{{{ Auto Pairing pairs
 let s:plugins["delimitMate"] = "Raimondi"
 let delimitMate_expand_cr = 1
@@ -137,6 +137,7 @@ imap  <C-O>
 "}}}
 "}}}
 "{{{ Formatting
+" Auto formatting options
 set autoindent
 set cinoptions=
 set cinoptions+=Ls " placement of labels will be shifted one over.
@@ -168,10 +169,8 @@ set tildeop
 nnoremap <silent><leader>ss :set spell<cr>1z=:set nospell<cr>
 "}}}
 "}}}
-"{{{ Motion
-" config for navigating the document, using motion keys, etc
+"{{{ Motion | Config for navigating vim
 "{{{ Cursor
-" configure movement of cursor
 set whichwrap=<,>,[,]          " enable wrapping with cursor keys in all modes
 set backspace=indent,eol,start " enable backspace
 set virtualedit=onemore,block  " allow cursor one past the line, and anywhere in block mode
@@ -180,17 +179,19 @@ set virtualedit=onemore,block  " allow cursor one past the line, and anywhere in
 set ignorecase smartcase
 set incsearch wrapscan
 set magic
-" Only show highlight
+" Only show highlight while searching
 augroup VIMRC_incsearch_highlight
 	autocmd!
 	autocmd CmdlineEnter /,\? :set hlsearch
 	autocmd CmdlineLeave /,\? :set nohlsearch
 augroup END
 "}}}
-"{{{ Marks
+"{{{ Registers
 " Swap mark jump keys around
 nnoremap ' `
 nnoremap ` '
+" Use \ for register
+nnoremap \ "
 "}}}
 "{{{ Scrolling
 set scrolloff=5
@@ -198,8 +199,7 @@ set sidescroll=1     " Enable side scrolling
 set sidescrolloff=5
 set nowrap           " Disable wrapping
 "}}}
-"{{{ Motions
-" add surround motions
+"{{{ Motion plugins
 let s:plugins["vim-surround"] = "tpope"
 let s:plugins["vim-repeat"] = "tpope"
 let s:plugins["vim-sexp"] = "guns"
@@ -209,18 +209,21 @@ let g:sexp_enable_insert_mode_mappings=0
 let s:plugins["vim-unimpaired"] = "tpope"
 "}}}
 "}}}
-"{{{ Display
+"{{{ Display | How things get printed
 "{{{ Text
 set showmatch " show matching pair under cursor
 set list
 set listchars=eol:$,tab:│•,trail:•,extends:→,precedes:←,conceal:δ,nbsp:•
 "}}}
-"{{{ Syntax
+"{{{ Syntax 
 let g:sh_no_error=1
+let g:c_comment_strings=1
+let g:c_no_bracket_error=1
+let g:c_curly_error=1
+
 "}}}
-"{{{ Columns
-set number         " Show current line number
-set relativenumber " and relative number for rest of lines
+"{{{ Columns/Margins
+set number relativenumber " show current line number and offsets
 set colorcolumn=+0
 augroup VIMRC_colorcolumn
 	autocmd!
@@ -312,12 +315,12 @@ function! VIMRC_Column() abort
 	return repeat(" ", l:padding) . col('.')
 endfunction
 "}}}
-"{{{ Print string if non empty
+"{{{ Printf string if non empty
 function! PrintIf(fmt, str) abort
 	return empty(a:str) ? '' : printf(a:fmt, a:str)
 endfunction
 "}}}
-"{{{ Print modifed status of the file
+"{{{ Prints modifed status of the file
 function! VIMRC_Modified() abort
 	return ! &modifiable ? '-' :
 	\      ! &modified   ? '' :
@@ -345,7 +348,7 @@ set background="dark"
 colorscheme kuro
 "}}}
 "}}}
-"{{{ Help
+"{{{ Help | How vim looks up keywords
 let s:plugins["vim-man"] = "vim-utils"
 set keywordprg=:Man
 "}}}
