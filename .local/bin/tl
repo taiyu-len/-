@@ -1,4 +1,12 @@
 #!/bin/sh
+while getopts ":f:t:" opt
+do case "$opt" in
+	f) FROM="$OPTARG" ;;
+	t) TO="$OPTARG"   ;;
+	*) echo "Usage: $(basename $0) -f[rom language] -t[o language] [stuff to translate|< translate from stdin]"; exit 0;;
+esac done
+shift $((OPTIND - 1))
+
 opts+=("Mozilla/5.0 (Windows NT 10.0; WOW64; rv:56.0) Gecko/20100101 Firefox/56.0")
 opts+=("https://translate.google.com/m?sl=${FROM:=jp}&tl=${TO:=en}&ie=UTF-8") 
 printf "%s\n" "$FROM -> $TO"
