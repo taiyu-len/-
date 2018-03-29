@@ -1,0 +1,5 @@
+filetype plugin indent on
+syntax enable
+set foldenable
+set foldmethod=syntax
+colorscheme kuro

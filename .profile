@@ -3,7 +3,7 @@
 export PATH=~/.local/bin:"$PATH"
 export PAGER=less
 export EDITOR=vim
-export GIT_EDITOR=vi
+export GIT_EDITOR="vim -u ~/.vim/git_vimrc"
 export BROWSER=w3m
 export TERMINAL=start-urxvtc
 export MAIL=~/.mail
