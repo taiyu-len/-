@@ -344,6 +344,12 @@ alias start="timew start"
 alias stop="timew stop"
 alias cont="timew continue"
 #}}}
+#{{{ nq
+alias nq="nq "
+mkdir -p /tmp/nq-wget
+alias qget='NQDIR=/tmp/nq-wget  nq wget'
+alias qwait='NQDIR=/tmp/nq-wget nq wget -q'
+#}}}
 #{{{ cpu settings
 alias cpumin="sudo cpupower frequency-set -u 800MHz"
 alias cpumed="sudo cpupower frequency-set -u 1.60GHz"

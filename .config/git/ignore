@@ -5,6 +5,7 @@
 *.exe
 *.o
 *.so
+*.d
 
 # Packages #
 ############
@@ -44,8 +45,13 @@ Thumbs.db
 .clang_complete
 compile_commands.json
 *.plist
+
 # CMAKE #
 #########
 CMakeCache.txt
 CMakeFiles
 cmake_install.cmake
+
+# NQ #
+######
+,*
