@@ -310,7 +310,7 @@ alias command="command "
 #{{{ safety
 alias mv="mv -i"
 alias cp="cp -i"
-alias rm="rm -i"
+alias rm="rm -i --one-file-system"
 #}}}
 #{{{ Use color
 alias dir='dir --color=auto'
