@@ -124,6 +124,10 @@ vmap <S-Down>  <Down>
 vmap <S-Right> <Right>
 vmap <S-Left>  <Left>
 "}}}
+"{{{ Suspend in insert mode
+imap  <C-O>
+"}}}
+"}}}
 "{{{ Yank to end of line
 map Y y$
 "}}}
@@ -132,9 +136,9 @@ let s:plugins["delimitMate"] = "Raimondi"
 let delimitMate_expand_cr = 1
 let delimitMate_expand_space = 1
 "}}}
-"{{{ Suspend in insert mode
-imap  <C-O>
-"}}}
+"{{{ Repeatable change word
+nnoremap c* *Ncgn
+nnoremap c# #NcgN
 "}}}
 "{{{ Formatting
 " Auto formatting options
@@ -215,11 +219,14 @@ set showmatch " show matching pair under cursor
 set list
 set listchars=eol:$,tab:│•,trail:•,extends:→,precedes:←,conceal:δ,nbsp:•
 "}}}
-"{{{ Syntax 
+"{{{ Syntax
+set synmaxcol=200
 let g:sh_no_error=1
 let g:c_comment_strings=1
+let g:c_no_if0=1
 let g:c_no_bracket_error=1
 let g:c_curly_error=1
+let g:load_doxygen_syntax=1
 
 "}}}
 "{{{ Columns/Margins
@@ -363,6 +370,9 @@ augroup END
 let s:plugins["vim-orgmode"] = "jceb"
 let g:org_todo_keywords=[['TODO(t)', 'STARTED(s)', 'DONE(d)'],
 			\['CANCELED(c)']]
+"}}}
+"{{{ Ledger
+let s:plugins["vim-ledger"] = "ledger"
 "}}}
 "{{{ Netrw
 let s:plugins["vim-vinegar"] = "tpope"

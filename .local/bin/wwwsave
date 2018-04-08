@@ -12,12 +12,12 @@ options+=(--force-directories)          # always use directories
 options+=(--execute=robots=off)         # ignore robots.txt
 options+=(--user-agent="$useragent")
 options+=(--no-check-certificate)       # ignore certificates
+# Websites with pages like `example.com/foo` and `example.com/foo/bar.html`
+# are not handled well by Wget. For now the current workaround is to use
+# --adjust-extension, which changes downloads foo as foo.html, but that is
+# fragile. Preferably, it should be saved as foo/index.html instead.
+# maybe add an adjust-extensionless which does that.
 options+=(--adjust-extension)           # fix extensions
-# unfortunately required as not having it breaks websites with pages like
-# example.com/foo
-# example.com/foo/bar.html
-# ideally, foo would be saved like v, but wget lacks such capability. might add that to wget later, looks easy enough to do
-# example.com/foo/index.html
 options+=(--wait=0.5 --random-wait)     # wait a little
 options+=(--tries=100 --timeout=60)     # tries a lot and timeout after a minute
 options+=(--timestamping)               # dont redownload files that havnt changed
@@ -29,6 +29,13 @@ options+=(--ignore-case)                # ignore case for resource extensions
 if [ "$(basename "$0")" = wwwmirror ]   # use mirror if this script is called with that name
 then options+=(--mirror)
 fi
+
+# Wget does not handle page-requisites+mirroring very well.
+# it considers pages linked via <a> to be downloaded as page-requisites, and 
+# proceeds to download the entire internet. the workaround for this is to use an 
+# accept-regex that downloads anything with a resources extension, or from the 
+# same domain avoiding the "download the internet" problem while still 
+# downloading resources from foriegn domains.
 
 # foreign resources to save
 resources+=(js css)                   # common prerequisites
