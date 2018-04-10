@@ -2,105 +2,63 @@
 # TODO Rewrite to be more modular
 # TODO Save all metadata associated with it
 # TODO Better Options
-
 set -o errexit
 set -o nounset
 
-: "${debug=false}"
-: "${quiet=false}"
+# Logging
+# shellcheck disable=SC2059
 log(){ $quiet || printf "$@" ;}
-err(){ printf "$@" >&2 ;printf "== %s\n" ${link+link="$link"} ${name+name="$name"} ${site+site="$site"} ;}
+# shellcheck disable=SC2059
+err(){
+	{
+		printf "$@"
+		printf '== %s\n' ${link+link="$link"} ${title+title="$title"} ${site+site="$site"}
+	} >&2
+}
 show_help() {
-	printf '%s\n' "usage: $(basename "$0") -h[elp]] -q[uiet] -d[ebug] <urls>..."
+	log '%s\n' "usage: $(basename "$0") -h[elp] -q[uiet] -d[ebug] <urls>..."
 }
 
-while getopts ":dqh" opt
-do
-	case "$opt" in
-	q) quiet=;;
-	d) debug=;;
+# Parse options
+debug=false
+quiet=false
+opts="dqh"
+
+#shellcheck disable=SC2046
+set -- $(getopt "$opts" "$@")
+while getopts "$opts" opt
+do case "$opt" in
+	q)  quiet=;; +q) quiet=false;;
+	d)  debug=;; +d) debug=false;;
 	h) show_help; exit;;
 	*) echo "Discarding unknown option: $opt";;
-	esac
-done
+esac done
 shift $((OPTIND - 1))
-
-$debug && set -x
 
 if [ "$#" -eq 0 ]
 then show_help; exit
 fi
 
-process_urls() {
-for link
-do
-	local wref="--referer=$link"
-	if
-		get_site &&
-		# download given url into fd 10
-		exec 10< <("${curl[@]}" -G "$1" || true) &&
-		# process the page from fd 10, setting required variables
-		# and prints urls to fd 11
-		"process_$site"
-	then
-		# setup directories
-		log "Downloading $name from $site now. ${pages:-unknown} pages\\n"
-		mkdir -p "${SAVEDIR-${SAVEDIR_PREFIX-/tmp}/$site/$name}"
-		cd       "${SAVEDIR-${SAVEDIR_PREFIX-/tmp}/$site/$name}"
-		local url
-		case ${rename_images[$site]} in
-		0 ) # Donot rename
-			{
-				# read a url first, breaking loop if there are truly no more
-				while IFS= read -r -u11 url
-				do
-					local urls=("$url")
-					# read urls into array until we timeout or there are no more
-					while read -r -u11 -t .5 url; do urls+=("$url"); done
-					# download all urls
-					"${wget[@]}"  "$wref" "${urls[@]}" || true
-				done
-			} <&11
-		;;
-		1 ) # rename completely.
-			local i=1
-			while IFS= read -r -u11 url
-			do "${wget[@]}" "$wref" "$url" "-O$(printf "%03d" $i).jpg" && ((++i))
-			done
-		;;
-		2 ) # Rename with numbered prefix
-			local i=1
-			while IFS= read -r -u11 url
-			do "${wget[@]}" "$wref" "$url" "-O$(printf "%03d" $i)_$(basename "$url")" && ((++i))
-			done
-		;;
-		esac
-		# read it
-		sxiv -r . &
-		# close fd
-		exec 11<&-
+$debug && set -x
+
+# Functions
+process_url() {
+	local link="$1" # Url we are downloading from
+	local site      # Site ID we are getting content from
+	local title     # Name of content being downloaded
+	local pages     # Number of urls we are downloading
+	local savedir   # Directory urls are saved in
+	if   prepare_urls
+	then download_urls
 	fi
-	exec 10<&-
-	# move onto the next
-	shift
-done
 }
 
-#{{{ default wget options
-wget=(wget)
-wget+=(--tries 0)
-wget+=(--timeout 60)
-wget+=(--continue)
-wget+=(--quiet)
-$quiet || wget+=(--show-progress)
-$quiet || wget+=('--progress=bar:force')
-#}}}
-#{{{ default curl options
-curl=(curl)
-curl+=(--retry 100)
-curl+=(--silent)
-#}}}
-get_site() {
+# Prepare urls
+prepare_urls() {
+	set_site || return 1
+	generate_urls || return 1
+}
+set_site() {
 	case "$link" in
 	( *gameofscanlation.moe/*  ) site=gos_moe     ;;
 	( *readms.net/*            ) site=mangastream ;;
@@ -108,94 +66,190 @@ get_site() {
 	( *webtoons.com/*          ) site=webtoons    ;;
 	( *otscans.com/foolslide/* ) site=foolslide   ;;
 	( *reader.deathtollscans.* ) site=foolslide   ;;
+	( *jaiminisbox.com/reader* ) site=foolslide   ;;
 	( *imgur.com/a/*           ) site=imgur       ;;
 	( *imgur.com/*             ) site=imgursolo   ;;
-	( *                        ) err "Unknown link: '$link'\\n"; return 1;;
+	( *mangadex.org/*          ) site=mangadex    ;;
+	( * )
+		err "Unknown link: '$link'\\n"
+		return 1
+		;;
 	esac
 }
-#{{{ Processing data
-# uses name between <title> and some extra parsing
+generate_urls() {
+	# Download initial page to fd 10
+	exec 10< <(curl -s "$link" || true)
+	# Process site to generate urls to fd11
+	"process_$site"
+}
+
+# Download Urls
+download_urls() {
+	log "Downloading $title from $site now. ${pages:-unknown} pages\\n"
+	savedir="${SAVEDIR-${SAVEDIR_PREFIX-/tmp}/$site/$title}"
+	mkdir -p "$savedir"
+	cd       "$savedir"
+	case ${rename_images[$site]} in
+	0) download_orig ;;
+	1) download_numbered ;;
+	2) download_prefixed ;;
+	esac
+	sxiv -r . </dev/null >/dev/null &
+	exec 11<&-
+}
+
+download_orig() {
+	local url
+	while read_url
+	do
+		local urls=("$url")
+		while read_url -t .5
+		do urls+=("$url")
+		done
+		wget "${urls[@]}" || true
+	done
+}
+download_numbered() {
+	local i=1
+	while read_url
+	do wget "$url" "-O$(printf "%03d" $i).jpg" && ((++i))
+	done
+}
+download_prefixed() {
+	local i=1
+	while read_url
+	do wget "$url" "-O$(printf "%03d" $i)_$(basename "$url")" && ((++i))
+	done
+}
+
+read_url() { IFS= read -r -u11 "$@" url;}
+wget() { command wget "${wget_opts[@]}" "--referer=$link" "$@" ;}
+
+# wget opts
+cookie_file=$(mktemp)
+wget_opts=(--tries 0)
+wget_opts+=(--timeout 60)
+wget_opts+=(--continue)
+wget_opts+=(--quiet)
+wget_opts+=(--save-cookies "$cookie_file")
+wget_opts+=(--load-cookies "$cookie_file")
+wget_opts+=(--keep-session-cookies)
+if ! $quiet
+then
+	wget_opts+=(--show-progress)
+	wget_opts+=('--progress=bar:force')
+fi
+
+# Site data
+# Regex to extract name from between <title>
 declare -A name_regex
 name_regex[gos_moe]='(.*)\ \|'
 name_regex[mangacow]='(.* - Chapter [^-]*) -'
 name_regex[webtoons]='(.*)<\/title>'
 name_regex[mangastream]='(.*)\ -'
 name_regex[foolslide]='(.*::.*) :: '
+name_regex[mangadex]='.*\((.*)\) - MangaDex'
 
-# if 1, urls are printed along with a filename to use.
+# if 0, do not rename
+# if 1, renumber completely
+# if 2, prefix name with number
 declare -A rename_images
 rename_images[gos_moe]=1
 rename_images[mangacow]=0
 rename_images[webtoons]=1
 rename_images[mangastream]=0
 rename_images[foolslide]=0
+rename_images[mangadex]=0
 # TODO save related metadata.
 rename_images[imgur]=2
 rename_images[imgursolo]=0
-#}}}
-#{{{ Process helper function
-# extract title from fd 10
-process_title() {
-	name=$(sed -nr -e "/<title>/{s/.*<title>${name_regex[$site]}.*/\\1/;T;p;q}" <&10)
-	[ "$name" ] || { err "unable to get name from url\\n"; return 1; }
-}
 
-# prints arguments to fd 11, sets $pages
-urls_from_args() {
+# Site processing functions
+# Read in initial webpage, and write out urls
+extract_title() {
+	title=$(sed -nr -e "/<title>/{s/.*<title>${name_regex[$site]}.*/\\1/;T;p;q}" <&10)
+	[ "$title" ] || { err "unable to get name from url\\n"; return 1; }
+}
+extract_page_count() {
+	# Remember to quit
+	pages=$(sed -nr "$1" <&10)
+}
+output_urls_from_args() {
 	local urls=("$@")
 	pages=${#urls[@]}
-	[ "$pages" -gt 0 ] || { err "unable to parse image urls from url\\n"; return 1; }
-	exec 11< <(printf '%s\n' "${urls[@]}")
+	if [ "$pages" -eq 0 ]
+	then err "Unable to parse links from $site\\n"; return 1
+	else exec 11< <(printf '%s\n' "${urls[@]}")
+	fi
 }
-
-# downloads pages and prints extracted urls to fd 11
-urls_generate() {
+output_urls_from_pages() {
 	exec 11< <(
 		for (( i=1; i <= "$pages"; ++i ))
-		do "${curl[@]}" -G "$1/$i" | sed -nr "$2"
+		do curl -s "$1/$i" | sed -nr "$2"
 		done
 	)
 }
-#}}}
-#{{{ Processing function
+output_urls_from_page() {
+	local args
+	mapfile -t args < <(sed -nr "$1" <&10)
+	output_urls_from_args "${args[@]}"
+}
+
+# Site Processing function
 process_gos_moe() {
-	process_title || return 1
-	mapfile -t args < <(sed -nr "/alt=\"$name/{s/.*src=\"([^\"]*)\".*/\\1/;p}" <&10 )
-	urls_from_args "${args[@]}"
+	extract_title || return 1
+	output_urls_from_page "/alt=\"$title/{s/.*src=\"([^\"]*)\".*/\\1/;p}"
 }
 process_webtoons() {
-	process_title || return 1
-	mapfile -t args < <(sed -nr '/class="_images"/{s/.*data-url="([^"]*)".*/\1/;p}' <&10)
-	urls_from_args "${args[@]}"
+	extract_title || return 1
+	output_urls_from_page '/class="_images"/{s/.*data-url="([^"]*)".*/\1/;p}'
 }
 process_mangacow() {
-	process_title || return 1
-	mapfile -t args < <(tr ';' '\n' <&10 | sed -nr '/arr_img.push/{s/.*"([^"]*)".*/\1/;p}')
-	urls_from_args "${args[@]}"
+	extract_title || return 1
+	exec 10< <(tr ';' '\n' <&10)
+	output_urls_from_page '/arr_img.push/{s/.*"([^"]*)".*/\1/;p}'
 }
 process_mangastream() {
-	process_title || return 1
-	pages=$(sed -nr '/a href.*Last Page/{s|.*/([0-9]*)">Last Page.*|\1|;p;q}' <&10)
-	urls_generate "$(dirname "$link")" '/id="manga-page"/{s/.*src="([^"]*)".*/http:\1/;p;q}'
+	extract_title || return 1
+	extract_page_count '/a href.*Last Page/{s|.*/([0-9]*)">Last Page.*|\1|;p;q}';
+	output_urls_from_pages "$(dirname "$link")" '/id="manga-page"/{s/.*src="([^"]*)".*/http:\1/;p}'
 }
 process_foolslide() {
-	process_title || return 1
-	pages=$(sed -nr "/tbtitle dropdown_parent dropdown_right/{s/.*>([0-9]*) .*/\\1/;p;q}" <&10)
-	urls_generate "$(dirname "$link")" '\,content/comics/,{s/.*src="([^"]*)".*/\1/;p;q}'
+	extract_title || return 1
+	extract_page_count '/tbtitle dropdown_parent dropdown_right/{s/.*>([0-9]*) .*/\1/;p;q}'
+	output_urls_from_pages "$(dirname "$link")" '\,content/comics/,{s/.*src="([^"]*)".*/\1/;p}'
 }
 process_imgur() {
-	name=$(basename "$link")
-	# find line in album which contains all the metadata.
+	title=$(basename "$link")
+	local args
 	mapfile -t args < <(perl -ne 'if (/item:/) { s/^.*"images"://; print "https://i.imgur.com/$1$2\n" while s|"hash":"([^"]*)".*?"ext":"([^"]*)"||; last }' <&10)
-	urls_from_args "${args[@]}"
+	output_urls_from_args "${args[@]}"
 }
 process_imgursolo() {
-	name=$(basename "$link")
-	# find line in album which contains all the metadata.
+	title=$(basename "$link")
+	local args
 	mapfile -t args < <(perl -ne 'if (/item:/) { print "https://i.imgur.com/$1$2\n" if s|"hash":"([^"]*)".*?"ext":"([^"]*)"||; last }' <&10)
-	urls_from_args "${args[@]}"
+	output_urls_from_args "${args[@]}"
+}
+process_mangadex() {
+	extract_title || return 1
+	local page
+	# Supress showing page contents in debug
+	$debug && set +x
+	page="$(cat <&10)"
+	$debug && set -x
+	local webtoon
+	mapfile -t webtoon < <(sed -nr '/class="webtoon/{s/.*img.*src="([^"]*)".*/\1/;p}' <<< "$page")
+	if [ "${#webtoon[@]}" -gt 0 ]
+	then output_urls_from_args "${webtoon[@]}"
+	else
+		pages=$(sed -nr '/Page 1/{s/.*Page ([0-9]*).*/\1/;p;q}' <<< "$page")
+		output_urls_from_pages "$link" '/id="current_page"/{s/.*img.*src="([^"]*)".*/\1/;p}'
+	fi
 }
 #}}}
 
-process_urls "$@"
-# vim: foldmethod=marker foldmarker={,}
+for url
+do process_url "$@"
+done
+rm "$cookie_file"
