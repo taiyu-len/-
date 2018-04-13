@@ -354,6 +354,12 @@ augroup END
 set background="dark"
 colorscheme kuro
 "}}}
+"{{{ GUI
+set guioptions-=i
+set guioptions-=T
+set guioptions-=r
+set guioptions-=L
+"}}}
 "}}}
 "{{{ Help | How vim looks up keywords
 let s:plugins["vim-man"] = "vim-utils"
@@ -373,6 +379,7 @@ let g:org_todo_keywords=[['TODO(t)', 'STARTED(s)', 'DONE(d)'],
 "}}}
 "{{{ Ledger
 let s:plugins["vim-ledger"] = "ledger"
+let g:ledger_fold_blanks = 1
 "}}}
 "{{{ Netrw
 let s:plugins["vim-vinegar"] = "tpope"
