@@ -10,6 +10,7 @@ export MAIL=~/.mail
 export MAILCHECK=$[60*15]
 export SXHKD_SHELL=sh
 export RLWRAP_HOME=~/.rlwrap
+export NQDIR=~/.nq
 #}}}
 #{{{ Files
 export ZSHRC=~/.zshrc
