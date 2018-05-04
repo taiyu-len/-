@@ -8,9 +8,10 @@ export BROWSER=w3m
 export TERMINAL=start-urxvtc
 export MAIL=~/.mail
 export MAILCHECK=$[60*15]
+export SHELL=bash
 export SXHKD_SHELL=sh
 export RLWRAP_HOME=~/.rlwrap
-export NQDIR=~/.nq
+export NQDIR=/tmp/.nqdir
 #}}}
 #{{{ Files
 export ZSHRC=~/.zshrc
