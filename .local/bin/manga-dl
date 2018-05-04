@@ -250,5 +250,5 @@ process_mangadex() {
 }
 
 for url
-do process_url "$@"
+do process_url "$url"
 done

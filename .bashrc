@@ -470,4 +470,4 @@ then unfunction is
 else unset is
 fi
 #}}}
-# vim: foldmethod=marker filetype=zsh
+# vim: foldmethod=marker foldmarker={{{,}}} filetype=zsh
