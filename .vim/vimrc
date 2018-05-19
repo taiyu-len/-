@@ -2,208 +2,98 @@
 "{{{ Plugin Setup
 filetype plugin indent on
 syntax enable
-let s:plugins = {}
 " let s:plugins["name"] = "author"
-" as in github.com/author/name. TODO improve this
-
-function! VIMRC_run_minpac() abort "{{{
+" as in github.com/author/name.
+let s:plugins = {}
+function! SetupMinpac() abort "{{{
 	packadd minpac
 	call minpac#init({'jobs': '1'})
 	call minpac#add('k-takata/minpac', {'type': 'opt'})
-	for addon in items(s:plugins)
-		call minpac#add(addon[1] . '/' . addon[0], {'type': 'opt'})
+	for plugin in items(s:plugins)
+		call minpac#add(plugin[1] . '/' . plugin[0], {'type': 'opt'})
 	endfor
 endfunction "}}}
-" Reloads vimrc, updating the function, call the function
-command! PackUpdate source $MYVIMRC | call VIMRC_run_minpac() | call minpac#update()
-command! PackClean  source $MYVIMRC | call VIMRC_run_minpac() | call minpac#clean()
-command! -bang PackAdd for name in keys(s:plugins) | execute "packadd<bang> " . fnameescape(name) | endfor
+command! PackUpdate call SetupMinpac() | call minpac#update()
+command! PackAdd for name in keys(s:plugins) | execute "packadd " . fnameescape(name) | endfor
 "}}}
-"{{{ Vim Files And Paths | Where vim saves things
-set secure
-set backup backupdir=.
-let &backupskip = escape(expand('$HOME'), '\') . '/.local/bin/*'
+set exrc secure
 set undofile undodir=~/.vim/undo
-set backupskip+=/tmp/*
 set directory=~/.vim/swap//
 set path+=include
 set viminfofile=~/.vim/viminfo
-"}}}
-"{{{ Buffers | How buffers are handled
 set hidden
-"}}}
-"}}}
-"{{{ Session | Automatic saving and resuming of sessions
 let s:plugins["vim-obsession"] = "tpope"
 let s:plugins["vim-prosession"] = "dhruvasagar"
 "}}}
-"{{{ Editing | Config for basic input
-set mouse= " mouse has annoying behavior so disabling for now
-let mapleader = " "
+"{{{ Editing | Config for input
+let mapleader      = " "
 let maplocalleader = ","
-"{{{ Setup Arrow keys for different terminals
-if &term == 'screen-256color'
-	map  [1;2A <S-Up>
-	map  [1;2B <S-Down>
-	map! [1;2A <S-Up>
-	map! [1;2B <S-Down>
-	set  t_%i=[1;2C " S-Right
-	set  t_#4=[1;2D " S-Left
-	map  [1;5A <C-Up>
-	map  [1;5B <C-Down>
-	map  [1;5C <C-Right>
-	map  [1;5D <C-Left>
-	map! [1;5A <C-Up>
-	map! [1;5B <C-Down>
-	map! [1;5C <C-Right>
-	map! [1;5D <C-Left>
-	map   <C-Backspace>
-	map!  <C-Backspace>
-	map  [3;5~ <C-delete>
-	map! [3;5~ <C-delete>
-elseif &term == 'dvtm-256color'
-	map  [a <S-Up>
-	map  [b <S-Down>
-	map! [a <S-Up>
-	map! [b <S-Down>
-	set  t_%i="[1;2C" " S-Right
-	set  t_#4="[1;2D" " S-Left
-	map  Oa <C-Up>
-	map  Ob <C-Down>
-	map  Oc <C-Right>
-	map  Od <C-Left>
-	map! Oa <C-Up>
-	map! Ob <C-Down>
-	map! Oc <C-Right>
-	map! Od <C-Left>
-elseif &term == 'rxvt-unicode-256color'
-	map  [a <S-Up>
-	map  [b <S-Down>
-	map! [a <S-Up>
-	map! [b <S-Down>
-	set  t_%i=[c " S-Right
-	set  t_#4=[d " S-Left
-	map  Oa <C-Up>
-	map  Ob <C-Down>
-	map  Oc <C-Right>
-	map  Od <C-Left>
-	map! Oa <C-Up>
-	map! Ob <C-Down>
-	map! Oc <C-Right>
-	map! Od <C-Left>
-	map   <C-Backspace>
-	map!  <C-Backspace>
-	map  [3^ <C-delete>
-	map! [3^ <C-delete>
-endif
-"}}}
-"{{{ basic mappings
-set shiftwidth=0 " make tab inserts <Tab>
-"{{{ remap backspace/delete keys
-map  <BS>       X
-nmap <C-BS>     db
-imap <C-BS>     <C-O>db
-nmap <C-Delete> dw
-imap <C-Delete> <C-O>dw
-"}}}
-"{{{ input mode Shift-Arrow changes to visual mode
-inoremap <S-Up>    <C-O>v<Up>
-inoremap <S-Down>  <C-O>v<Down>
-inoremap <S-Right> <C-O>v<Right>
-inoremap <S-Left>  <C-O>v<Left>
-"}}}
-"{{{ normal mode goes to visual mode
-nnoremap <S-Up>    v<Up>
-nnoremap <S-Down>  v<Down>
-nnoremap <S-Right> v<Right>
-nnoremap <S-Left>  v<Left>
-"}}}
-"{{{ shift-arrow moves just like arrow in visual mode
-vmap <S-Up>    <Up>
-vmap <S-Down>  <Down>
-vmap <S-Right> <Right>
-vmap <S-Left>  <Left>
-"}}}
-"{{{ Suspend in insert mode
-imap  <C-O>
-"}}}
-"}}}
-"{{{ Yank to end of line
-map Y y$
-"}}}
-"{{{ Auto Pairing pairs
+
+" Suspend from insert mode
+inoremap  <C-O>
+
+" Make Y consistent with D, C, etc
+nnoremap Y y$
+
+" Auto close (), {}, [], "", etc
 let s:plugins["delimitMate"] = "Raimondi"
 let delimitMate_expand_cr = 1
 let delimitMate_expand_space = 1
-"}}}
-"{{{ Repeatable change word
+
+" Repeatable change word
 nnoremap c* *Ncgn
 nnoremap c# #NcgN
-"}}}
-"{{{ Formatting
-" Auto formatting options
-set autoindent
-set cinoptions=
-set cinoptions+=Ls " placement of labels will be shifted one over.
-set cinoptions+=:0 " indent of case: inside switch
-set cinoptions+=l1 " case{\n.body.} no alignment inside body. just indent
-set cinoptions+=g0 " public:private:protected: will be shifted one over
-set cinoptions+=N-s " namespace body has no indent
-set cinoptions+=t0 " func return type alignment
-set cinoptions+=i0 " base class/constructor init alignment
-set cinoptions+=cs " Comment alignment
-set cinoptions+=(0,u0,U1 " for Proper alignment
-set cinoptions+=Ws "
-set cinoptions+=ks
-set cinoptions+=m1 " parenthesis acts like brace
 
 set formatoptions=ro " Insert comment leader after newline
 set formatoptions+=j " Remove comment leader when joining lines
 set formatoptions+=q " Format comments when using gq
 set formatoptions+=w " Soft line break
-set formatoptions+=l " donot break existing long lines
-set formatoptions+=nj
+set formatoptions+=l " Dont break existing long lines
 
 set textwidth=80
-"}}}
-"{{{ Operators
 set tildeop
-"}}}
-"{{{ Spelling
+
+" TODO some better way of fixing spellcheck
 nnoremap <silent><leader>ss :set spell<cr>1z=:set nospell<cr>
+
+"}}}
+"{{{ Command
+cnoremap <C-Backspace> <C-w>
+nnoremap q: <nop>
+nnoremap q/ <nop>
+nnoremap q? <nop>
+nnoremap Q: q:
+nnoremap Q/ q/
+nnoremap Q? q?
+"{{{ Wild menu
+set wildmenu
+set wildchar=<TAB>
+set wildignorecase
+set wildmode=list:longest
 "}}}
 "}}}
 "{{{ Motion | Config for navigating vim
-"{{{ Cursor
 set whichwrap=<,>,[,]          " enable wrapping with cursor keys in all modes
 set backspace=indent,eol,start " enable backspace
 set virtualedit=onemore,block  " allow cursor one past the line, and anywhere in block mode
-"}}}
-"{{{ Search
+
 set ignorecase smartcase
 set incsearch wrapscan
 set magic
-" Only show highlight while searching
-augroup VIMRC_incsearch_highlight
-	autocmd!
-	autocmd CmdlineEnter /,\? :set hlsearch
-	autocmd CmdlineLeave /,\? :set nohlsearch
-augroup END
-"}}}
-"{{{ Registers
+
 " Swap mark jump keys around
 nnoremap ' `
 nnoremap ` '
-" Use \ for register
-nnoremap \ "
-"}}}
-"{{{ Scrolling
+
+" virtual line move
+nnoremap <silent> <expr> k (v:count==0?'gk':'k')
+nnoremap <silent> <expr> j (v:count==0?'gj':'j')
+
 set scrolloff=5
 set sidescroll=1     " Enable side scrolling
 set sidescrolloff=5
 set nowrap           " Disable wrapping
-"}}}
-"{{{ Motion plugins
+
 let s:plugins["vim-surround"] = "tpope"
 let s:plugins["vim-repeat"] = "tpope"
 let s:plugins["vim-sexp"] = "guns"
@@ -212,14 +102,23 @@ let g:sexp_filetypes = 'clojure,scheme,lisp,timl,c,cpp'
 let g:sexp_enable_insert_mode_mappings=0
 let s:plugins["vim-unimpaired"] = "tpope"
 "}}}
-"}}}
 "{{{ Display | How things get printed
-"{{{ Text
-set showmatch " show matching pair under cursor
-set list
-set listchars=eol:$,tab:│•,trail:•,extends:→,precedes:←,conceal:δ,nbsp:•
-"}}}
-"{{{ Syntax
+set background="dark"
+colorscheme kuro
+
+set list listchars=eol:$,tab:│•,trail:•,extends:→,precedes:←,conceal:δ,nbsp:•
+
+set hlsearch
+" make <C-L> also clear highlighting, and update diff
+if maparg('<C-L>', 'n') ==# ''
+	if has('diff')
+		nnoremap <silent> <C-L> :nohlsearch<bar>diffupdate<CR><C-L>
+	else
+		nnoremap <silent> <C-L> :nohlsearch<CR><C-L>
+	endif
+endif
+
+" Syntax
 set synmaxcol=200
 let g:sh_no_error=1
 let g:c_comment_strings=1
@@ -228,14 +127,22 @@ let g:c_no_bracket_error=1
 let g:c_curly_error=1
 let g:load_doxygen_syntax=1
 
-"}}}
-"{{{ Columns/Margins
+" Columns/Margins
 set number relativenumber " show current line number and offsets
 set colorcolumn=+0
 augroup VIMRC_colorcolumn
 	autocmd!
 	autocmd BufReadPost quickfix setlocal colorcolumn=0
 augroup END
+set conceallevel=2 concealcursor=
+
+set winminheight=0 winminwidth=0
+
+set errorbells
+set guioptions-=i
+set guioptions-=T
+set guioptions-=r
+set guioptions-=L
 "}}}
 "{{{ Folding
 "{{{ fancy fold function
@@ -257,7 +164,8 @@ function! VIMRC_expand(line, tab) abort
 			if l:tabidx > 0
 				let l:newline .= strpart(l:line, 0, l:tabidx)
 				let l:line = strpart(l:line, l:tabidx)
-			else | return l:newline . l:line
+			else
+				return l:newline . l:line
 			endif
 		endif
 	endwhile
@@ -285,7 +193,8 @@ function! VIMRC_fold_function() abort
 	let l:strlen = l:width - strdisplaywidth("..." . l:end)
 	if exists('g:vimrc_foldexpand') && g:vimrc_foldexpand > 0
 		let l:foldstr = printf("%.*S...%s", l:strlen, VIMRC_expand(getline(v:foldstart), l:tab), l:end)
-	else | let l:foldstr = printf("%.*S...%s", l:strlen, substitute(getline(v:foldstart), '\t', l:tab, 'g'), l:end)
+	else
+		let l:foldstr = printf("%.*S...%s", l:strlen, substitute(getline(v:foldstart), '\t', l:tab, 'g'), l:end)
 	endif
 	return printf("%-*S%s", l:width, l:foldstr, l:lines)
 endfunction "}}}
@@ -297,16 +206,7 @@ set foldopen+=insert
 set foldlevelstart=0
 let g:sh_fold_enabled=7
 "}}}
-"{{{ Conceal
-set conceallevel=2
-set concealcursor=
-"}}}
-"{{{ Window
-set winminheight=0 winminwidth=0
-set fillchars=stl:^,stlnc:-,vert:│,fold:\ ,diff:-
-"}}}
-"{{{ Status
-set errorbells
+"{{{ Status line
 set ruler
 set laststatus=2
 "{{{ Helperfunctions
@@ -322,7 +222,7 @@ function! VIMRC_Column() abort
 	return repeat(" ", l:padding) . col('.')
 endfunction
 "}}}
-"{{{ Printf string if non empty
+"{{{ PrintIf string if non empty
 function! PrintIf(fmt, str) abort
 	return empty(a:str) ? '' : printf(a:fmt, a:str)
 endfunction
@@ -350,18 +250,7 @@ augroup VIMRC_FixStatus
 	autocmd BufReadPost netrw setlocal statusline= netrw │ %F %=%{PrintIf(' │ %s ',fugitive#head())}
 augroup END
 "}}}
-"{{{ Theme
-set background="dark"
-colorscheme kuro
-"}}}
-"{{{ GUI
-set guioptions-=i
-set guioptions-=T
-set guioptions-=r
-set guioptions-=L
-"}}}
-"}}}
-"{{{ Help | How vim looks up keywords
+"{{{ Keywords
 let s:plugins["vim-man"] = "vim-utils"
 set keywordprg=:Man
 "}}}
@@ -388,21 +277,6 @@ let g:netrw_liststyle = 4
 let g:netrw_hide = 1
 let g:netrw_list_hide = "\\~$"
 let g:netrw_sizestyle = "h"
-"}}}
-"{{{ Command
-cnoremap <C-Backspace> <C-w>
-nnoremap q: <nop>
-nnoremap q/ <nop>
-nnoremap q? <nop>
-nnoremap Q: q:
-nnoremap Q/ q/
-nnoremap Q? q?
-"{{{ Wild menu
-set wildmenu
-set wildchar=<TAB>
-set wildignorecase
-set wildmode=list:longest
-"}}}
 "}}}
 "{{{ Buffer
 let s:plugins["a.vim"] = "vim-scripts"
