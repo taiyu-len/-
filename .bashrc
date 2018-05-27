@@ -333,12 +333,6 @@ alias ll="\\ls -l ${ls_common[*]}"
 alias la="\\ls -A ${ls_common[*]}"
 unset ls_common
 #}}}
-#{{{ git
-alias g="git status -s"
-for i in status commit merge pull push fetch grep log diff mv rm blame add
-do alias g$i="git $i"
-done; unset i
-##}}}
 #{{{ timew
 alias start="timew start"
 alias stop="timew stop"
@@ -346,9 +340,9 @@ alias cont="timew continue"
 #}}}
 #{{{ nq
 alias nq="nq "
-mkdir -p /tmp/nq-wget
-alias qget='NQDIR=/tmp/nq-wget  nq wget'
-alias qwait='NQDIR=/tmp/nq-wget nq wget -q'
+mkdir -p /tmp/.nq-wget
+alias qget='NQDIR=/tmp/nq-wget \nq \wget --progress=dot:mega'
+alias fget='NQDIR=/tmp/nq-wget \fq'
 #}}}
 #{{{ cpu settings
 alias cpumin="sudo cpupower frequency-set -u 800MHz"
@@ -419,7 +413,9 @@ plll() {
 	while read line
 	do
 		local args=("$line")
-		while read -t "1" line; do args+=("$line"); done
+		while read -t 1 line
+		do args+=("$line")
+		done
 		"$@" "${args[@]}"
 	done
 }
