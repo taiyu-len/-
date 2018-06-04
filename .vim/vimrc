@@ -22,6 +22,7 @@ set directory=~/.vim/swap//
 set path+=include
 set viminfofile=~/.vim/viminfo
 set hidden
+set shell=/bin/bash
 let s:plugins["vim-obsession"] = "tpope"
 let s:plugins["vim-prosession"] = "dhruvasagar"
 "}}}

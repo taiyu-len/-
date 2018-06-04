@@ -1,2 +1,4 @@
 e scr.utf8=true
-e asm.lines.call=true
+e scr.rainbow=true
+e cfg.newtab=true
+

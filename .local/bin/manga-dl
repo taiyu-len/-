@@ -84,16 +84,16 @@ generate_urls() {
 
 # Download Urls
 download_urls() {
-	log "Downloading $title from $site now. ${pages:-unknown} pages\\n"
+	log "\\nDownloading $title from $site now. ${pages:-unknown} pages\\n"
 	savedir="${SAVEDIR-${SAVEDIR_PREFIX-/tmp}/$site/$title}"
 	mkdir -p "$savedir"
 	cd       "$savedir"
-	case ${rename_images[$site]} in
+	case "${rename_images[$site]}" in
 	0) download_original ;;
 	1) download_numbered ;;
 	2) download_prefixed ;;
 	esac
-	sxiv -r . </dev/null >/dev/null 2>&1 &
+	NQDIR=/tmp/manga-nq nq sxiv -r "$savedir" </dev/null >/dev/null 2>&1
 	exec 11<&-
 }
 
@@ -137,7 +137,10 @@ wget_opts+=(--keep-session-cookies)
 if ! $quiet
 then
 	wget_opts+=(--show-progress)
-	wget_opts+=('--progress=bar:force')
+	if tty > /dev/null
+	then wget_opts+=('--progress=bar')
+	else wget_opts+=('--progress=dot:mega')
+	fi
 fi
 
 # Site data

@@ -1,6 +1,6 @@
 "{{{ Vim Text
-highlight Normal               NONE ctermfg=7 cterm=bold
-highlight Bold                 NONE           cterm=bold
+highlight Normal               ctermfg=7
+highlight Bold                 cterm=bold
 highlight!link ErrorMsg        Error
 highlight!link SpecialKey      Comment
 highlight!link NonText         Comment

@@ -12,6 +12,7 @@ export SHELL=bash
 export SXHKD_SHELL=sh
 export RLWRAP_HOME=~/.rlwrap
 export NQDIR=/tmp/.nqdir
+export XDG_CONFIG_HOME=~/.config
 #}}}
 #{{{ Files
 export ZSHRC=~/.zshrc

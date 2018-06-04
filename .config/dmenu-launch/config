@@ -1,7 +1,7 @@
 flag_history="yes"
 flag_xdg_names="no"
 flag_binaries="yes"
-flag_terminal="no"
 terminal="urxvtc"
 # Use rofi instead of dmenu
 dm="rofi -dmenu"
+flag_terminal="no"

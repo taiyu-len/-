@@ -8,7 +8,7 @@ esac done
 shift $((OPTIND - 1))
 
 opts+=("Mozilla/5.0 (Windows NT 10.0; WOW64; rv:56.0) Gecko/20100101 Firefox/56.0")
-opts+=("https://translate.google.com/m?sl=${FROM:=jp}&tl=${TO:=en}&ie=UTF-8") 
+opts+=("https://translate.google.com/m?sl=${FROM:=ja}&tl=${TO:=en}&ie=UTF-8") 
 printf "%s\n" "$FROM -> $TO"
 if [ "$*" ]
 then opts+=(--data-urlencode "q=$*")
