@@ -1,0 +1,31 @@
+#!/bin/sh
+
+# Example for $XDG_CONFIG_HOME/sxiv/exec/image-info
+# Called by sxiv(1) whenever an image gets loaded.
+# The output is displayed in sxiv's status bar.
+# Arguments:
+#   $1: path to image file
+#   $2: image width
+#   $3: image height
+
+exec 2>/dev/null
+readonly s=" | " # field separator
+
+readonly dirname="$(dirname -- "$1")"
+readonly filename="$(basename -- "$1")"
+readonly filesize="$(du -Hh -- "$1" | cut -f 1)"
+
+readonly geometry="${2}x${3}"
+readonly tags="$(cd "$dirname"; tmsu tags -1 -- "$1" | tail -n+2 | tr '\n' ' ')"
+
+readonly tag_file=~/.config/sxiv/quicktags
+source "$tag_file"
+
+qtags=
+for i in "${!quicktag[@]}"
+do qtags+=" $i=${quicktag[$i]} "
+done
+
+echo "${filesize}${s}${geometry}${s}${filename}${tags:+${s}tags: ${tags}}${qtags:+ ${s} quicktags: ${qtags}}"
+
+
