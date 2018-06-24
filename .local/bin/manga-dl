@@ -59,16 +59,18 @@ prepare_urls() {
 }
 set_site() {
 	case "$link" in
-	( *gameofscanlation.moe/*  ) site=gos_moe     ;;
-	( *readms.net/*            ) site=mangastream ;;
-	( *mngcow.co/*             ) site=mangacow    ;;
-	( *webtoons.com/*          ) site=webtoons    ;;
-	( *otscans.com/foolslide/* ) site=foolslide   ;;
-	( *reader.deathtollscans.* ) site=foolslide   ;;
-	( *jaiminisbox.com/reader* ) site=foolslide   ;;
-	( *imgur.com/a/*           ) site=imgur       ;;
-	( *imgur.com/*             ) site=imgursolo   ;;
-	( *mangadex.org/*          ) site=mangadex    ;;
+	( *gameofscanlation.moe/*    ) site=gos_moe     ;;
+	( *readms.net/*              ) site=mangastream ;;
+	( *mngcow.co/*               ) site=mangacow    ;;
+	( *webtoons.com/*            ) site=webtoons    ;;
+	( *otscans.com/foolslide/*   ) site=foolslide   ;;
+	( *reader.deathtollscans.*   ) site=foolslide   ;;
+	( *jaiminisbox.com/reader*   ) site=foolslide   ;;
+	( *reader.championscans.com/*) site=foolslide   ;;
+	( *reader.kireicake.com/*    ) site=foolslide   ;;
+	( *imgur.com/a/*             ) site=imgur       ;;
+	( *imgur.com/*               ) site=imgursolo   ;;
+	( *mangadex.org/*            ) site=mangadex    ;;
 	( * )
 		err "Unknown link: '$link'\\n"
 		return 1
@@ -92,8 +94,9 @@ download_urls() {
 	0) download_original ;;
 	1) download_numbered ;;
 	2) download_prefixed ;;
+	3) download_mangadex ;;
 	esac
-	NQDIR=/tmp/manga-nq nq sxiv -r "$savedir" </dev/null >/dev/null 2>&1
+	NQDIR=/tmp/manga-nq nq -c sxiv -r "$savedir" </dev/null >/dev/null 2>&1
 	exec 11<&-
 }
 
@@ -102,7 +105,7 @@ download_original() {
 	while read_url
 	do
 		local urls=("$url")
-		while read_url -t .5
+		while read_url -t 1
 		do urls+=("$url")
 		done
 		wget "${urls[@]}" || true
@@ -119,6 +122,10 @@ download_prefixed() {
 	while read_url
 	do wget "$url" "-O$(printf "%03d" $i)_$(basename "$url")" && ((++i))
 	done
+}
+download_mangadex() {
+	download_original
+	sedname 's/\(^\|[^0-9]\)\([0-9]\.\)/\10\2/' * 2>&1 | grep -v change
 }
 
 read_url() { IFS= read -r -u11 "$@" url;}
@@ -156,13 +163,14 @@ name_regex[mangadex]='(.*\(.*\)) - MangaDex'
 # if 0, do not rename
 # if 1, renumber completely
 # if 2, prefix name with number
+# if 3, rename mangadex names
 declare -A rename_images
 rename_images[gos_moe]=1
 rename_images[mangacow]=0
 rename_images[webtoons]=1
 rename_images[mangastream]=0
 rename_images[foolslide]=0
-rename_images[mangadex]=0
+rename_images[mangadex]=3
 # TODO save related metadata.
 rename_images[imgur]=2
 rename_images[imgursolo]=0
