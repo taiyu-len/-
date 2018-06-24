@@ -51,6 +51,20 @@ set formatoptions+=q " Format comments when using gq
 set formatoptions+=w " Soft line break
 set formatoptions+=l " Dont break existing long lines
 
+set cinoptions=
+set cinoptions+=Ls " placement of labels will be shifted one over.
+set cinoptions+=:0 " indent of case: inside switch
+set cinoptions+=l1 " case{\n.body.} no alignment inside body. just indent
+set cinoptions+=g0 " public:private:protected: will be shifted one over
+set cinoptions+=N-s " namespace body has no indent
+set cinoptions+=t0 " func return type alignment
+set cinoptions+=i0 " base class/constructor init alignment
+set cinoptions+=cs " Comment alignment
+set cinoptions+=(0,u0,U1 " for Proper alignment
+set cinoptions+=Ws "
+set cinoptions+=ks
+set cinoptions+=m1 " parenthesis acts like brace
+
 set textwidth=80
 set tildeop
 
@@ -107,7 +121,7 @@ let s:plugins["vim-unimpaired"] = "tpope"
 set background="dark"
 colorscheme kuro
 
-set list listchars=eol:$,tab:│•,trail:•,extends:→,precedes:←,conceal:δ,nbsp:•
+set list listchars=eol:$,tab:│\ ,trail:•,extends:→,precedes:←,conceal:δ,nbsp:•
 
 set hlsearch
 " make <C-L> also clear highlighting, and update diff
