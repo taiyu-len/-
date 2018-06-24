@@ -12,7 +12,7 @@
 # where C/M/S indicate Ctrl/Meta(Alt)/Shift modifier states and KEY is the X
 # keysym as listed in /usr/include/X11/keysymdef.h without the "XK_" prefix.
 # exec 2>/dev/null
-readonly KEY="$1";
+KEY="$1";
 
 # Reads images into mapfile array
 read_images() {
@@ -56,7 +56,7 @@ tag_rm() {
 	(
 		cd "$(dirname -- "${images[0]}")"
 		local tags
-		while select_tags "${images[@]}"
+		while select_tags --explicit "${images[@]}"
 		do tmsu untag --tags="$tags" "${images[@]}"
 		done &
 	)
@@ -66,9 +66,10 @@ readonly TAGFILE=~/.config/sxiv/quicktags
 
 # arg1: quick tag to set, must be a digit
 set_quicktag() {
-	read_images
+	local image
+	read image
 	(
-		cd "$(dirname -- "${images[0]}")"
+		cd "$(dirname -- "$image")"
 		local tag
 		if select_tag
 		then
@@ -80,6 +81,7 @@ set_quicktag() {
 		fi &
 	)
 }
+
 # arg1: quick tag to use, must be a digit
 use_quicktag() {
 	read_images
@@ -89,7 +91,15 @@ use_quicktag() {
 		tmsu tag --tags="${quicktag[$1]}" "${images[@]}"
 	)
 }
+shell() {
+	read image
+	"$TERMINAL" -cd "$(realpath "$(dirname -- "$image")")"
+}
 
+readonly LASTKEY=~/.config/sxiv/lastkey
+if [ "$KEY" = "C-x" ]
+then read KEY < "$LASTKEY"
+fi
 
 case "$KEY" in
 "y") xclip -i ;;
@@ -106,5 +116,12 @@ case "$KEY" in
 "8") use_quicktag 8 ;; "asterisk")    set_quicktag 8 ;;
 "9") use_quicktag 9 ;; "parenleft")   set_quicktag 9 ;;
 "0") use_quicktag 0 ;; "parenright")  set_quicktag 0 ;;
+
+"colon") shell ;;
+ * )
+	# echo no handler for "'$KEY'" >&2
+	exit 0
+	;;
 esac
 
+echo "$KEY" > "$LASTKEY"

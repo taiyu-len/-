@@ -16,7 +16,7 @@ readonly filename="$(basename -- "$1")"
 readonly filesize="$(du -Hh -- "$1" | cut -f 1)"
 
 readonly geometry="${2}x${3}"
-readonly tags="$(cd "$dirname"; tmsu tags -1 -- "$1" | tail -n+2 | tr '\n' ' ')"
+readonly tags="$(cd "$dirname"; tmsu tags -1 -- "$filename" | tail -n+2 | tr '\n' ' ')"
 
 readonly tag_file=~/.config/sxiv/quicktags
 source "$tag_file"
