@@ -13,6 +13,7 @@
 # keysym as listed in /usr/include/X11/keysymdef.h without the "XK_" prefix.
 # exec 2>/dev/null
 KEY="$1";
+readonly ROOT=~/.config/sxiv
 
 # Reads images into mapfile array
 read_images() {
@@ -62,7 +63,23 @@ tag_rm() {
 	)
 }
 
-readonly TAGFILE=~/.config/sxiv/quicktags
+readonly YANKTAG="$ROOT"/yanktag
+
+tag_yank() {
+	local image
+	read image
+	printf "$image" > "$YANKTAG"
+}
+
+tag_paste() {
+	read_images
+	(
+		cd "$(dirname -- "${images[0]}")"
+		tmsu tag --from "$(cat "$YANKTAG")" "${images[@]}"
+	)
+}
+
+readonly TAGFILE="$ROOT"/quicktags
 
 # arg1: quick tag to set, must be a digit
 set_quicktag() {
@@ -102,7 +119,8 @@ then read KEY < "$LASTKEY"
 fi
 
 case "$KEY" in
-"y") xclip -i ;;
+"y") tag_yank ;;
+"p") tag_paste ;;
 "t") tag_add ;;
 "T") tag_rm  ;;
 
