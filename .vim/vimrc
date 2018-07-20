@@ -1,21 +1,6 @@
 "{{{ Vim
-"{{{ Plugin Setup
 filetype plugin indent on
 syntax enable
-" let s:plugins["name"] = "author"
-" as in github.com/author/name.
-let s:plugins = {}
-function! SetupMinpac() abort "{{{
-	packadd minpac
-	call minpac#init({'jobs': '1'})
-	call minpac#add('k-takata/minpac', {'type': 'opt'})
-	for plugin in items(s:plugins)
-		call minpac#add(plugin[1] . '/' . plugin[0], {'type': 'opt'})
-	endfor
-endfunction "}}}
-command! PackUpdate call SetupMinpac() | call minpac#update()
-command! PackAdd for name in keys(s:plugins) | execute "packadd " . fnameescape(name) | endfor
-"}}}
 set exrc secure
 set undofile undodir=~/.vim/undo
 set directory=~/.vim/swap//
@@ -23,8 +8,6 @@ set path+=include
 set viminfofile=~/.vim/viminfo
 set hidden
 set shell=/bin/bash
-let s:plugins["vim-obsession"] = "tpope"
-let s:plugins["vim-prosession"] = "dhruvasagar"
 "}}}
 "{{{ Editing | Config for input
 let mapleader      = " "
@@ -36,10 +19,9 @@ inoremap  <C-O>
 " Make Y consistent with D, C, etc
 nnoremap Y y$
 
+" cpo-$
+set cpoptions+=$
 " Auto close (), {}, [], "", etc
-let s:plugins["delimitMate"] = "Raimondi"
-let delimitMate_expand_cr = 1
-let delimitMate_expand_space = 1
 
 " Repeatable change word
 nnoremap c* *Ncgn
@@ -88,6 +70,62 @@ set wildmode=list:longest
 "}}}
 "}}}
 "{{{ Motion | Config for navigating vim
+"{{{ Setup Arrow keys for different terminals
+if &term == 'screen-256color'
+	map  [1;2A <S-Up>
+	map  [1;2B <S-Down>
+	map! [1;2A <S-Up>
+	map! [1;2B <S-Down>
+	set  t_%i=[1;2C " S-Right
+	set  t_#4=[1;2D " S-Left
+	map  [1;5A <C-Up>
+	map  [1;5B <C-Down>
+	map  [1;5C <C-Right>
+	map  [1;5D <C-Left>
+	map! [1;5A <C-Up>
+	map! [1;5B <C-Down>
+	map! [1;5C <C-Right>
+	map! [1;5D <C-Left>
+	map   <C-Backspace>
+	map!  <C-Backspace>
+	map  [3;5~ <C-delete>
+	map! [3;5~ <C-delete>
+elseif &term == 'dvtm-256color'
+	map  [a <S-Up>
+	map  [b <S-Down>
+	map! [a <S-Up>
+	map! [b <S-Down>
+	set  t_%i="[1;2C" " S-Right
+	set  t_#4="[1;2D" " S-Left
+	map  Oa <C-Up>
+	map  Ob <C-Down>
+	map  Oc <C-Right>
+	map  Od <C-Left>
+	map! Oa <C-Up>
+	map! Ob <C-Down>
+	map! Oc <C-Right>
+	map! Od <C-Left>
+elseif &term == 'rxvt-unicode-256color'
+	map  [a <S-Up>
+	map  [b <S-Down>
+	map! [a <S-Up>
+	map! [b <S-Down>
+	set  t_%i=[c " S-Right
+	set  t_#4=[d " S-Left
+	map  Oa <C-Up>
+	map  Ob <C-Down>
+	map  Oc <C-Right>
+	map  Od <C-Left>
+	map! Oa <C-Up>
+	map! Ob <C-Down>
+	map! Oc <C-Right>
+	map! Od <C-Left>
+	map   <C-Backspace>
+	map!  <C-Backspace>
+	map  [3^ <C-delete>
+	map! [3^ <C-delete>
+endif
+"}}}
 set whichwrap=<,>,[,]          " enable wrapping with cursor keys in all modes
 set backspace=indent,eol,start " enable backspace
 set virtualedit=onemore,block  " allow cursor one past the line, and anywhere in block mode
@@ -109,19 +147,13 @@ set sidescroll=1     " Enable side scrolling
 set sidescrolloff=5
 set nowrap           " Disable wrapping
 
-let s:plugins["vim-surround"] = "tpope"
-let s:plugins["vim-repeat"] = "tpope"
-let s:plugins["vim-sexp"] = "guns"
-let s:plugins["vim-sexp-mappings-for-regular-people"] = "tpope"
-let g:sexp_filetypes = 'clojure,scheme,lisp,timl,c,cpp'
-let g:sexp_enable_insert_mode_mappings=0
-let s:plugins["vim-unimpaired"] = "tpope"
 "}}}
 "{{{ Display | How things get printed
 set background="dark"
 colorscheme kuro
 
 set list listchars=eol:$,tab:│\ ,trail:•,extends:→,precedes:←,conceal:δ,nbsp:•
+set fillchars=vert:\|,stlnc:-,stl:^
 
 set hlsearch
 " make <C-L> also clear highlighting, and update diff
@@ -143,7 +175,7 @@ let g:c_curly_error=1
 let g:load_doxygen_syntax=1
 
 " Columns/Margins
-set number relativenumber " show current line number and offsets
+nnoremap <silent><leader>n :set nu! rnu!<cr>
 set colorcolumn=+0
 augroup VIMRC_colorcolumn
 	autocmd!
@@ -222,8 +254,8 @@ set foldlevelstart=0
 let g:sh_fold_enabled=7
 "}}}
 "{{{ Status line
-set ruler
 set laststatus=2
+set ruler
 "{{{ Helperfunctions
 "{{{ Column
 function! VIMRC_ShowsSigns() abort
@@ -250,7 +282,6 @@ function! VIMRC_Modified() abort
 endfunction
 "}}}
 "}}}
-let s:plugins["vim-fugitive"] = "tpope"
 set statusline=%{VIMRC_Column()}
 set statusline+= │ #%n
 set statusline+= │ %{VIMRC_Modified()}%t
@@ -265,28 +296,35 @@ augroup VIMRC_FixStatus
 	autocmd BufReadPost netrw setlocal statusline= netrw │ %F %=%{PrintIf(' │ %s ',fugitive#head())}
 augroup END
 "}}}
-"{{{ Keywords
-let s:plugins["vim-man"] = "vim-utils"
-set keywordprg=:Man
+"{{{ Plugin
+" Package Management
+packadd minpac
+call minpac#init()
+call minpac#add('k-takata/minpac', {'type': 'opt'})
+function UseAddon(name, author)
+	call minpac#add(a:author . '/' . a:name, {'type':'opt'})
+	execute "packadd! " . fnameescape(a:name)
+endfunction
+"{{{ Sessions
+call UseAddon('vim-prosession', 'dhruvasagar')
+call UseAddon('vim-obsession', 'tpope')
 "}}}
-"{{{ Git
-let s:plugins["vim-fugitive"] = "tpope"
-augroup VIMRC_fugitive
-	autocmd!
-	autocmd BufReadPost fugitive://* set bufhidden=delete
-augroup END
+"{{{ AutoClose (), {}, [], etc
+call UseAddon("delimitMate", "Raimondi")
+let delimitMate_expand_cr = 1
+let delimitMate_expand_space = 1
 "}}}
-"{{{ Org
-let s:plugins["vim-orgmode"] = "jceb"
-let g:org_todo_keywords=[['TODO(t)', 'STARTED(s)', 'DONE(d)'],
-			\['CANCELED(c)']]
-"}}}
-"{{{ Ledger
-let s:plugins["vim-ledger"] = "ledger"
-let g:ledger_fold_blanks = 1
+"{{{ Useful
+call UseAddon("vim-surround", "tpope")
+call UseAddon("vim-repeat", "tpope")
+call UseAddon("vim-sexp", "guns")
+call UseAddon("vim-sexp-mappings-for-regular-people", "tpope")
+let g:sexp_filetypes = 'clojure,scheme,lisp,timl,c,cpp'
+let g:sexp_enable_insert_mode_mappings=0
+call UseAddon("vim-unimpaired", "tpope")
 "}}}
 "{{{ Netrw
-let s:plugins["vim-vinegar"] = "tpope"
+call UseAddon("vim-vinegar", "tpope")
 let g:netrw_http_cmd = "curl -so"
 let g:netrw_liststyle = 4
 let g:netrw_hide = 1
@@ -294,11 +332,38 @@ let g:netrw_list_hide = "\\~$"
 let g:netrw_sizestyle = "h"
 "}}}
 "{{{ Buffer
-let s:plugins["a.vim"] = "vim-scripts"
+call UseAddon("a.vim", "vim-scripts")
 nnoremap <leader>b :ls<cr>:b<space>
 nnoremap <leader>sb :ls<cr>:sb<space>
 nnoremap gb :bnext<cr>
 nnoremap gB :bprevious<cr>
 "}}}
-PackAdd
+"{{{ Syntax
+call UseAddon("vim-plugin-AnsiEsc", "powerman")
+"}}}
+"{{{ Tasks
+call UseAddon('taskwiki', 'tbabej')
+call UseAddon('vimwiki', 'vimwiki')
+"}}}
+"{{{ Keywords
+call UseAddon("vim-man", "vim-utils")
+set keywordprg=:Man
+"}}}
+"{{{ Git
+call UseAddon("vim-fugitive", "tpope")
+augroup VIMRC_fugitive
+	autocmd!
+	autocmd BufReadPost fugitive://* set bufhidden=delete
+augroup END
+"}}}
+"{{{ Ale
+call UseAddon("ale", "w0rp")
+let g:ale_lint_on_insert_leave = 1
+let g:ale_lint_on_text_changed = "normal"
+let g:ale_linters = {
+	\ 'c': ['clangtidy', 'cppcheck'],
+	\ 'cpp': ['clangtidy', 'cppcheck']
+	\}
+"}}}
+"}}}
 " vim: foldmarker={{{,}}}: foldlevel=0: foldmethod=marker
