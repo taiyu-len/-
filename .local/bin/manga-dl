@@ -84,12 +84,28 @@ generate_urls() {
 	"process_$site"
 }
 
+# wget opts
+cookie_file=$(mktemp)
+trap "{ rm '$cookie_file'; }" EXIT
+wget=(wget)
+wget+=(--tries 0)
+wget+=(--timeout 60)
+wget+=(--continue)
+wget+=(--save-cookies "$cookie_file")
+wget+=(--load-cookies "$cookie_file")
+wget+=(--keep-session-cookies)
+if $quiet
+then wget+=(--quiet)
+else wget+=(--no-verbose)
+fi
+
 # Download Urls
 download_urls() {
-	log "\\nDownloading $title from $site now. ${pages:-unknown} pages\\n"
+	log "Downloading $title from $site now. ${pages:-unknown} pages\\n"
 	savedir="${SAVEDIR-${SAVEDIR_PREFIX-/tmp}/$site/$title}"
 	mkdir -p "$savedir"
 	cd       "$savedir"
+	local wget=("${wget[@]}" --referer="'$link'")
 	case "${rename_images[$site]}" in
 	0) download_original ;;
 	1) download_numbered ;;
@@ -101,26 +117,23 @@ download_urls() {
 }
 
 download_original() {
+	local parallel=(parallel -P 2 -n 4)
 	local url
 	while read_url
-	do
-		local urls=("$url")
-		while read_url -t 1
-		do urls+=("$url")
-		done
-		wget "${urls[@]}" || true
-	done
+	do echo "$url"
+	done | tee urls | "${parallel[@]}" "${wget[@]}" {}
 }
 download_numbered() {
-	local url i=1
+	local parallel=(parallel -P 2 --rpl '{#} $_=sprintf("%03d",$job->seq())')
+	local url
 	while read_url
-	do wget "$url" "-O$(printf "%03d" $i).jpg" && ((++i))
-	done
+	do echo "$url"
+	done | tee urls | "${parallel[@]}" "${wget[@]}" '-O{#}.jpg' {}
 }
 download_prefixed() {
 	local url i=1
 	while read_url
-	do wget "$url" "-O$(printf "%03d" $i)_$(basename "$url")" && ((++i))
+	do "${wget[@]}" "$url" "-O$(printf "%03d" $i)_$(basename "$url")" && ((++i))
 	done
 }
 download_mangadex() {
@@ -129,26 +142,6 @@ download_mangadex() {
 }
 
 read_url() { IFS= read -r -u11 "$@" url;}
-wget() { command wget "${wget_opts[@]}" "--referer=$link" "$@" ;}
-
-# wget opts
-cookie_file=$(mktemp)
-trap "{ rm '$cookie_file'; }" EXIT
-wget_opts=(--tries 0)
-wget_opts+=(--timeout 60)
-wget_opts+=(--continue)
-wget_opts+=(--quiet)
-wget_opts+=(--save-cookies "$cookie_file")
-wget_opts+=(--load-cookies "$cookie_file")
-wget_opts+=(--keep-session-cookies)
-if ! $quiet
-then
-	wget_opts+=(--show-progress)
-	if tty > /dev/null
-	then wget_opts+=('--progress=bar')
-	else wget_opts+=('--progress=dot:mega')
-	fi
-fi
 
 # Site data
 # Regex to extract name from between <title>
