@@ -17,7 +17,11 @@ readonly ROOT=~/.config/sxiv
 
 # Reads images into mapfile array
 read_images() {
-	mapfile -t images < <(tr '\n' '\0' | xargs -0 realpath)
+	images=()
+	local img
+	while read -r img
+	do images+=("$(realpath "$img")")
+	done
 }
 
 # args: filenames to get tags from
@@ -67,8 +71,8 @@ readonly YANKTAG="$ROOT"/yanktag
 
 tag_yank() {
 	local image
-	read image
-	printf "$image" > "$YANKTAG"
+	read -r image
+	printf "%s" "$image" > "$YANKTAG"
 }
 
 tag_paste() {
@@ -84,7 +88,7 @@ readonly TAGFILE="$ROOT"/quicktags
 # arg1: quick tag to set, must be a digit
 set_quicktag() {
 	local image
-	read image
+	read -r image
 	(
 		cd "$(dirname -- "$image")"
 		local tag
