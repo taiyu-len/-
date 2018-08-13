@@ -15,7 +15,7 @@
 KEY="$1";
 readonly ROOT=~/.config/sxiv
 
-# Reads images into mapfile array
+# vars: $images = Reads images into mapfile array
 read_images() {
 	images=()
 	local img
@@ -24,32 +24,71 @@ read_images() {
 	done
 }
 
-# args: filenames to get tags from
+# args:   filenames to get tags from
 # stdout: newline seperated list of tags
 print_tags() {
 	tmsu tags -1 "$@" | grep -v ':$\|^$' | sort -u
 }
+# args:   tags to get values from
+# stdout: newline seperated list of values
+print_values() {
+	tmsu values -1 "$@" | sort -u
+}
 
 # args: files to get tags from, or all existing tags if no arguments
-# vars: sets $tags to space seperated list of tags selected via rofi
-# exit: with 1 if no tags selected, 0 otherwise
+# vars: $tags = space seperated list of tags selected via rofi
+# exit: 1 if no tags selected; else 0
 select_tags() {
 	tags="$(print_tags "$@" | rofi -multi-select -dmenu | tr '\n' ' ')"
 	[ "$tags" ]
 }
 
 # args: files to get tags from, or all existing tags if no arguments
-# vars: sets tag to selected tag
-# exit: with 1 if tag is selected, 0 otherwise
+# vars: $tag = selected tag
+# exit: 1 if no tag selected; else 0
+# shellcheck disable=SC2120
 select_tag() {
 	tag="$(print_tags "$@" | rofi -dmenu)"
 	[ "$tag" ]
 }
 
+# args: tag to get values from
+# vars: $value -> value selected
+# exit: 1 if no value selected; else 0
+select_value() {
+	value="$(print_values "$@" | rofi -dmenu)"
+	[ "$value" ]
+}
+
+
+# args: $1 = tag to set value to
+add_value() {
+	read_images
+	(
+		cd "$(dirname -- "${images[0]}")" || exit
+		while select_value "$1"
+		do tmsu tag --tags="$1=$value" "${images[@]}"
+		done &
+	)
+}
+
+tag_value() {
+	read_images
+	(
+		cd "$(dirname -- "${images[0]}")" || exit
+		# shellcheck disable=SC2119
+		if select_tag
+		then while select_value "$tag"
+		do tmsu tag --tags="$tag=$value" "${images[@]}"
+		done &
+		fi
+	);
+}
+
 tag_add() {
 	read_images
 	(
-		cd "$(dirname -- "${images[0]}")"
+		cd "$(dirname -- "${images[0]}")" || exit
 		while select_tags
 		do tmsu tag --tags="$tags" "${images[@]}"
 		done &
@@ -59,7 +98,7 @@ tag_add() {
 tag_rm() {
 	read_images
 	(
-		cd "$(dirname -- "${images[0]}")"
+		cd "$(dirname -- "${images[0]}")" || exit
 		local tags
 		while select_tags --explicit "${images[@]}"
 		do tmsu untag --tags="$tags" "${images[@]}"
@@ -72,13 +111,13 @@ readonly YANKTAG="$ROOT"/yanktag
 tag_yank() {
 	local image
 	read -r image
-	printf "%s" "$image" > "$YANKTAG"
+	printf "%s" "$(realpath "$image")" > "$YANKTAG"
 }
 
 tag_paste() {
 	read_images
 	(
-		cd "$(dirname -- "${images[0]}")"
+		cd "$(dirname -- "${images[0]}")" || exit
 		tmsu tag --from "$(cat "$YANKTAG")" "${images[@]}"
 	)
 }
@@ -90,8 +129,9 @@ set_quicktag() {
 	local image
 	read -r image
 	(
-		cd "$(dirname -- "$image")"
+		cd "$(dirname -- "$image")" || exit
 		local tag
+		# shellcheck disable=SC2119
 		if select_tag
 		then
 			{
@@ -106,25 +146,33 @@ set_quicktag() {
 # arg1: quick tag to use, must be a digit
 use_quicktag() {
 	read_images
+		# shellcheck disable=SC1090
 	source "$TAGFILE"
 	(
-		cd "$(dirname -- "${images[0]}")"
+		cd "$(dirname -- "${images[0]}")" || exit
+		# shellcheck disable=SC2154
 		tmsu tag --tags="${quicktag[$1]}" "${images[@]}"
 	)
 }
+
 shell() {
-	read image
+	read -r image
 	"$TERMINAL" -cd "$(realpath "$(dirname -- "$image")")"
 }
 
 readonly LASTKEY=~/.config/sxiv/lastkey
 if [ "$KEY" = "C-x" ]
-then read KEY < "$LASTKEY"
+then read -r KEY < "$LASTKEY"
 fi
 
 case "$KEY" in
+"a") add_value artist ;;
+"c") add_value character ;;
+"s") add_value series ;;
+
 "y") tag_yank ;;
 "p") tag_paste ;;
+"v") tag_value ;;
 "t") tag_add ;;
 "T") tag_rm  ;;
 
