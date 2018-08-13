@@ -6,10 +6,11 @@ set -o errexit
 set -o nounset
 
 # Logging
+# args:   $1= printf format, rest print arguments
 # shellcheck disable=SC2059
-log(){ $quiet || printf "$@" ;}
+log() { $quiet || printf "$@" ;}
 # shellcheck disable=SC2059
-err(){
+err() {
 	{
 		printf "$@"
 		printf '== %s\n' ${link+link="$link"} ${title+title="$title"} ${site+site="$site"}
@@ -42,6 +43,7 @@ fi
 $debug && set -x
 
 # Functions
+# args: $1 -> link to download from
 process_url() {
 	local link="$1" # Url we are downloading from
 	local site      # Site ID we are getting content from
@@ -54,9 +56,12 @@ process_url() {
 }
 
 # Prepare urls
+# exit: 1 if unable to set site, or generate urls; else 0
 prepare_urls() {
 	set_site && generate_urls
 }
+# vars: $link is used to determine what site is used
+# vars: $site = id of website link
 set_site() {
 	case "$link" in
 	( *gameofscanlation.moe/*    ) site=gos_moe     ;;
@@ -88,8 +93,9 @@ generate_urls() {
 cookie_file=$(mktemp)
 trap "{ rm '$cookie_file'; }" EXIT
 wget=(wget)
-wget+=(--tries 0)
+wget+=(--tries inf)
 wget+=(--timeout 60)
+wget+=(--no-check-certificate)
 wget+=(--continue)
 wget+=(--save-cookies "$cookie_file")
 wget+=(--load-cookies "$cookie_file")
@@ -105,6 +111,7 @@ download_urls() {
 	savedir="${SAVEDIR-${SAVEDIR_PREFIX-/tmp}/$site/$title}"
 	mkdir -p "$savedir"
 	cd       "$savedir"
+# shellcheck disable=SC2191
 	local wget=("${wget[@]}" --referer="'$link'")
 	case "${rename_images[$site]}" in
 	0) download_original ;;
@@ -121,14 +128,15 @@ download_original() {
 	local url
 	while read_url
 	do echo "$url"
-	done | tee urls | "${parallel[@]}" "${wget[@]}" {}
+	done | tee urls | until "${parallel[@]}" "${wget[@]}" {}; do :; done
 }
 download_numbered() {
+	#shellcheck disable=SC2016
 	local parallel=(parallel -P 2 --rpl '{#} $_=sprintf("%03d",$job->seq())')
 	local url
 	while read_url
 	do echo "$url"
-	done | tee urls | "${parallel[@]}" "${wget[@]}" '-O{#}.jpg' {}
+	done | tee urls | until "${parallel[@]}" "${wget[@]}" '-O{#}.jpg' {}; do :; done
 }
 download_prefixed() {
 	local url i=1
@@ -151,7 +159,7 @@ name_regex[mangacow]='(.* - Chapter [^-]*) -'
 name_regex[webtoons]='(.*)<\/title>'
 name_regex[mangastream]='(.*)\ -'
 name_regex[foolslide]='(.*::.*) :: '
-name_regex[mangadex]='(.*\(.*\)) - MangaDex'
+name_regex[mangadex]='(.*) - MangaDex'
 
 # if 0, do not rename
 # if 1, renumber completely
@@ -235,22 +243,14 @@ process_imgursolo() {
 	mapfile -t args < <(perl -ne 'if (/item:/) { print "https://i.imgur.com/$1$2\n" if s|"hash":"([^"]*)".*?"ext":"([^"]*)"||; last }' <&10)
 	output_urls_from_args "${args[@]}"
 }
+#shellcheck disable=SC2155
+#shellcheck disable=SC2046
 process_mangadex() {
 	extract_title || return 1
-	local page webtoon
-	# Supress showing page contents in debug
-	$debug && set +x
-	page="$(cat <&10)"
-	$debug && set -x
-	# some pages have the mangadex part, others use relative url
-	local url_regex='s_.*img.*src="((.*)mangadex.org|)([^"]*)".*_\2mangadex.org/\3_'
-	mapfile -t webtoon < <(sed -nr '/class="webtoon/{'"$url_regex"';p}' <<< "$page")
-	if [ "${#webtoon[@]}" -gt 0 ]
-	then output_urls_from_args "${webtoon[@]}"
-	else
-		pages=$(sed -nr '/Page 1/{s/.*Page ([0-9]*).*/\1/;p;q}' <<< "$page")
-		output_urls_from_pages "$link" '/id="current_page"/{'"$url_regex"';p}'
-	fi
+	local chapter="$(sed -r 's/https:..mangadex.org.chapter.([0-9]*).*/\1/' <<< "$link")"
+	local query='"https://mangadex.org" + .server + .hash + "/" + .page_array[]'
+	local json="$(curl -s "https://mangadex.org/api/chapter/$chapter")"
+	output_urls_from_args $(jq -r "$query" <<< "$json")
 }
 
 for url
