@@ -39,7 +39,7 @@ print_values() {
 # vars: $tags = space seperated list of tags selected via rofi
 # exit: 1 if no tags selected; else 0
 select_tags() {
-	tags="$(print_tags "$@" | rofi -multi-select -dmenu | tr '\n' ' ')"
+	tags="$(print_tags "$@" | rofi -p "select tag" -multi-select -dmenu | tr '\n' ' ')"
 	[ "$tags" ]
 }
 
@@ -48,7 +48,7 @@ select_tags() {
 # exit: 1 if no tag selected; else 0
 # shellcheck disable=SC2120
 select_tag() {
-	tag="$(print_tags "$@" | rofi -dmenu)"
+	tag="$(print_tags "$@" | rofi -p "select tag" -dmenu)"
 	[ "$tag" ]
 }
 
@@ -56,7 +56,7 @@ select_tag() {
 # vars: $value -> value selected
 # exit: 1 if no value selected; else 0
 select_value() {
-	value="$(print_values "$@" | rofi -dmenu)"
+	value="$(print_values "$@" | rofi -p "select value" -dmenu)"
 	[ "$value" ]
 }
 
@@ -77,11 +77,9 @@ tag_value() {
 	(
 		cd "$(dirname -- "${images[0]}")" || exit
 		# shellcheck disable=SC2119
-		if select_tag
-		then while select_value "$tag"
+		while select_tag && select_value "$tag"
 		do tmsu tag --tags="$tag=$value" "${images[@]}"
 		done &
-		fi
 	);
 }
 
