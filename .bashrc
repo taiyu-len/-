@@ -59,7 +59,7 @@
 #{{{ Shell test
 if   [[ "$0" =~ zsh ]] && [ "$ZSH_NAME" ]
 then is() { [ "$1" = zsh  ] && shift && "$@" ;}
-elif [[ "$0" =~ bash ]] && [ "$BASH" ]
+elif [ "$BASH" ]
 then is() { [ "$1" = bash ] && shift && "$@" ;}
 else is() { false; }
 fi
@@ -151,7 +151,7 @@ then
 	PS3="$PS_PREFIX?# │$PS_SUFFIX "
 	#}}}
 elif is bash #{{{
-then PS1='\w \$ '
+then PS1='\$ '
 fi #}}}
 #}}}
 #{{{ Completions

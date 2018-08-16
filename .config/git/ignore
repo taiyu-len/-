@@ -45,6 +45,7 @@ Thumbs.db
 .clang_complete
 compile_commands.json
 *.plist
+*.compdb
 
 # CMAKE #
 #########
