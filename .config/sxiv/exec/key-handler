@@ -56,18 +56,19 @@ select_tag() {
 # vars: $value -> value selected
 # exit: 1 if no value selected; else 0
 select_value() {
-	value="$(print_values "$@" | rofi -p "select value" -dmenu)"
+	value="$(print_values "$@" | rofi -p "select value ${tag:+for $tag}" -dmenu)"
 	[ "$value" ]
 }
 
 
 # args: $1 = tag to set value to
 add_value() {
+	local tag="$1"
 	read_images
 	(
 		cd "$(dirname -- "${images[0]}")" || exit
-		while select_value "$1"
-		do tmsu tag --tags="$1=$value" "${images[@]}"
+		while select_value "$tag"
+		do tmsu tag --tags="$tag=$value" "${images[@]}"
 		done &
 	)
 }
