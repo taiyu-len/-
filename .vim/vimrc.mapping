@@ -1,0 +1,46 @@
+let mapleader      = " "
+let maplocalleader = ","
+
+" Suspend from insert mode
+inoremap  <C-O>
+
+" Make Y consistent with D, C, etc
+nnoremap Y y$
+
+" cpo-$
+set cpoptions+=$
+
+" Repeatable change word
+nnoremap c* *Ncgn
+nnoremap c# #NcgN
+
+set textwidth=80
+set tildeop
+
+" TODO some better way of fixing spellcheck
+nnoremap <silent><leader>ss :set spell<cr>1z=:set nospell<cr>
+
+" Suspend from insert mode
+inoremap  <C-O>
+
+"{{{ Format
+set formatoptions=ro " Insert comment leader after newline
+set formatoptions+=j " Remove comment leader when joining lines
+set formatoptions+=q " Format comments when using gq
+set formatoptions+=w " Soft line break
+set formatoptions+=l " Dont break existing long lines
+
+set cinoptions=
+set cinoptions+=Ls " placement of labels will be shifted one over.
+set cinoptions+=:0 " indent of case: inside switch
+set cinoptions+=l1 " case{\n.body.} no alignment inside body. just indent
+set cinoptions+=g0 " public:private:protected: will be shifted one over
+set cinoptions+=N-s " namespace body has no indent
+set cinoptions+=t0 " func return type alignment
+set cinoptions+=i0 " base class/constructor init alignment
+set cinoptions+=cs " Comment alignment
+set cinoptions+=(0,u0,U1 " for Proper alignment
+set cinoptions+=Ws "
+set cinoptions+=ks
+set cinoptions+=m1 " parenthesis acts like brace
+"}}}

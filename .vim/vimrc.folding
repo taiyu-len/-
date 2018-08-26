@@ -1,0 +1,56 @@
+function! VIMRC_expand(line, tab) abort
+	let l:line = a:line
+	let l:newline = ''
+	while strlen(l:line) > 0
+		if l:line[0] == "\t"
+			let l:newline .= strcharpart(a:tab, 0, &tabstop - (strdisplaywidth(l:newline) % &tabstop))
+			let l:line = strpart(l:line, 1)
+			while l:line[0] == "\t"
+				let l:newline .= a:tab
+				let l:line = strpart(l:line, 1)
+			endwhile
+		else
+			let l:tabidx = stridx(l:line, "\t", 1)
+			if l:tabidx > 0
+				let l:newline .= strpart(l:line, 0, l:tabidx)
+				let l:line = strpart(l:line, l:tabidx)
+			else
+				return l:newline . l:line
+			endif
+		endif
+	endwhile
+	return l:newline
+endfunction
+function! VIMRC_fold_function() abort
+	if &list
+		let l:tabidx = stridx(&listchars, "tab:")
+		let l:tabs = l:tabidx == -1 ? " " : strcharpart(&listchars[l:tabidx+4:], 0, 1)
+		let l:tabe = l:tabidx == -1 ? " " : strcharpart(&listchars[l:tabidx+4:], 1, 1)
+		let l:tab = l:tabs . repeat(l:tabe, &tabstop-1)
+	else | let l:tab = repeat(" ", &tabstop)
+	endif
+	let l:end = ''
+	if (&foldmethod ==? "marker")
+		let l:end = split(&foldmarker, ',')[1]
+	elseif (&foldmethod ==? "syntax")
+		let l:end = substitute(getline(v:foldend), '^\s*\([])}]\|\w\+\|\).*$', '\1', '')
+	endif
+	let l:lines  = line('$')
+	let l:folded = v:foldend - v:foldstart+1
+	let l:lines = printf("│ %*d │ %4.1f%%", len(l:lines), l:folded, l:folded*100.0/l:lines)
+	let l:width = (&textwidth ? &textwidth : 80) - 1
+	let l:strlen = l:width - strdisplaywidth("..." . l:end)
+	if exists('g:vimrc_foldexpand') && g:vimrc_foldexpand > 0
+		let l:foldstr = printf("%.*S...%s", l:strlen, VIMRC_expand(getline(v:foldstart), l:tab), l:end)
+	else
+		let l:foldstr = printf("%.*S...%s", l:strlen, substitute(getline(v:foldstart), '\t', l:tab, 'g'), l:end)
+	endif
+	return printf("%-*S%s", l:width, l:foldstr, l:lines)
+endfunction
+" let g:vimrc_foldexpand
+set foldtext=VIMRC_fold_function()
+set foldmethod=syntax
+set foldclose=
+set foldopen+=insert
+set foldlevelstart=0
+let g:sh_fold_enabled=7

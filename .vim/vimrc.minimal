@@ -1,0 +1,148 @@
+filetype plugin indent on
+syntax enable
+set undofile undodir=~/.vim/undo
+set directory=~/.vim/swap//
+set path+=include
+set viminfofile=~/.vim/viminfo
+set hidden
+set shell=/bin/bash
+
+"{{{ Setup Arrow keys for different terminals
+if &term == 'screen-256color'
+	map  [1;2A <S-Up>
+	map  [1;2B <S-Down>
+	map! [1;2A <S-Up>
+	map! [1;2B <S-Down>
+	set  t_%i=[1;2C " S-Right
+	set  t_#4=[1;2D " S-Left
+	map  [1;5A <C-Up>
+	map  [1;5B <C-Down>
+	map  [1;5C <C-Right>
+	map  [1;5D <C-Left>
+	map! [1;5A <C-Up>
+	map! [1;5B <C-Down>
+	map! [1;5C <C-Right>
+	map! [1;5D <C-Left>
+	map   <C-Backspace>
+	map!  <C-Backspace>
+	map  [3;5~ <C-delete>
+	map! [3;5~ <C-delete>
+elseif &term == 'dvtm-256color'
+	map  [a <S-Up>
+	map  [b <S-Down>
+	map! [a <S-Up>
+	map! [b <S-Down>
+	set  t_%i="[1;2C" " S-Right
+	set  t_#4="[1;2D" " S-Left
+	map  Oa <C-Up>
+	map  Ob <C-Down>
+	map  Oc <C-Right>
+	map  Od <C-Left>
+	map! Oa <C-Up>
+	map! Ob <C-Down>
+	map! Oc <C-Right>
+	map! Od <C-Left>
+elseif &term == 'rxvt-unicode-256color'
+	map  [a <S-Up>
+	map  [b <S-Down>
+	map! [a <S-Up>
+	map! [b <S-Down>
+	set  t_%i=[c " S-Right
+	set  t_#4=[d " S-Left
+	map  Oa <C-Up>
+	map  Ob <C-Down>
+	map  Oc <C-Right>
+	map  Od <C-Left>
+	map! Oa <C-Up>
+	map! Ob <C-Down>
+	map! Oc <C-Right>
+	map! Od <C-Left>
+	map   <C-Backspace>
+	map!  <C-Backspace>
+	map  [3^ <C-delete>
+	map! [3^ <C-delete>
+endif
+"}}}
+"{{{ Command
+cnoremap <C-Backspace> <C-w>
+nnoremap q: <nop>
+nnoremap q/ <nop>
+nnoremap q? <nop>
+nnoremap Q: q:
+nnoremap Q/ q/
+nnoremap Q? q?
+"{{{ Wild menu
+set wildmenu
+set wildchar=<TAB>
+set wildignorecase
+set wildmode=list:longest
+"}}}
+"}}}
+"{{{ Motion | Config for navigating vim
+set whichwrap=<,>,[,]          " enable wrapping with cursor keys in all modes
+set backspace=indent,eol,start " enable backspace
+set virtualedit=onemore,block  " allow cursor one past the line, and anywhere in block mode
+
+set ignorecase smartcase
+set incsearch wrapscan
+set magic
+
+" Swap mark jump keys around
+nnoremap ' `
+nnoremap ` '
+
+" virtual line move
+nnoremap <silent> <expr> k (v:count==0?'gk':'k')
+nnoremap <silent> <expr> j (v:count==0?'gj':'j')
+
+set scrolloff=5
+set sidescroll=1     " Enable side scrolling
+set sidescrolloff=5
+set nowrap           " Disable wrapping
+
+"}}}
+"{{{ Display
+set background="dark"
+colorscheme kuro
+
+set list listchars=eol:$,tab:│\ ,trail:•,extends:→,precedes:←,conceal:δ,nbsp:•
+set fillchars=vert:\|,stlnc:-,stl:^
+
+set hlsearch
+" make <C-L> also clear highlighting, and update diff
+if maparg('<C-L>', 'n') ==# ''
+	if has('diff')
+		nnoremap <silent> <C-L> :nohlsearch<bar>diffupdate<CR><C-L>
+	else
+		nnoremap <silent> <C-L> :nohlsearch<CR><C-L>
+	endif
+endif
+
+" Syntax
+set synmaxcol=200
+let g:sh_no_error=1
+let g:c_comment_strings=1
+let g:c_no_if0=1
+let g:c_no_bracket_error=1
+let g:c_curly_error=1
+let g:load_doxygen_syntax=1
+
+" Columns/Margins
+nnoremap <silent><leader>n :set nu! rnu!<cr>
+set colorcolumn=+0
+augroup VIMRC_colorcolumn
+	autocmd!
+	autocmd BufReadPost quickfix setlocal colorcolumn=0
+augroup END
+set conceallevel=2 concealcursor=
+
+set winminheight=0 winminwidth=0
+
+set errorbells
+set guioptions-=i
+set guioptions-=T
+set guioptions-=r
+set guioptions-=L
+"}}}
+
+" vim: foldmarker={{{,}}}: foldlevel=0: foldmethod=marker

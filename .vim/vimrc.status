@@ -1,0 +1,41 @@
+set laststatus=2
+set ruler
+"{{{ Helperfunctions
+"{{{ Column
+function! VIMRC_ShowsSigns() abort
+	return 2 * (&signcolumn == "yes" || (&signcolumn != "no" && has_key(getbufinfo(bufname(''))[0], "signs")))
+endfunction
+function! VIMRC_Column() abort
+	" width of numbers in margin
+	let l:max_width = (&number ? max([len(line('$')), &numberwidth-1]) : 0)
+	let l:max_width += &foldcolumn + VIMRC_ShowsSigns()
+	let l:padding = max([3, l:max_width]) - len(col('.'))
+	return repeat(" ", l:padding) . col('.')
+endfunction
+"}}}
+"{{{ PrintIf string if non empty
+function! PrintIf(fmt, str) abort
+	return empty(a:str) ? '' : printf(a:fmt, a:str)
+endfunction
+"}}}
+"{{{ Prints modifed status of the file
+function! VIMRC_Modified() abort
+	return ! &modifiable ? '-' :
+	\      ! &modified   ? '' :
+	\        &readonly   ? '!' : '+'
+endfunction
+"}}}
+"}}}
+set statusline=%{VIMRC_Column()}
+set statusline+= │ #%n
+set statusline+= │ %{VIMRC_Modified()}%t
+set statusline+=%{PrintIf(' │ %s',&filetype)}
+set statusline+= │ %=
+set statusline+= │ %<%F
+set statusline+=%{PrintIf(' │ %s',fugitive#head())} 
+augroup VIMRC_FixStatus
+	autocmd!
+	autocmd BufReadPost quickfix setlocal statusline= %{&filetype} │ %=%<
+	autocmd BufReadPost quickfix setlocal statusline+=%{exists('w:quickfix_title')?'\ '.w:quickfix_title:''}
+	autocmd BufReadPost netrw setlocal statusline= netrw │ %F %=%{PrintIf(' │ %s ',fugitive#head())}
+augroup END
