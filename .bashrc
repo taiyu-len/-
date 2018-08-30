@@ -99,7 +99,7 @@ then
 	HISTFILE=~/.zsh/history
 	SAVEHIST=$HISTSIZE
 	HISTORY_IGNORE="($(IFS='|'; printf %s "${ign_cmds[*]}"))"
-	setopt BANG_HIST
+	setopt NO_BANG_HIST
 	setopt EXTENDED_HISTORY
 	setopt INC_APPEND_HISTORY_TIME
 	setopt HIST_EXPIRE_DUPS_FIRST
@@ -423,7 +423,10 @@ plll() {
 spawn() { ("$@" </dev/null &>/dev/null &) ;}
 is zsh compdef spawn=command
 hless() { highlight -Oansi "$@" | less -R ;}
-
+sleep_until() {
+	d="$(date -d "$1" +%s)" || return 1
+	sleep $[d - $(date +%s)]
+}
 lensay() {
 	local ponycmd=()
 	if [[ "$TERM" =~ 256color ]]

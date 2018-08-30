@@ -8,11 +8,11 @@ Xft.antialias: 1
 *.boldFont:       -*-dina-bold-r-*-*-10-*-*-*-*-*-*-*
 *.boldItalicFont: -*-dina-bold-i-*-*-10-*-*-*-*-*-*-*
 
-*.cursorColor:   #333366
+*.cursorColor:   #FFAA88
 
 !! default bg/fg
-*.background:    #111122
-*.foreground:    #DDDDEE
+*.background:    #221111
+*.foreground:    #EEDDDD
 
 ! black dark/light
 *.color0:        #111122
@@ -135,10 +135,10 @@ rofi.fake-transparency:true
 rofi.matching:fuzzy
 rofi.sort:true
 !           State: #Bg      , #fg    , #bgalt   , #hlbg  , #hlfg
-rofi.color-normal: #00000000, #BBBBDD, #00000000, #333366, #DDDDEE
-rofi.color-urgent: #00000000, #BBBBDD, #00000000, #333366, #DDDDEE
-rofi.color-active: #00000000, #BBBBDD, #00000000, #333366, #DDDDEE
+rofi.color-normal: #00000000, #DDBBBB, #00000000, #663333, #EEDDDD
+rofi.color-urgent: #00000000, #DDBBBB, #00000000, #663333, #EEDDDD
+rofi.color-active: #00000000, #DDBBBB, #00000000, #663333, #EEDDDD
 !                  #bg        #border  #separator
-rofi.color-window: #CC111122, #111122, #111122
+rofi.color-window: #CC221111, #221111, #221111
 !!}}}
 ! vim:foldmethod=marker foldmarker={{{,}}}

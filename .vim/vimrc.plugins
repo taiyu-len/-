@@ -72,3 +72,4 @@ let g:ale_cpp_clangtidy_checks = [
 	\'*', '-fuchsia-default-arguments',
 	\'-cppcoreguidelines-pro-type-vararg', '-hicpp-vararg']
 "}}}
+" vim: foldmarker={{{,}}}: foldlevel=0: foldmethod=marker
