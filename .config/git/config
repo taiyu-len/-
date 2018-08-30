@@ -12,6 +12,8 @@
 [status]
 	short = true
 	branch = true
+[diff]
+	algorithm = patience
 [color]
 	ui = true
 [alias]

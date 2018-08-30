@@ -5,6 +5,7 @@
 *.exe
 *.o
 *.so
+*.a
 *.d
 
 # Packages #

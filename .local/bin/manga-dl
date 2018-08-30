@@ -227,6 +227,7 @@ process_mangastream() {
 	output_urls_from_pages "$(dirname "$link")" '/id="manga-page"/{s/.*src="([^"]*)".*/http:\1/;p}'
 }
 process_foolslide() {
+	link="$(sed -r 's,/(|page/.*)$,/page/1,' <<< "$link")"
 	extract_title &&
 	extract_page_count '/tbtitle dropdown_parent dropdown_right/{s/.*>([0-9]*) .*/\1/;p;q}' &&
 	output_urls_from_pages "$(dirname "$link")" '\,content/comics/,{s/.*src="([^"]*)".*/\1/;p}'
@@ -248,7 +249,11 @@ process_imgursolo() {
 process_mangadex() {
 	extract_title || return 1
 	local chapter="$(sed -r 's/https:..mangadex.org.chapter.([0-9]*).*/\1/' <<< "$link")"
-	local query='"https://mangadex.org" + .server + .hash + "/" + .page_array[]'
+	local query='
+		if .server | contains("mangadex")
+		then .server + .hash + "/" + .page_array[]
+		else "https://mangadex.org" + .server + .hash + "/" + .page_array[]
+		end'
 	local json="$(curl -s "https://mangadex.org/api/chapter/$chapter")"
 	output_urls_from_args $(jq -r "$query" <<< "$json")
 }
