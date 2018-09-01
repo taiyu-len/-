@@ -1,4 +1,0 @@
-#!/bin/sh
-timew start "${@-locked}"
-slock
-timew stop  "${@-locked}"

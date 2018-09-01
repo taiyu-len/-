@@ -44,9 +44,17 @@ call UseAddon("NrrwRgn", "chrisbra")
 "{{{ Syntax
 call UseAddon("vim-plugin-AnsiEsc", "powerman")
 "}}}
-"{{{ Tasks
-call UseAddon('taskwiki', 'tbabej')
+"{{{ Wiki
 call UseAddon('vimwiki', 'vimwiki')
+let g:vimwiki_list = [{
+\ 'path': '~/prog/wiki',
+\ 'path_html': '~/prog/wiki/site/',
+\ 'template_path': '~/prog/wiki/template/'
+\}]
+augroup VIMRC_vimwiki
+	autocmd!
+	autocmd FileType vimwiki setlocal tabstop=2 shiftwidth=2 expandtab
+augroup END
 "}}}
 "{{{ Keywords
 call UseAddon("vim-man", "vim-utils")

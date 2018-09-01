@@ -398,6 +398,19 @@ tat() { tmux new-session -As "${@:-$(basename "$PWD")}"; }
 tdt() { tmux detach; }
 tsplit() { tmux split-window "$@"; }
 #}}}
+#{{{ Task
+timelock() {
+	timew start "${@-locked}"
+	slock
+	timew stop "${@-locked}"
+}
+tasklock() {
+	task="$1"; shift
+	task "$task" start "$@"
+	slock
+	task +ACTIVE stop
+}
+#}}}
 #{{{ neat curl things
 wttr() { curl "wttr.in/$*" ;}
 cheat.sh() { curl "cheat.sh/$*" ;}

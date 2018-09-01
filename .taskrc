@@ -24,3 +24,5 @@ uda.type.type=string
 uda.type.label=Type
 report.next.columns=id,start.age,entry.age,depends,priority,project,type,tags,scheduled.countdown,due.relative,until.remaining,description,urgency
 report.next.labels=ID,Active,Age,Deps,P,Project,Type,Tags,S,Due,Until,Description,Urg
+context.pending=status:pending
+context=pending
