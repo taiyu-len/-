@@ -129,7 +129,7 @@ Rxvt.color15:       [80]#EEEEFF
 !!}}}
 !!}}}
 !!{{{ Rofi
-rofi.font:dina 8
+rofi.font:dina 9
 rofi.fake-background:background
 rofi.fake-transparency:true
 rofi.matching:fuzzy
