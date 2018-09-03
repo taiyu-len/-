@@ -23,6 +23,14 @@ if &term == 'screen-256color'
 	map! [1;5B <C-Down>
 	map! [1;5C <C-Right>
 	map! [1;5D <C-Left>
+	map  [A <A-Up>
+	map  [B <A-Down>
+	map  [C <A-Right>
+	map  [D <A-Left>
+	map! [A <A-Up>
+	map! [B <A-Down>
+	map! [C <A-Right>
+	map! [D <A-Left>
 	map   <C-Backspace>
 	map!  <C-Backspace>
 	map  [3;5~ <C-delete>
@@ -130,10 +138,6 @@ let g:load_doxygen_syntax=1
 " Columns/Margins
 nnoremap <silent><leader>n :set nu! rnu!<cr>
 set colorcolumn=+0
-augroup VIMRC_colorcolumn
-	autocmd!
-	autocmd BufReadPost quickfix setlocal colorcolumn=0
-augroup END
 set conceallevel=2 concealcursor=
 
 set winminheight=0 winminwidth=0

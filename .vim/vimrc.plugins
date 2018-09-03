@@ -52,11 +52,6 @@ let g:vimwiki_list = [{
 \ 'path_html': '~/prog/wiki/site/',
 \ 'template_path': '~/prog/wiki/template/'
 \}]
-augroup VIMRC_vimwiki
-	autocmd!
-	autocmd FileType vimwiki setlocal tabstop=2 shiftwidth=2 expandtab
-	autocmd FileType vimwiki nmap  :VimwikiReturn 3 1<cr>
-augroup END
 "}}}
 "{{{ Keywords
 call UseAddon("vim-man", "vim-utils")

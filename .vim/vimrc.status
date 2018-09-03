@@ -32,9 +32,3 @@ set statusline+= │ %{VIMRC_Modified()}%t
 set statusline+=%{PrintIf(' │ %s',&filetype)}
 set statusline+= │ %=
 set statusline+= │ %<%F
-augroup VIMRC_FixStatus
-	autocmd!
-	autocmd BufReadPost quickfix setlocal statusline= %{&filetype} │ %=%<
-	autocmd BufReadPost quickfix setlocal statusline+=%{exists('w:quickfix_title')?'\ '.w:quickfix_title:''}
-	autocmd BufReadPost netrw setlocal statusline= netrw │ %F
-augroup END
