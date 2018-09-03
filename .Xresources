@@ -134,6 +134,8 @@ rofi.fake-background:background
 rofi.fake-transparency:true
 rofi.matching:fuzzy
 rofi.sort:true
+rofi.modi:
+rofi.show-icons:true
 !           State: #Bg      , #fg    , #bgalt   , #hlbg  , #hlfg
 rofi.color-normal: #00000000, #DDBBBB, #00000000, #663333, #EEDDDD
 rofi.color-urgent: #00000000, #DDBBBB, #00000000, #663333, #EEDDDD

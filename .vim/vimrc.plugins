@@ -2,7 +2,7 @@
 packadd minpac
 call minpac#init()
 call minpac#add('k-takata/minpac', {'type': 'opt'})
-function UseAddon(name, author)
+function! UseAddon(name, author)
 	call minpac#add(a:author . '/' . a:name, {'type':'opt'})
 	execute "packadd! " . fnameescape(a:name)
 endfunction
@@ -22,11 +22,12 @@ call UseAddon("vim-sexp", "guns")
 call UseAddon("vim-sexp-mappings-for-regular-people", "tpope")
 let g:sexp_filetypes = 'clojure,scheme,lisp,timl,c,cpp'
 let g:sexp_enable_insert_mode_mappings=0
-call UseAddon("vim-unimpaired", "tpope")
 call UseAddon("vim-eunuch", "tpope")
+call UseAddon("vim-unimpaired", "tpope")
 "}}}
 "{{{ Netrw
 call UseAddon("vim-vinegar", "tpope")
+nmap gu <Plug>VinegarUp
 let g:netrw_http_cmd = "curl -so"
 let g:netrw_liststyle = 4
 let g:netrw_hide = 1
@@ -54,6 +55,7 @@ let g:vimwiki_list = [{
 augroup VIMRC_vimwiki
 	autocmd!
 	autocmd FileType vimwiki setlocal tabstop=2 shiftwidth=2 expandtab
+	autocmd FileType vimwiki nmap  :VimwikiReturn 3 1<cr>
 augroup END
 "}}}
 "{{{ Keywords

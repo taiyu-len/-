@@ -25,11 +25,6 @@ read -r after
 # Dont modify task
 echo "$after"
 
-# avoid parsing command
-if [ "$api" ] && [ "$cmd" != "start" ] && [ "$cmd" != "stop" ]
-then exit 0
-fi
-
 # Check what whether we are stopping or starting
 if jq -ne "$before|has(\"start\") and ($after|has(\"start\")|not)"
 then

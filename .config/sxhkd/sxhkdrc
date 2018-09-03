@@ -4,7 +4,7 @@ super + Return
 	$\{TERMINAL:-xterm\}
 ## Launch process
 super + space
-	dmenu-launch
+	rofi -show drun
 #super + shift + grave
 #	
 ## Reload sxhkdrc

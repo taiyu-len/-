@@ -1,2 +1,37 @@
 map <Space> scroll half-down
 map <S-Space> scroll half-up
+
+set font                               "Dina 9"
+
+set default-bg                         "#221111"
+set default-fg                         "#FFFFFF"
+
+set inputbar-bg                        "#110808"
+set inputbar-fg                        "#FFFFFF"
+
+set notification-bg                    "#221111"
+set notification-fg                    "#FFFFFF"
+
+set completion-bg                      "#331919"
+set completion-fg                      "#FFFFFF"
+
+set completion-highlight-bg            "#FFFFFF"
+set completion-highlight-fg            "#331919"
+
+set statusbar-bg                       "#442222"
+set statusbar-fg                       "#FFFFFF"
+
+set recolor-lightcolor                 "#221111"
+set recolor-darkcolor                  "#FFFFFF"
+set recolor true
+
+map <C-r> rotate
+map r recolor
+set page-padding 0
+map x toggle_page_mode
+set pages-per-row 1
+set adjust-open width
+
+set window-title-basename true
+set statusbar-home-tilde true
+set show-hidden true
