@@ -29,7 +29,4 @@ bspc config window_gap  -$width
 for side in top bottom right left ; do
 	bspc config ${side}_padding $width
 done
-# Bars
-MONITOR=LVDS1 polybar bar &
-MONITOR=VGA1  polybar bar &
 exec sxhkd

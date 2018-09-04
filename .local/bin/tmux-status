@@ -1,0 +1,35 @@
+#!/bin/bash
+sep() { printf "%s" "#[fg=white]▕▏" "$@"; }
+# shellcheck disable=SC2183 # Time Printf
+if [ "$1" = "left" ]
+then
+	ip -br addr|awk '$2=="UP" {
+		split($3,a,"(\\.|/)");
+		printf "#[fg=yellow,nobold]"a[1]"."a[2]"."a[3]"."
+		printf "#[fg=brightyellow,bold]"a[4]
+	}'
+	sep
+	printf "#[fg=blue,bold]%(%d-%b-#[fg=brightblue,nobold]%a)T"
+	mail="$(dircount "$MAIL/INBOX/new")"
+	if [ "$mail" != "0" ]
+	then sep && printf "#[fg=green]Mail:%d" "$mail"
+	fi
+	exec sleep 1m;
+else # $1 = right
+	free -h --si | awk '$1=="Mem:"{printf "M:#[fg=cyan]"$3"/#[fg=blue]"$2}'
+	sep "C:#[fg=green]"
+	awk -v a="$(awk '/cpu /{print $2+$4,$2+$4+$5}' /proc/stat; sleep 1)" '
+		/cpu /{
+			split(a,b," ");
+			printf "%3.0f%%", 100*($2+$4-b[1])/($2+$4+$5-b[2])
+		}'  /proc/stat
+	sep "L:"
+	</proc/loadavg awk '{
+		printf "#[fg=brightmagenta,bold]"$1;
+		printf "#[fg=brightmagenta,nobold] "$2;
+		printf "#[fg=magenta,nobold] "$3;
+	}'
+	sep
+	printf "#[fg=red,bold]%(%H:%M)T"
+	echo
+fi
