@@ -1,6 +1,9 @@
 "{{{ Vim Text
+highlight Error                ctermbg=1 ctermfg=0 cterm=None
+highlight SpellCap             ctermbg=3 ctermfg=0 cterm=None
 highlight Normal               ctermfg=7
 highlight Bold                 cterm=bold
+highlight!link SpellBad        Error
 highlight!link ErrorMsg        Error
 highlight!link SpecialKey      Comment
 highlight!link NonText         Comment

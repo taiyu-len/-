@@ -307,6 +307,9 @@ alias sudo="sudo "
 alias torify="torify "
 alias exec="exec "
 alias command="command "
+#{{{ Config
+alias config="/usr/bin/git --git-dir=$HOME/.home.git/ --work-tree=$HOME"
+#}}}
 #{{{ safety
 alias mv="mv -i"
 alias cp="cp -i"
@@ -406,9 +409,12 @@ timelock() {
 }
 tasklock() {
 	task="$1"; shift
-	task "$task" start "$@"
+	task "${task#-}" start "$@"
 	slock
-	task +ACTIVE stop
+	if [ "${task:0:1}" = "-"  ]
+	then task "${task#-}" done
+	else task "${task#-}" stop
+	fi
 }
 #}}}
 #{{{ neat curl things
