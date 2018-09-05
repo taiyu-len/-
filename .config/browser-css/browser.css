@@ -1,0 +1,93 @@
+  @namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
+/** Toolbar **/
+
+toolbaritem,
+toolbarbutton {
+  min-height:18px!important;
+  padding:0 !important;
+  margin:0 !important;
+  border:0 !important;
+}toolbar,
+toolbaritem,
+toolbarbutton {
+  -moz-appearance:none !important;
+  font-size:11px;
+  font-family: Dina !important;
+  background: #663333 !important;
+  color:#FFF!important;
+  padding:0!important;
+}
+toolbar#nav-bar { display: none;}
+/** Menubar **/
+#main-menubar, menu#tinymenu {
+  -moz-appearance:none !important;
+  max-height:18px !important;
+  border:0 !important;
+  padding:0 !important;
+  color: #ccc !important;
+}/** Bookmarks **/
+.bookmark-item  > .toolbarbutton-icon {
+  display:none;
+}
+#personal-bookmarks {
+  min-height:18px!important;
+}
+
+toolbarbutton.bookmark-item,
+toolbarbutton.bookmark-item[open="true"] {
+  padding:0 !important;
+  border:0 !important;
+  margin:0 !important;
+}/* urlbar */
+#urlbar,
+#urlbar > #identity-box,
+#urlbar > #identity-box > * {
+  padding:0; margin:0; border:0;
+  background-color: #442222 !important;
+  color: #fff!important;
+  text-align:center;
+}
+
+#urlbar {
+  -moz-appearance:none;
+  box-shadow:none !important;
+}
+/* tabs */
+#TabsToolbar {
+  background-image: none !important;
+  background-color: #221111 !important;
+  min-height:18px!important;
+  color:#CCC!important;
+  border:0!important;
+}
+
+.tabbrowser-tab {
+  background-image:none !important;
+  min-height:18px !important;
+  max-height:18px !important;
+  max-width:none !important;
+  min-width:18px;
+  background:none;
+  border:0!important;
+  margin-top:0!important;
+  border-width: 0 !important;
+  border-radius: 0 !important;
+  border-image:none !important;
+  padding:0!important;
+  background: #221111 !important;
+  color: #fff !important;
+}
+.tabbrowser-tab[pinned] {
+  max-width:18px !important;
+  min-width:18px !important;
+}
+.tabbrowser-tab:hover {
+  background: #442222 !important;
+  color: #fff !important;
+}
+.tabbrowser-tab[selected="true"] {
+  background: #663333 !important;
+  color: #fff !important;
+}
+.tabbrowser-tab .tab-text { opacity: 1!important; }
+.tab-icon-image, .tab-throbber { margin:1px!important; }
