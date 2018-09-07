@@ -55,5 +55,5 @@ CMakeFiles
 cmake_install.cmake
 
 # NQ #
-######
-,*
+###### Disable because of bug in netrw_gitignore#Hide()
+#,*

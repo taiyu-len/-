@@ -217,6 +217,7 @@ then
 	zstyle ':completion:*' use-cache on
 	zstyle ':completion:*:complete:*' cache-path ~/.zsh/cache
 	#}}}
+	fpath+=("$HOME/.local/share/zsh/functions/Completion/Zsh")
 
 	autoload -Uz compinit
 	compinit
@@ -381,21 +382,11 @@ then
 	alias -s exe=wine
 fi #}}}
 #}}}
-#{{{ Functions
-#{{{ Timew tracking function
-track() {
-	local tags=()
-	while [[ "$1" = @* ]]
-	do tags+=("${1/@/}"); shift
-	done
-	if ! hash "${1:?Requires a function to call}" &> /dev/null && { [ -d "$1" ] || [ ! -x "$1" ]; }
-	then echo "Requires a valid function to call" >&2; return 1
-	fi
-	timew start "${tags[@]:-$(basename "$1")}"
-	"$@"
-	timew stop
-}
+#{{{ GPG
+export GPG_TTY=$(tty)
+export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
 #}}}
+#{{{ Functions
 #{{{ Tmux
 tat() { tmux new-session -As "${@:-$(basename "$PWD")}"; }
 tdt() { tmux detach; }
@@ -415,6 +406,18 @@ tasklock() {
 	then task "${task#-}" done
 	else task "${task#-}" stop
 	fi
+}
+track() {
+	local tags=()
+	while [[ "$1" = @* ]]
+	do tags+=("${1/@/}"); shift
+	done
+	if ! hash "${1:?Requires a function to call}" &> /dev/null && { [ -d "$1" ] || [ ! -x "$1" ]; }
+	then echo "Requires a valid function to call" >&2; return 1
+	fi
+	timew start "${tags[@]:-$(basename "$1")}"
+	"$@"
+	timew stop
 }
 #}}}
 #{{{ neat curl things

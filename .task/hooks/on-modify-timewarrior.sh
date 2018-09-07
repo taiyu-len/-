@@ -49,3 +49,4 @@ read -r anno
 } < <(jq -nr "$after|$query")
 
 timew "$timew_cmd" ${desc:+"$desc"} ${proj:+"$proj"} ${anno:+"$anno"} :yes
+exit 0

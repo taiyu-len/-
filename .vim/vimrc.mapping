@@ -6,6 +6,18 @@ inoremap  <C-O>
 
 " Make Y consistent with D, C, etc
 nnoremap Y y$
+nnoremap gy "*y
+nnoremap gp "*p
+xnoremap gy "*y
+xnoremap gp "*p
+
+" Keep selection
+xnoremap < <gv
+xnoremap > >gv
+
+" Quickfix/locallist
+nnoremap <silent> <leader>q :copen<cr>
+nnoremap <silent> <leader>l :lopen<cr>
 
 " cpo-$
 set cpoptions+=$

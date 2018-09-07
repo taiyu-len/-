@@ -14,7 +14,7 @@ then
 	echo -n "$date"
 	[ "$ip"          ] && sep "$ip"
 	[ "$mail" != "0" ] && sep "#[fg=green]Mail:$mail"
-	exec sleep 1m;
+	exec sleep 10;
 else # $1 = right
 
 	memory=$(free -h --si | awk '$1=="Mem:"{printf "M:#[fg=cyan]"$3"/#[fg=blue]"$2}')
