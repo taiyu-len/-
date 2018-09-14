@@ -70,7 +70,7 @@ hide_duplicates_count = yes
 # The width can be negative.  In this case the actual width is the
 # screen width minus the width defined in within the geometry option.
 #geometry = "250x50-40+40"
-geometry = "300x50-15+49"
+geometry = "x50"
 
 # Shrink window if it's smaller than the width.  Will be ignored if
 # width is 0.
@@ -84,7 +84,7 @@ transparency = 5
 # Don't remove messages, if the user is idle (no mouse or keyboard input)
 # for longer than idle_threshold seconds.
 # Set to 0 to disable.
-idle_threshold = 0
+idle_threshold = 30
 
 # Which monitor should the notifications be displayed on.
 monitor = 0
@@ -110,7 +110,7 @@ sticky_history = yes
 history_length = 15
 
 # Display indicators for URLs (U) and actions (A).
-show_indicators = no
+show_indicators = yes
 
 # The height of a single line.  If the height is smaller than the
 # font height, it will get raised to the font height.
@@ -148,11 +148,11 @@ dmenu = /usr/bin/rofi -dmenu -p dunst:
 browser = /usr/bin/palemoon -new-tab
 
 # Align icons left/right/off
-icon_position = off
+icon_position = left
 max_icon_size = 80
 
 # Paths to default icons.
-icon_path = /usr/share/icons/Adwaita/16x16/mimetypes/:/usr/share/icons/Adwaita/48x48/status/:/usr/share/icons/Adwaita/16x16/devices/:/usr/share/icons/Adwaita/48x48/notifications/:/usr/share/icons/Adwaita/48x48/emblems/
+icon_path = /usr/share/icons/hicolor/48x48/mimetypes/:/usr/share/icons/hicolor/48x48/status/:/usr/share/icons/hicolor/48x48/devices/:/usr/share/icons/hicolor/48x48/notifications/:/usr/share/icons/hicolor/48x48/emblems/:/home/taiyu/.local/share/icons/hicolor/48x48/apps/:/home/taiyu/pics/etc/icons/
 
 frame_width = 3
 frame_color = "#8EC07C"
@@ -185,21 +185,21 @@ frame_color = "#3B7C87"
 foreground = "#5BACD7"
 background = "#191311"
 #background = "#2B313C"
-timeout = 4
+timeout = 6
 
 [urgency_normal]
 frame_color = "#5B8234"
 foreground = "#ABD254"
 background = "#191311"
 #background = "#2B313C"
-timeout = 6
+timeout = 8
 
 [urgency_critical]
 frame_color = "#B7472A"
 foreground = "#D7674A"
 background = "#191311"
 #background = "#2B313C"
-timeout = 8
+timeout = 10
 
 
 # Every section that isn't one of the above is interpreted as a rules to
@@ -220,7 +220,14 @@ timeout = 8
 # to "".
 # NOTE: It might be helpful to run dunst -print in a terminal in order
 # to find fitting options for rules.
-
+[stretch]
+    summary = "stretch"
+    new_icon = "zoge"
+    urgency = low
+[sleepy]
+    summary = "sleep"
+    new_icon = "sleepy"
+    timeout = 30
 #[espeak]
 #    summary = "*"
 #    script = dunst_espeak.sh

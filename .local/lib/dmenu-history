@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ### Dmenu History Wrapper
-error () { printf "${FUNCNAME[1]}: $1\\n" "${@:2}" >&2 ;}
+error () { printf "%s" "${FUNCNAME[1]}: $1\\n" "${@:2}" >&2 ;}
 init () {
 	confd="${XDG_USER_CONFIG_DIR:-$HOME/.config}/dmenu-history"
 	context="$(basename "$0")"
