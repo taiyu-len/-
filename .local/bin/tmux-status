@@ -9,7 +9,7 @@ then
 		printf "#[fg=yellow,nobold]"a[1]"."a[2]"."a[3]"."
 		printf "#[fg=brightyellow,bold]"a[4]
 	}')"
-	mail="$(dircount "$MAIL/INBOX/new")"
+	mail="$(dircount "$MAIL/taiyu-len/INBOX/new")"
 
 	echo -n "$date"
 	[ "$ip"          ] && sep "$ip"

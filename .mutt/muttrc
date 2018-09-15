@@ -1,0 +1,64 @@
+# Mailbox setup
+set folder       = "~/mail"
+set header_cache = "+hcache"
+set spoolfile    = "+taiyu-len/INBOX" # Default maildir
+folder-hook taiyu-len/* source ~/.mutt/accounts/taiyu-len
+
+# force tls for remote connections
+set ssl_starttls
+set ssl_force_tls
+
+# Do not mark mail as Old
+unset mark_old
+
+# Scroll by lines
+set menu_scroll
+
+# Keybinds
+bind pager,index g  noop
+bind pager gg top
+bind index gg first-entry
+bind pager G  bottom
+bind index G  last-entry
+bind pager j  next-line
+bind pager k  previous-line
+bind pager N  search-opposite
+bind index gj sidebar-next-new
+bind index gJ sidebar-next
+bind index gk sidebar-prev-new
+bind index gK sidebar-prev
+bind index go sidebar-open
+
+#Sidebar
+set sidebar_visible
+set sidebar_format = "%B%?F? [%F]?%* %?N?%N/?%S"
+set mail_check_stats
+set sidebar_divider_char = "█"
+set sidebar_short_path
+set sidebar_folder_indent
+set sidebar_indent_string = " "
+set sidebar_next_new_wrap
+
+# Formatting
+set reflow_text=yes
+set smart_wrap=yes
+set markers=no
+set text_flowed=yes
+set include=yes
+
+# Colors
+color sidebar_indicator default blue
+color sidebar_highlight white   black
+color sidebar_spoolfile cyan    default
+color sidebar_new       default green
+color sidebar_flagged   red     default
+
+color quoted0   blue        default
+color quoted1   green       default
+color quoted2   red         default
+color quoted3   blue        default
+color quoted4   green       default
+color quoted5   red         default
+color quoted6   blue        default
+color signature green       default
+color tilde     cyan        default
