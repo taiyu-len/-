@@ -175,6 +175,8 @@ case "$KEY" in
 "t") tag_add ;;
 "T") tag_rm  ;;
 
+"g") read_images; gimp "${images[@]}" & ;;
+
 "1") use_quicktag 1 ;; "exclam")      set_quicktag 1 ;;
 "2") use_quicktag 2 ;; "at")          set_quicktag 2 ;;
 "3") use_quicktag 3 ;; "numbersign")  set_quicktag 3 ;;
