@@ -31,7 +31,7 @@ nmap gu <Plug>VinegarUp
 let g:netrw_http_cmd = "curl -so"
 let g:netrw_liststyle = 4
 let g:netrw_hide = 1
-let g:netrw_list_hide = "\\~$"
+let g:netrw_list_hide = netrw_gitignore#Hide()
 let g:netrw_sizestyle = "h"
 "}}}
 "{{{ Buffer
@@ -44,6 +44,7 @@ call UseAddon("NrrwRgn", "chrisbra")
 "}}}
 "{{{ Syntax
 call UseAddon("vim-plugin-AnsiEsc", "powerman")
+call UseAddon("vim-cpp-enhanced-highlight", "octol")
 "}}}
 "{{{ Wiki
 call UseAddon('vimwiki', 'vimwiki')
@@ -67,6 +68,7 @@ augroup END
 "}}}
 "{{{ Ale
 call UseAddon("ale", "w0rp")
+let g:ale_lint_on_text_change = 0
 let g:ale_linters = {
 	\ 'c': ['clangtidy', 'cppcheck'],
 	\ 'cpp': ['clangtidy', 'cppcheck']
@@ -78,7 +80,8 @@ let g:ale_sign_error   = '▕▏'
 let g:ale_cpp_clangtidy_checks = [
 	\'*', '-fuchsia-default-arguments',
 	\'-fuchsia-overloaded-operator',
-	\'-cppcoreguidelines-pro-type-vararg', '-hicpp-vararg']
+	\'-cppcoreguidelines-pro-type-vararg', '-hicpp-vararg',
+	\'google-runtime-int', 'cert-err58-cpp']
 hi ALEErrorSign   ctermfg=1 ctermbg=0 cterm=bold
 hi ALEWarningSign ctermfg=3 ctermbg=0 cterm=bold
 hi ALEInfoSign    ctermfg=4 ctermbg=0 cterm=bold
