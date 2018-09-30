@@ -449,6 +449,12 @@ sleep_until() {
 	d="$(date -d "$1" +%s)" || return 1
 	sleep $[d - $(date +%s)]
 }
+alarm() {
+	sleep_until $1
+	while pgrep slock >/dev/null
+	do beep -d50 -nr5 -nr5 -nr5 -nr5 -nr5 && sleep 5m
+	done
+}
 lensay() {
 	local ponycmd=()
 	if [[ "$TERM" =~ 256color ]]
