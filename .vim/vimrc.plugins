@@ -15,6 +15,10 @@ call UseAddon("delimitMate", "Raimondi")
 let delimitMate_expand_cr = 1
 let delimitMate_expand_space = 1
 "}}}
+"{{{ Snippets
+let g:UltiSnipsSnippetDirectories=["snippet"]
+call UseAddon("UltiSnips", "sirver")
+"}}}
 "{{{ Useful
 call UseAddon("vim-surround", "tpope")
 call UseAddon("vim-repeat", "tpope")
@@ -67,7 +71,7 @@ augroup VIMRC_fugitive
 augroup END
 "}}}
 "{{{ Ale
-call UseAddon("ale", "w0rp")
+" call UseAddon("ale", "w0rp")
 let g:ale_lint_on_text_change = 0
 let g:ale_linters = {
 	\ 'c': ['clangtidy', 'cppcheck'],
@@ -88,5 +92,18 @@ hi ALEInfoSign    ctermfg=4 ctermbg=0 cterm=bold
 
 nmap <silent> <C-k> <Plug>(ale_previous_wrap)
 nmap <silent> <C-j> <Plug>(ale_next_wrap)
+"}}}
+"{{{ Make
+call UseAddon("neomake", "neomake")
+let g:neomake_error_sign   = {'text': '▕▏', 'texthl': 'NeomakeErrorSign'}
+let g:neomake_warning_sign = {'text': '▕▏', 'texthl': 'NeomakeWarningSign'}
+let g:neomake_message_sign = {'text': '▕▏', 'texthl': 'NeomakeMessageSign'}
+let g:neomake_info_sign    = {'text': '▕▏', 'texthl': 'NeomakeInfoSign'}
+let g:airline#extensions#neomake#enabled=0
+let g:neomake_cpp_ninja_maker = {
+	\ 'args': ['-Cbuild'],
+	\ 'errorformat': '../%f:%l:%c: %trror: %m,../%f:%l:%c: %tarning: %m,../%f:%l:%c: %tote: %m',
+	\ }
+let g:neomake_c_ninja_maker = g:neomake_cpp_ninja_maker
 "}}}
 " vim: foldmarker={{{,}}}: foldlevel=0: foldmethod=marker

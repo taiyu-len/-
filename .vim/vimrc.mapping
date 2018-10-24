@@ -16,8 +16,8 @@ xnoremap < <gv
 xnoremap > >gv
 
 " Quickfix/locallist
-nnoremap <silent> <leader>q :copen<cr>
-nnoremap <silent> <leader>l :lopen<cr>
+nnoremap <silent> <leader>q :cwindow<cr>
+nnoremap <silent> <leader>l :lwindow<cr>
 
 " cpo-$
 set cpoptions+=$
@@ -39,7 +39,6 @@ inoremap  <C-O>
 set formatoptions=ro " Insert comment leader after newline
 set formatoptions+=j " Remove comment leader when joining lines
 set formatoptions+=q " Format comments when using gq
-set formatoptions+=w " Soft line break
 set formatoptions+=l " Dont break existing long lines
 
 set cinoptions=
