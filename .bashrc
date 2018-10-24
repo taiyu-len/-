@@ -355,7 +355,7 @@ alias cpumax="sudo cpupower frequency-set -u 2.53GHz"
 #}}}
 #{{{ cmd | uploader
 alias ix="curl -F 'f:1=<-' ix.io"
-alias myix="curl -nF 'f:1=<-' ix.io"
+alias myix="curl --netrc-file=~/.netrc.ix.io  -nF 'f:1=<-' ix.io"
 alias sprunge.us="curl -F 'sprunge=<-' http://sprunge.us"
 #}}}
 #{{{ readline wrappers
@@ -399,12 +399,16 @@ timelock() {
 	timew stop "${@-locked}"
 }
 tasklock() {
-	task="$1"; shift
-	task "${task#-}" start "$@"
-	slock
-	if [ "${task:0:1}" = "-"  ]
-	then task "${task#-}" done
-	else task "${task#-}" stop
+	local first="${task:0:1}"
+	local uuid="$(task status:pending "${task#-}" uuid)"
+	shift
+	if task "$uuid" start "$@"
+	then
+		slock
+		if [ "$first" = "-"  ]
+		then task "$uuid" done
+		else task "$uuid" stop
+		fi
 	fi
 }
 track() {
@@ -450,9 +454,10 @@ sleep_until() {
 	sleep $[d - $(date +%s)]
 }
 alarm() {
-	sleep_until $1
+	sleep_until "$1"
+	beep -d50 -nr5 -nr5 -nr5 -nr5 -nr5
 	while pgrep slock >/dev/null
-	do beep -d50 -nr5 -nr5 -nr5 -nr5 -nr5 && sleep 5m
+	do beep -d50 -r4 && sleep 5m
 	done
 }
 lensay() {
