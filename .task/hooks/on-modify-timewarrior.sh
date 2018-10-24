@@ -1,4 +1,7 @@
 #!/bin/bash
+#########################################
+# Tasks will be tracked via timewarrior #
+#########################################
 #~/.task/hooks/on-xxx.yyy \
 #   api:2 \
 #   args:'task rc:~/mytaskrc list' \
