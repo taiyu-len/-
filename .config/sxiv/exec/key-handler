@@ -155,8 +155,9 @@ use_quicktag() {
 }
 
 shell() {
-	read -r image
-	"$TERMINAL" -cd "$(realpath "$(dirname -- "$image")")"
+	read_images
+	files="$(printf "%q " "${images[@]}")" \
+	"$TERMINAL" -cd "$(realpath "$(dirname -- "${images[0]}")")"
 }
 
 readonly LASTKEY=~/.config/sxiv/lastkey
