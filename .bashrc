@@ -399,8 +399,8 @@ timelock() {
 	timew stop "${@-locked}"
 }
 tasklock() {
-	local first="${task:0:1}"
-	local uuid="$(task status:pending "${task#-}" uuid)"
+	local first="${1:0:1}"
+	local uuid="$(task status:pending "${1#-}" uuids)"
 	shift
 	if task "$uuid" start "$@"
 	then
