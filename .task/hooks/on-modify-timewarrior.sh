@@ -2,29 +2,9 @@
 #########################################
 # Tasks will be tracked via timewarrior #
 #########################################
-#~/.task/hooks/on-xxx.yyy \
-#   api:2 \
-#   args:'task rc:~/mytaskrc list' \
-#   command:add \
-#   rc:/home/foo/mytaskrc \
-#   data:/home/foo/.task \
-#   version:2.4.3 \
-#   <input.txt \
-#   >output.txt
-
-# shellcheck disable=SC2034
-# Read arguments.
-{
-    api="${1#api:}"
-   args="${2#args:}"
-    cmd="${3#command:}"
-     ec="${4#rc:}"
-   data="${5#data:}"
-version="${6#version:}"
-
 read -r before
 read -r after
-}
+
 # Dont modify task
 echo "$after"
 
@@ -42,8 +22,12 @@ fi > /dev/null
 
 # shellcheck disable=SC2016
 # Query json
-query='.description//"", .project//"",
-(.annotations[]?|select(.entry == '"$start_time"').description)'
+query="$(cat <<SCRIPT
+.description//"",
+.project//"",
+(.annotations[]? | select(.entry == $start_time).description)
+SCRIPT
+)"
 # extract json info
 {
 read -r desc
