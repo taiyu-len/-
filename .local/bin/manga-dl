@@ -9,8 +9,10 @@ set -o nounset
 # args:   $1= printf format, rest print arguments
 # shellcheck disable=SC2059
 log() { $quiet || printf "$@" ;}
+res=0
 # shellcheck disable=SC2059
 err() {
+	res=1
 	{
 		printf "$@"
 		printf '== %s\n' ${link+link="$link"} ${title+title="$title"} ${site+site="$site"}
@@ -76,6 +78,7 @@ set_site() {
 	( *imgur.com/a/*             ) site=imgur       ;;
 	( *imgur.com/*               ) site=imgursolo   ;;
 	( *mangadex.org/*            ) site=mangadex    ;;
+	( *read.egscans.com/*        ) site=egscans     ;;
 	( * )
 		err "Unknown link: '$link'\\n"
 		return 1
@@ -91,6 +94,7 @@ generate_urls() {
 
 # wget opts
 cookie_file=$(mktemp)
+#shellcheck disable=SC2064
 trap "{ rm '$cookie_file'; }" EXIT
 wget=(wget)
 wget+=(--tries inf)
@@ -124,31 +128,35 @@ download_urls() {
 }
 
 download_original() {
-	local parallel=(parallel -P 2 -n 4)
+	local parallel=(parallel -P 1 -n 4)
 	local url
+	# shellcheck disable=SC2119
 	while read_url
 	do echo "$url"
 	done | tee urls | until "${parallel[@]}" "${wget[@]}" {}; do :; done
 }
 download_numbered() {
 	#shellcheck disable=SC2016
-	local parallel=(parallel -P 2 --rpl '{#} $_=sprintf("%03d",$job->seq())')
+	local parallel=(parallel -P 1 --rpl '{#} $_=sprintf("%03d",$job->seq())')
 	local url
+	# shellcheck disable=SC2119
 	while read_url
 	do echo "$url"
 	done | tee urls | until "${parallel[@]}" "${wget[@]}" '-O{#}.jpg' {}; do :; done
 }
 download_prefixed() {
 	local url i=1
+	# shellcheck disable=SC2119
 	while read_url
 	do "${wget[@]}" "$url" "-O$(printf "%03d" $i)_$(basename "$url")" && ((++i))
 	done
 }
 download_mangadex() {
 	download_original
-	sedname 's/\(^\|[^0-9]\)\([0-9]\.\)/\10\2/' * 2>&1 | grep -v change
+	sedname 's/\(^\|[^0-9]\)\([0-9]\.\)/\10\2/' ./* 2>&1 | grep -v change
 }
 
+#shellcheck disable=SC2120
 read_url() { IFS= read -r -u11 "$@" url;}
 
 # Site data
@@ -160,6 +168,7 @@ name_regex[webtoons]='(.*)<\/title>'
 name_regex[mangastream]='(.*)\ -'
 name_regex[foolslide]='(.*::.*) :: '
 name_regex[mangadex]='(.*) - MangaDex'
+name_regex[egscans]='EGScans - Online Manga Viewer - (.* - .*) - Page'
 
 # if 0, do not rename
 # if 1, renumber completely
@@ -172,9 +181,28 @@ rename_images[webtoons]=1
 rename_images[mangastream]=0
 rename_images[foolslide]=0
 rename_images[mangadex]=3
+rename_images[egscans]=0
 # TODO save related metadata.
 rename_images[imgur]=2
 rename_images[imgursolo]=0
+
+# $1: printf style format string to extract.
+# $2: string to extract from
+# %s => any string
+# %d => any number
+# %c => any character
+# %^ => any string not including the next character
+substring_format() {
+	s="${1//\\/\\\\}" # / => \\
+	s="${s//\//\\/}" # / => \/
+	s="${s//./\\.}" # . => \.
+	s="${s//\[/\\[}" # [ => \[
+	s="$(sed 's/%^\(.\)/[^\1]\\+\1/g' <<< "$s")"
+	s="${s//%s/.\\+}"
+	s="${s//%d/[0-9]\\+}"
+	s="${s//%c/.}"
+	sed -n "s/.*\\($s\\).*/\\1/;T;p;q" <<< "$2"
+}
 
 # Site processing functions
 # Read in initial webpage, and write out urls
@@ -232,6 +260,11 @@ process_foolslide() {
 	extract_page_count '/tbtitle dropdown_parent dropdown_right/{s/.*>([0-9]*) .*/\1/;p;q}' &&
 	output_urls_from_pages "$(dirname "$link")" '\,content/comics/,{s/.*src="([^"]*)".*/\1/;p}'
 }
+process_egscans() {
+	# make use of webtoon javascript for images
+	extract_title &&
+	output_urls_from_page '/img_html.push.*picture/{s/.* src="([^"]*)".*/read.egscans.com\/\1/;p}'
+}
 process_imgur() {
 	title=$(basename "$link")
 	local args
@@ -261,3 +294,4 @@ process_mangadex() {
 for url
 do process_url "$url"
 done
+exit $res
