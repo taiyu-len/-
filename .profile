@@ -1,6 +1,6 @@
 #{{{ Global Exports
 #{{{ paths and programs
-export PATH=~/.local/bin:"$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 export PAGER=less
 export EDITOR=vim
 export GIT_EDITOR="vim -u ~/.vim/git_vimrc"
