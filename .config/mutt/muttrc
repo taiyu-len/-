@@ -2,7 +2,7 @@
 set folder       = "~/mail"
 set header_cache = "+hcache"
 set spoolfile    = "+taiyu-len/INBOX" # Default maildir
-folder-hook taiyu-len/* source ~/.mutt/accounts/taiyu-len
+folder-hook taiyu-len/* source ~/.config/mutt/accounts/taiyu-len
 
 # force tls for remote connections
 set ssl_starttls

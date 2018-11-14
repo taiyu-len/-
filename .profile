@@ -11,7 +11,25 @@ export SHELL=bash
 export SXHKD_SHELL=sh
 export RLWRAP_HOME=~/.rlwrap
 export NQDIR=/tmp/.nqdir
-export XDG_CONFIG_HOME=~/.config
+#}}}
+#{{{ XDGDIRS
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_DATA_HOME="$HOME/.local/share"
+
+export ELINKS_CONFDIR="$XDG_CONFIG_HOME"/elinks
+
+export GNUPGHOME="$XDG_CONFIG_HOME"/gnupg
+
+export NOTMUCH_CONFIG="$XDG_CONFIG_HOME"/notmuch/notmuchrc
+export NMBGIT="$XDG_DATA_HOME"/notmuch/nmbug
+
+export PASSWORD_STORE_DIR="$XDG_DATA_HOME"/pass
+
+export TASKDATA="$XDG_DATA_HOME"/task
+export TASKRC="$XDG_CONFIG_HOME"/task/taskrc
+
+export WEECHAT_HOME="$XDG_CONFIG_HOME"/weechat
 #}}}
 #{{{ Files
 export ZSHRC=~/.zshrc
