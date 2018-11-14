@@ -3,10 +3,10 @@ Xft.hintstyle: hintslight
 Xft.hinting:   1
 Xft.antialias: 1
 !!{{{ Global Colors
-*.font:           -*-dina-medium-r-*-*-10-*-*-*-*-*-*-*
-*.italicFont:     -*-dina-medium-i-*-*-10-*-*-*-*-*-*-*
-*.boldFont:       -*-dina-bold-r-*-*-10-*-*-*-*-*-*-*
-*.boldItalicFont: -*-dina-bold-i-*-*-10-*-*-*-*-*-*-*
+*.font:           -*-dina-medium-r-*-*-13-*-*-*-*-*-*-*
+*.italicFont:     -*-dina-medium-i-*-*-13-*-*-*-*-*-*-*
+*.boldFont:       -*-dina-bold-r-*-*-13-*-*-*-*-*-*-*
+*.boldItalicFont: -*-dina-bold-i-*-*-13-*-*-*-*-*-*-*
 
 *.cursorColor:   #FFAA88
 
@@ -51,11 +51,11 @@ Xft.antialias: 1
 Rxvt.tripleclickwords:       false
 
 !Font
-Rxvt.font:           -*-dina-medium-r-*-*-10-*-*-*-*-*-*-*,-*-ipamonagothic-*-r-*-*-*-*-*-*-*-*-iso10646-*
-Rxvt.italicFont:     -*-dina-medium-i-*-*-10-*-*-*-*-*-*-*,-*-ipamonagothic-*-r-*-*-*-*-*-*-*-*-iso10646-*
-Rxvt.boldFont:       -*-dina-bold-r-*-*-10-*-*-*-*-*-*-*,-*-ipamonagothic-*-r-*-*-*-*-*-*-*-*-iso10646-*
-Rxvt.boldItalicFont: -*-dina-bold-i-*-*-10-*-*-*-*-*-*-*,-*-ipamonagothic-*-r-*-*-*-*-*-*-*-*-iso10646-*
-Rxvt.letterSpace: 1
+Rxvt.font:           -*-dina-medium-r-*-*-13-*-*-*-*-*-*-*,-*-ipamonagothic-*-r-*-*-*-*-*-*-*-*-iso10646-*
+Rxvt.italicFont:     -*-dina-medium-i-*-*-13-*-*-*-*-*-*-*,-*-ipamonagothic-*-r-*-*-*-*-*-*-*-*-iso10646-*
+Rxvt.boldFont:       -*-dina-bold-r-*-*-13-*-*-*-*-*-*-*,-*-ipamonagothic-*-r-*-*-*-*-*-*-*-*-iso10646-*
+Rxvt.boldItalicFont: -*-dina-bold-i-*-*-13-*-*-*-*-*-*-*,-*-ipamonagothic-*-r-*-*-*-*-*-*-*-*-iso10646-*
+Rxvt.letterSpace: 0
 
 !! Font keybinds
 !! 4x6. tiny font
