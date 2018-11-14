@@ -14,10 +14,6 @@ unset mark_old
 # Scroll by lines
 set menu_scroll
 
-# Html
-auto_view text/html                                      # view html automatically
-alternative_order text/plain text/enriched text/html     # save html for last
-
 # Keybinds
 bind pager,index g  noop
 bind pager gg top
