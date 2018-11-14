@@ -2,10 +2,8 @@
 ############################################################
 # Remove annotations from duplicated tasks with REPEAT tag #
 ############################################################
-exec jq -cM "$(cat <<SCRIPT
-if any(.tags[]?; . == "REPEAT")
+exec jq -cM '
+if has("repeat")
 then del(.annotations)
 else .
-end
-SCRIPT
-)"
+end'

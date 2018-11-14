@@ -21,8 +21,14 @@ include /usr/share/doc/task/rc/dark-16.theme
 #include /usr/share/doc/task/rc/no-color.theme
 uda.type.type=string
 uda.type.label=Type
-report.next.columns=id,start.age,entry.age,depends,priority,project,type,tags,scheduled.countdown,due.relative,until.remaining,description,urgency
-report.next.labels=ID,Active,Age,Deps,P,Project,Type,Tags,S,Due,Until,Description,Urg
+
+uda.repeat.type=string
+uda.repeat.label=Repeat
+urgency.uda.repeat.coefficient=2.0
+
+report.next.columns=id,start.age,entry.age,depends,priority,project,type,repeat,tags,scheduled.countdown,due.relative,until.remaining,description,urgency
+report.next.labels=ID,Active,Age,Deps,P,Project,Type,Repeat,Tags,S,Due,Until,Description,Urg
+
 context.pending=status:pending
 search.case.sensitive=false
 context=pending
