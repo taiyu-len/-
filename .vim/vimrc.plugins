@@ -50,6 +50,11 @@ call UseAddon("NrrwRgn", "chrisbra")
 call UseAddon("vim-plugin-AnsiEsc", "powerman")
 call UseAddon("vim-cpp-enhanced-highlight", "octol")
 "}}}
+"{{{ Fold
+call UseAddon("FastFold","Konfekt")
+let g:fastfold_fold_command_suffixes =  ['x', 'X']
+let g:fastfold_fold_movement_commands = []
+"}}}
 "{{{ Wiki
 call UseAddon('vimwiki', 'vimwiki')
 let g:vimwiki_list = [{

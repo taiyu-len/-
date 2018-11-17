@@ -32,7 +32,7 @@ function! VIMRC_fold_function() abort
 	let l:end = ''
 	if (&foldmethod ==? "marker")
 		let l:end = split(&foldmarker, ',')[1]
-	elseif (&foldmethod ==? "syntax")
+	else
 		let l:end = substitute(getline(v:foldend), '^\s*\([])}]\|\w\+\|\).*$', '\1', '')
 	endif
 	let l:lines  = line('$')
