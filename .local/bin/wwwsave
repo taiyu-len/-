@@ -5,9 +5,16 @@ set -o errexit
 savedir=${WWWSAVEDIR:-"$HOME/www"}
 homepage=${WWWHOMEPAGE:-"$savedir/homepage.html"}
 useragent=${USER_AGENT:-"Mozilla/5.0 (compatible; Konqueror/3.2; Linux)"}
+
+use_js=true
+use_docs=true
+use_fonts=true
+use_images=true
+
 # wget options
 options+=(--directory-prefix="$savedir")     # directory to store mirroring
-options+=(--no-verbose --show-progress) # less spam
+options+=(--quiet --show-progress)      # less spam
+options+=(--progress=bar:noscroll)      # try to show full path
 options+=(--force-directories)          # always use directories
 options+=(--execute=robots=off)         # ignore robots.txt
 options+=(--user-agent="$useragent")
@@ -30,39 +37,46 @@ if [ "$(basename "$0")" = wwwmirror ]   # use mirror if this script is called wi
 then options+=(--mirror)
 fi
 
-# Wget does not handle page-requisites+mirroring very well.
-# it considers pages linked via <a> to be downloaded as page-requisites, and 
-# proceeds to download the entire internet. the workaround for this is to use an 
-# accept-regex that downloads anything with a resources extension, or from the 
-# same domain avoiding the "download the internet" problem while still 
-# downloading resources from foriegn domains.
-
-# foreign resources to save
-resources+=(js css)                   # common prerequisites
-resources+=(woff ttf eot)             # fonts
-resources+=(png jpeg jpg svg gif bmp) # graphics
-resources+=(pdf epub djvu txt)        # documents
-resources_regex=$(IFS='|'; printf "${resources[*]}")
-
-# seperate out urls and wget options
-for arg in "$@"
+# handle, arguments, and seperate out urls and wget options
+for arg
 do
-	if [[ "$arg" = -* ]]
+	if [[ "$arg" = "--no-js" ]];     then use_js=false
+	elif [[ "$arg" = "--no-fonts" ]]; then use_fonts=false
+	elif [[ "$arg" = "--no-img" ]];  then use_images=false
+	elif [[ "$arg" = "--no-doc" ]];  then use_docs=false
+	elif [[ "$arg" = -* ]]
 	then options+=("$arg")
 	else urls+=("$arg")
 	fi
 done
 
-# remove protocal, directories, subdomain and store domains in urls
+# foreign resources to save
+add_to_arr() {
+	local c="$1"; shift
+	if "$c"; then accept+=("$@"); else reject+=("$@"); fi
+}
+accept+=(css) # always get css
+add_to_arr "$use_js"     js
+add_to_arr "$use_fonts"  woff ttf  eot
+add_to_arr "$use_images" png  jpeg jpg  svg gif bmp
+add_to_arr "$use_docs"   pdf  epub djvu txt
+accept_regex="$(IFS=','; printf '%s' "${accept[*]}")"
+reject_list="$(IFS=','; printf '%s' "${reject[*]}")"
+
+# remove protocol, directories, subdomain and store domains in urls
 stripped_urls=($(
 	for url in "${urls[@]}"
 	do sed -r -e 's_.*://__' -e 's_/.*__' -e 's_^.*\.([^.]*\.[^.]*)$_\1_' <<< "$url"
 	done | sort -u
 ))
-urls_regex=$(IFS='|'; printf "${stripped_urls[*]}")
-options+=(--accept-regex "$urls_regex|\.($resources_regex)")
+urls_regex="$(IFS='|'; printf "%s" "${stripped_urls[*]}")"
+options+=(--accept-regex="$urls_regex|\.($accept_regex)")
+if [ "$reject_list" ]
+then options+=(--reject="$reject_list")
+fi
 
 # Download all urls
+echo wget "${options[@]}" "${urls[@]}"
 wget "${options[@]}" "${urls[@]}" || true
 
 # store urls into homepage
