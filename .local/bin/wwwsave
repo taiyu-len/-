@@ -60,7 +60,7 @@ add_to_arr "$use_js"     js
 add_to_arr "$use_fonts"  woff ttf  eot
 add_to_arr "$use_images" png  jpeg jpg  svg gif bmp
 add_to_arr "$use_docs"   pdf  epub djvu txt
-accept_regex="$(IFS=','; printf '%s' "${accept[*]}")"
+accept_regex="$(IFS='|'; printf '%s' "${accept[*]}")"
 reject_list="$(IFS=','; printf '%s' "${reject[*]}")"
 
 # remove protocol, directories, subdomain and store domains in urls
@@ -69,11 +69,15 @@ stripped_urls=($(
 	do sed -r -e 's_.*://__' -e 's_/.*__' -e 's_^.*\.([^.]*\.[^.]*)$_\1_' <<< "$url"
 	done | sort -u
 ))
+#
 urls_regex="$(IFS='|'; printf "%s" "${stripped_urls[*]}")"
 options+=(--accept-regex="$urls_regex|\.($accept_regex)")
 if [ "$reject_list" ]
 then options+=(--reject="$reject_list")
 fi
+# List of always blocked websites.
+banned_domains="google.com|wikipedia.org|wikimedia.org"
+options+=(--reject-regex="$banned_domains")
 
 # Download all urls
 echo wget "${options[@]}" "${urls[@]}"
