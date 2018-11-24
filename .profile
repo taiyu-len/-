@@ -4,13 +4,14 @@ export PATH="$HOME/.local/bin:$PATH"
 export PAGER=less
 export EDITOR=vim
 export GIT_EDITOR="vim -u ~/.vim/git_vimrc"
-export BROWSER=w3m
+export BROWSER=palemoon
 export TERMINAL=start-urxvtc
 export MAIL=~/mail
 export SHELL=bash
 export SXHKD_SHELL=sh
 export RLWRAP_HOME=~/.rlwrap
 export NQDIR=/tmp/.nqdir
+export GPGKEY=86695A2E7CD2E4333D3A08961373D121DBFE66C3
 #}}}
 #{{{ XDGDIRS
 export XDG_CONFIG_HOME="$HOME/.config"
@@ -18,8 +19,6 @@ export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_DATA_HOME="$HOME/.local/share"
 
 export ELINKS_CONFDIR="$XDG_CONFIG_HOME"/elinks
-
-export GNUPGHOME="$XDG_CONFIG_HOME"/gnupg
 
 export NOTMUCH_CONFIG="$XDG_CONFIG_HOME"/notmuch/notmuchrc
 export NMBGIT="$XDG_DATA_HOME"/notmuch/nmbug

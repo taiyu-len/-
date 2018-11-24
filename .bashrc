@@ -1,5 +1,4 @@
-#{{{ Startup Order
-#{{{ Bash
+# Startup order
 # +----------------+-----------+-----------+------+
 # |                |Interactive|Interactive|Script|
 # |                |login      |non-login  |      |
@@ -24,284 +23,15 @@
 # +----------------+-----------+-----------+------+
 # |~/.bash_logout  |    C      |           |      |
 # +----------------+-----------+-----------+------+
-#}}}
-#{{{ Zsh
-# +----------------+-----------+-----------+------+
-# |                |Interactive|Interactive|Script|
-# |                |login      |non-login  |      |
-# +----------------+-----------+-----------+------+
-# |/etc/zshenv     |    A      |    A      |  A   |
-# +----------------+-----------+-----------+------+
-# |~/.zshenv       |    B      |    B      |  B   | -> /dev/null
-# +----------------+-----------+-----------+------+
-# |/etc/zprofile   |    C      |           |      |
-# +----------------+-----------+-----------+------+
-# |~/.zprofile     |    D      |           |      | -> .profile
-# +----------------+-----------+-----------+------+
-# |/etc/zshrc      |    E      |    C      |      |
-# +----------------+-----------+-----------+------+
-# |~/.zshrc        |    F      |    D      |      | -> .bashrc
-# +----------------+-----------+-----------+------+
-# |/etc/zlogin     |    G      |           |      |
-# +----------------+-----------+-----------+------+
-# |~/.zlogin       |    H      |           |      | prints message
-# +----------------+-----------+-----------+------+
-# |                |           |           |      |
-# +----------------+-----------+-----------+------+
-# |                |           |           |      |
-# +----------------+-----------+-----------+------+
-# |~/.zlogout      |    I      |           |      |
-# +----------------+-----------+-----------+------+
-# |/etc/zlogout    |    J      |           |      |
-# +----------------+-----------+-----------+------+
-#}}}
-#}}}
-#{{{ Shell test
-if   [[ "$0" =~ zsh ]] && [ "$ZSH_NAME" ]
-then is() { [ "$1" = zsh  ] && shift && "$@" ;}
-elif [ "$BASH" ]
-then is() { [ "$1" = bash ] && shift && "$@" ;}
-else is() { false; }
-fi
-#}}}
-#{{{ Options
-if is zsh #{{{
-then
-	source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-	REPORTTIME=60 # print statistics for commands longer then 60 seconds
-	WORDCHARS=''
-	DIRSTACKSIZE=20
-
-	setopt PRINTEXITVALUE
-	setopt NOBEEP
-	setopt INTERACTIVE_COMMENTS
-	setopt PUSHDIGNOREDUPS
-	setopt AUTOPUSHD
-	setopt NO_CLOBBER
-
-	setopt AUTOCD # type directory name to change to it
-	setopt EXTENDEDGLOB # regular expresssion globbing
-	#}}}
-elif is bash #{{{
+if test "$BASH"
 then
 	set -o noclobber
-fi #}}}
-#}}}
-#{{{ History
-ign_cmds=(ls cd "cd -" pwd exit date "* --help" "* -h" jobs fg bg htop ps "* /tmp*")
-HISTSIZE=1000000
-HISTFILE=
-if is zsh #{{{
-then
-	# Infinite history size,
-	# enables start, end meta data.
-	# use shared history between ttys
-	HISTFILE=~/.zsh/history
-	SAVEHIST=$HISTSIZE
-	HISTORY_IGNORE="($(IFS='|'; printf %s "${ign_cmds[*]}"))"
-	setopt NO_BANG_HIST
-	setopt EXTENDED_HISTORY
-	setopt INC_APPEND_HISTORY_TIME
-	setopt HIST_EXPIRE_DUPS_FIRST
-	setopt HIST_IGNORE_ALL_DUPS
-	setopt HIST_IGNORE_SPACE
-	setopt HIST_SAVE_NO_DUPS
-	setopt HIST_NO_FUNCTIONS
-	setopt HIST_NO_STORE # dont add history command to history
-	setopt HIST_VERIFY
-	setopt HIST_BEEP
-	setopt HIST_REDUCE_BLANKS
-	#}}}
-elif is bash #{{{
-then
-	HISTIGNORE="$(IFS=:; printf %s "${ign_cmds[*]}")"
 	HISTCONTROL=ignoreboth
 	HISTTIMEFORMAT=%s
 	HISTFILE=~/.bash_history
-fi #}}}
-unset ign_cmds
-#}}}
-#{{{ Prompt
-if is zsh #{{{
-then
-	[[ $TERM =~ (screen|rxvt) ]]
-	ZLE_RPROMPT_INDENT=$?
-	setopt PROMPT_SUBST
-	my_git_status() { #{{{
-		emulate -L zsh
-		local b c s # branch_name, has changes to be commited, status of uncommited files
-		typeset -A s
-		{
-			local line
-			read -r line && b=$(sed -n 's/^## \(\(.*\)\.\.\..*\|\(.*\)\)/\2\3/;T;p' <<< "$line")
-			[ "$b" ] && while IFS= read -r line; do
-				[[ ! "${line:0:1}" =~ [?!\ ] ]] && c=+
-				[[ "${line:0:1}" == 'A' ]] && ((++s[A]))
-				((++s[${line:1:1}]))
-			done
-		} < <(git status -bs --porcelain=v1 2>/dev/null)
-		local B="%F{blu}" R="%F{r}" G="%F{g}"
-		printf "%s" "${b:+│ $c$b ${s[M]:+$B$s[M] }${s[A]:+$G$s[A] }${s[D]:+$R$s[D] }}"
-	} #}}}
-	PS_PREFIX='%B%K{black}%F{white}' PS_SUFFIX='%f%k%b'
-	PS1="$PS_PREFIX%(1j.%j.)│$PS_SUFFIX "
-	RPS1="$PS_PREFIX"' %~ $(my_git_status)'"$PS_SUFFIX"
-	[[ "$TERM" == "linux" ]] && PS1+=' '
-	PS2="$PS_PREFIX%_ │$PS_SUFFIX "
-	PS3="$PS_PREFIX?# │$PS_SUFFIX "
-	#}}}
-elif is bash #{{{
-then PS1='\$ '
-fi #}}}
-#}}}
-#{{{ Completions
-if is zsh
-then
-	test -e ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh && . "$_"
-	# : completion : function : completer : command : argument : tag
-	#
-	# Completers to use.
-	#zstyle ':completion:*' completer _expand _extensions _complete _ignored _correct _approximate _files
-	zstyle ':completion:*' completer _extensions _expand _prefix _complete _ignored _correct _approximate
-	#{{{ Display
-	# Use colors for results
-	zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}" # enable colors
-	# Messages
-	zstyle ':completion:*'              verbose true
-	zstyle ':completion:*:descriptions' format '%F{6}%B== %U%d%u ==%b%f'
-	zstyle ':completion:*:corrections'  format '%F{5}%B%d (errors: %e)%b%f'
-	zstyle ':completion:*:warnings'     format '%F{6}%Bno matches for: %d%b%f'
-	zstyle ':completion:*:messages'     format '%F{6}%B%d%b%f'
-	zstyle ':completion:*:correct'      format '%F{6}%Bcorrected to: %U%e%u%b%f'
-	zstyle ':completion:*:options'      auto-description '%d'
-	zstyle ':completion:*:options'      description 'yes'
-	# Group matches by descriptions
-	zstyle ':completion:*'              group-name ''
-	# Display more information for man pages
-	zstyle ':completion:*:manuals'    separate-sections true
-	zstyle ':completion:*:manuals.*'  insert-sections   true
-	#}}}
-	#{{{ Selection
-	# Use menu by default
-	zstyle ':completion:*'       menu select
-	# use first menu choice right away
-	zstyle ':completion:*:man:*' menu yes select
-	#}}}
-	#{{{ Generating
-	# lowercase matches uppercase. aka smartcase
-	zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
-	# allow to match all or a matching file
-	zstyle ':completion:*:expand:*' tag-order 'all-expansions expansions'
-	# on processes completion complete all user processes
-	zstyle ':completion:*:processes' command 'ps -a'
-	#}}}
-	#{{{ Corrections
-	# allow 1 error per 3 characters
-	zstyle -e ':completion:*:approximate:' max-errors 'reply=($(((3+$#PREFIX+$#SUFFIX)/3)) numeric)'
-	zstyle    ':completion:*:expand:' keep-prefix true
-	# ignore functions starting with _ when approximate matching
-	zstyle  ':completion:*:(^approximate*):*:functions' ignored-patterns '_*'
-	#}}}
-	#{{{ Filtering
-	# ignore cd ../$pwd
-	zstyle ':completion:*:cd:*'   ignore-parents parent pwd
-	zstyle ':completion:*:mkcd:*' ignore-parents parent pwd
-	# dont show parameters when indexing arrays
-	zstyle ':completion:*:*:-subscript-:*' tag-order indexes
-	# Ignore backup files for commands
-	zstyle ':completion:*:complete:-command-::commands' ignored-patterns='*\~'
-	# disable usings hosts file because its huge
-	zstyle ':completion:*' hosts off
-	#}}}
-	#{{{ Cache
-	zstyle ':completion:*' use-cache on
-	zstyle ':completion:*:complete:*' cache-path ~/.zsh/cache
-	#}}}
-	fpath+=("$HOME/.local/share/zsh/functions/Completion/Zsh")
-
-	autoload -Uz compinit
-	compinit
-
-	compdef _gnu_generic zenity
-	compdef wwwsave=wget
-	compdef wwwsave=wget
-	compdef '_files -g "*.swf"' flashplayer
+	PS1='\$ '
 fi
-#}}}
-#{{{ KeyBinds
-if is zsh
-then
-	#{{{ Map Ctrl-Z to call fg
-	# via http://git.grml.org/?p=grml-etc-core.git;a=blob_plain;f=etc/zsh/zshrc;hb=HEAD
-	grml-zsh-fg() {
-		if (( ${#jobstates} )); then
-			zle .push-input
-			[[ -o hist_ignore_space ]] && BUFFER=' ' || BUFFER=''
-			BUFFER="${BUFFER}fg"
-			zle .accept-line
-		else
-			zle -M 'No background jobs.'
-		fi
-	}
-	zle -N grml-zsh-fg
-	bindkey '^z' grml-zsh-fg
-	#}}}
-	#{{{ Fix pasted urls
-	autoload -Uz bracketed-paste-url-magic
-	zle -N bracketed-paste bracketed-paste-url-magic
-	#}}}
-	#{{{ .... => ../../..
-	rationalise-dot() {
-		if [[ $LBUFFER = *.. ]]
-		then LBUFFER+=/..
-		else LBUFFER+=.
-		fi
-	}
-	zle -N rationalise-dot
-	bindkey . rationalise-dot
-	#}}}
-	#{{{ Fix special characters
-	typeset -A key
-	autoload zkbd
-	zkbd_file() {
-		{ test -f ~/".zkbd/${TERM}-${VENDOR}-${OSTYPE}" && printf "%s" "$_" ;} ||
-		{ test -f ~/".zkbd/${TERM}-${DISPLAY}"          && printf "%s" "$_" ;}
-	}
-	load_zkbd() { keyfile="$(zkbd_file)" && source "$keyfile" ;}
-	if ! load_zkbd
-	then zkbd && load_zkbd || printf 'Failed to setup keys via zkbd.\n' 1>&2
-	fi
-	unfunction zkbd_file load_zkbd
-	unset keyfile
-	#}}}
-	#{{{ set mappings
-	bindkey -v # vim mode
-	[ "${key[Home]}"           ]  && bindkey "${key[Home]}"           beginning-of-line
-	[ "${key[End]}"            ]  && bindkey "${key[End]}"            end-of-line
-	[ "${key[Insert]}"         ]  && bindkey "${key[Insert]}"         overwrite-mode
-	[ "${key[Delete]}"         ]  && bindkey "${key[Delete]}"         delete-char
-	[ "${key[Up]}"             ]  && bindkey "${key[Up]}"             up-line-or-history
-	[ "${key[Down]}"           ]  && bindkey "${key[Down]}"           down-line-or-history
-	[ "${key[Left]}"           ]  && bindkey "${key[Left]}"           backward-char
-	[ "${key[Right]}"          ]  && bindkey "${key[Right]}"          forward-char
-	[ "${key[Shift-Left]}"     ]  && bindkey "${key[Shift-Left]}"     backward-char
-	[ "${key[Shift-Right]}"    ]  && bindkey "${key[Shift-Right]}"    forward-char
-	[ "${key[Ctrl-Up]}"        ]  && bindkey "${key[Ctrl-Up]}"        history-beginning-search-backward
-	[ "${key[Ctrl-Down]}"      ]  && bindkey "${key[Ctrl-Down]}"      history-beginning-search-forward
-	[ "${key[Ctrl-Left]}"      ]  && bindkey "${key[Ctrl-Left]}"      backward-word
-	[ "${key[Ctrl-Right]}"     ]  && bindkey "${key[Ctrl-Right]}"     forward-word
-	[ "${key[PageUp]}"         ]  && bindkey "${key[PageUp]}"         beginning-of-buffer-or-history
-	[ "${key[PageDown]}"       ]  && bindkey "${key[PageDown]}"       end-of-buffer-or-history
-	[ "${key[Ctrl-Backspace]}" ]  && bindkey "${key[Ctrl-Backspace]}" backward-delete-word
-	[ "${key[Ctrl-Delete]}"    ]  && bindkey "${key[Ctrl-Delete]}"    delete-word
-	[ "${key[Alt-H]}"          ]  && bindkey "${key[Alt-H]}"          run-help
-	[ "${key[Shift-Tab]}"      ]  && bindkey "${key[Shift-Tab]}"      reverse-menu-complete
-	#}}}
-	#{{{ run-help
-	bindkey -v "h" run-help
-	#}}}
-fi
-#}}}
+WORDCHARS='[:alnum:]'
 #{{{ Aliases
 ## Command aliases
 alias sudo="sudo "
@@ -373,14 +103,6 @@ alias unmnt='udisksctl unmount -b'
 alias bget="wget --header='User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:36.0) Gecko/20100101 Firefox/36.0' --header='Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' --header='Accept-Language: en,ja;q=0.7,en-US;q=0.3' --header='Content-Type: application/x-www-form-urlencoded'"
 alias hc="herbstclient"
 #}}}
-#{{{ Suffix Alias
-if is zsh
-then
-	alias -s {png,jpg,jpeg,gif}=feh
-	alias -s {3gp,avi,mkv,mp4,webm}=mpv
-	alias -s {pdf,epub}=mupdf
-	alias -s exe=wine
-fi #}}}
 #}}}
 #{{{ GPG
 export GPG_TTY=$(tty)
@@ -391,6 +113,7 @@ export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
 tat() { tmux new-session -As "${@:-$(basename "$PWD")}"; }
 tdt() { tmux detach; }
 tsplit() { tmux split-window "$@"; }
+tvi() { tmux split-window -p 33 vim $@; exit; }
 #}}}
 #{{{ Task
 timelock() {
@@ -447,7 +170,6 @@ plll() {
 }
 
 spawn() { ("$@" </dev/null &>/dev/null &) ;}
-is zsh compdef spawn=command
 hless() { highlight -Oansi "$@" | less -R ;}
 sleep_until() {
 	d="$(date -d "$1" +%s)" || return 1
@@ -471,7 +193,6 @@ lensay() {
 }
 #{{{ *cd
 mkcd() { mkdir -p "$*" &&  cd "$_" ;}
-is zsh compdef mkcd=mkdir
 
 # fuzzy cd lookup
 hash fzf 2>/dev/null &&
@@ -480,26 +201,12 @@ hash fzf 2>/dev/null &&
 		dir=$(find "${1:-.}" -path '*/\.*' -prune \
 			-o -type d -print 2> /dev/null | fzf +m) &&
 		cd "$dir"
-	} &&
-	is zsh compdef fzcd=cd
+	}
 
 tmpcd() {
 	cd "$(mktemp -dp /tmp ${*:+-d "$*.XXXXXXXXX"})"
 	pwd
 }
 #}}}
-#{{{ help
-if is zsh
-then
-	unalias run-help &> /dev/null
-	autoload run-help
-fi
-#}}}
-#}}}
-#{{{ Cleanup
-if is zsh
-then unfunction is
-else unset is
-fi
 #}}}
 # vim: foldmethod=marker foldmarker={{{,}}} filetype=zsh
