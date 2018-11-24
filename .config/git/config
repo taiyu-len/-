@@ -24,3 +24,8 @@
 [commit]
 	verbose = 1
 	gpgsign = true
+[sendemail]
+	smtpEncryption = tls
+	smtpServer =  smtp.gmail.com
+	smtpServerPort = 587
+	suppresscc = self
