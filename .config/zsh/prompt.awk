@@ -12,12 +12,12 @@ BEGIN {
 	next
 }
 /^[12] [^.?!]/ { C = "+" }
-/^[12] A/ { A++; next }
+/^[12] A/  { A++; next }
 /^[12] .M/ { M++; next }
 /^[12] .D/ { D++; next }
 END {
 	printf "%s", "%B" C Br
-	if (D+M+A) printf "%B "
+	if (D+M+A) printf " "
 	if (D) printf "%s", R D
 	if (M) printf "%s", B M
 	if (A) printf "%s", G A

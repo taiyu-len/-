@@ -6,19 +6,21 @@ __my_git_prompt() {
 	git status -bs --porcelain=v2 2>/dev/null |
 	awk -f "$ZDOTDIR/prompt.awk"
 }
+__my_ps1='!%!%(1j. %%%j.)%(?.. ?%?) $(shrink-path "${(D)PWD}")$(__my_git_prompt)'
+
 function zle-line-init zle-keymap-select {
 	local e;
 	if test "$KEYMAP" = vicmd
 	then e="< "
 	else e="> "
 	fi
-	PS1='!%!%(1j. %%%j.)%(?.. ?%?) $(dirs -p|shrink-path)$(__my_git_prompt)'"$e"
+	PS1="$__my_ps1$e"
 	zle reset-prompt
 }
 zle -N zle-keymap-select
 zle -N zle-line-init
 
-PS1='!%!%(1j. %%%j.)%(?.. ?%?) $(dirs -p|shrink-path)$(__my_git_prompt)> '
+PS1="$__my_ps1> "
 # https://github.com/taiyu-len/shrink-path
 PS2="%_ "
 PS3="?# "
