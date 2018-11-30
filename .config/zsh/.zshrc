@@ -27,7 +27,7 @@
 # +------------------+-----------+-----------+------+
 # |/etc/zlogout      |    J      |           |      |
 # +------------------+-----------+-----------+------+
-export ZPLUG_HOME="$ZDOTDIR/zplug/"
+ZPLUG_HOME="$ZDOTDIR/zplug/"
 source "$HOME/.bashrc"
 source "$ZPLUG_HOME/init.zsh"
 source "$ZDOTDIR/plugins.zsh"

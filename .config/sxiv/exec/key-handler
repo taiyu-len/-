@@ -154,10 +154,21 @@ use_quicktag() {
 	)
 }
 
+readonly CMDFILE="$ROOT/recentcmds"
 shell() {
 	read_images
-	files="$(printf "%q " "${images[@]}")" \
-	"$TERMINAL" -cd "$(realpath "$(dirname -- "${images[0]}")")"
+	files="$(printf "%q " "${images[@]}")"
+	cmd="$(rofi -dmenu -p "command {}:" < $CMDFILE)" || exit 0
+	{
+		printf "%s\n" "$cmd"
+		cat $CMDFILE;
+	} | head -n20 > $CMDFILE.tmp
+	mv $CMDFILE.tmp $CMDFILE
+
+	if [[ "$cmd" =~ '{}' ]]
+	then ${cmd//\{\}/${images[@]}}
+	else $cmd ${images[@]}
+	fi
 }
 
 readonly LASTKEY=~/.config/sxiv/lastkey

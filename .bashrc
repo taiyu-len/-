@@ -55,6 +55,9 @@ alias egrep='egrep --color=auto'
 alias diff='diff --color=auto'
 alias ip='ip -c'
 #}}}
+#{{{ Replacemnents
+alias rename=perl-rename
+#}}}
 #{{{ human readable
 alias df='df -h'
 alias du='du -h'
@@ -112,8 +115,16 @@ export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
 #{{{ Tmux
 tat() { tmux new-session -As "${@:-$(basename "$PWD")}"; }
 tdt() { tmux detach; }
-tsplit() { tmux split-window "$@"; }
-tvi() { tmux split-window -p 33 vim $@; exit; }
+ts() {
+	[ $# -eq 1 ] && set -- bash -ic "$@"
+	tmux split-window -vp 33 "$@"
+}
+tv() {
+	[ $# -eq 1 ] && set -- bash -ic "$@"
+	tmux split-window -hp 33 "$@"
+}
+alias ts="ts "
+alias tv="tv "
 #}}}
 #{{{ Task
 timelock() {
@@ -209,4 +220,4 @@ tmpcd() {
 }
 #}}}
 #}}}
-# vim: foldmethod=marker foldmarker={{{,}}} filetype=zsh
+# vim: foldmethod=marker foldmarker={{{,}}}

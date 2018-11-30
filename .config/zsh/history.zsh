@@ -16,4 +16,5 @@ test -v XDG_DATA_HOME && {
 	setopt HIST_VERIFY
 	setopt HIST_BEEP
 	setopt HIST_REDUCE_BLANKS
+	unset ign_cmds
 }

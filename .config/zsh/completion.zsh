@@ -44,7 +44,7 @@ zstyle  ':completion:*:(^approximate*):*:functions' ignored-patterns '_*'
 #{{{ Filtering
 # ignore cd ../$pwd
 zstyle ':completion:*:cd:*'   ignore-parents parent pwd
-zstyle ':completion:*:mkcd:*' ignore-parents parent pwd
+zstyle ':completion:*:mkdir:*' ignore-parents parent pwd
 # dont show parameters when indexing arrays
 zstyle ':completion:*:*:-subscript-:*' tag-order indexes
 # Ignore backup files for commands
@@ -54,18 +54,24 @@ zstyle ':completion:*' hosts off
 #}}}
 #{{{ Cache
 zstyle ':completion:*' use-cache on
-zstyle ':completion:*:complete:*' cache-path ~/.zsh/cache
+zstyle ':completion:*' cache-path ~/.cache/zsh
 #}}}
 fpath+=("$HOME/.local/share/zsh/functions/Completion/Zsh")
 
 autoload -Uz compinit
 compinit
 
+# My programs/aliass/functions
 compdef wwwsave=wget
 compdef wwwmirror=wget
 compdef '_files -g "*.swf"' flashplayer
 compdef spawn=command
+compdef ts=command
+compdef tv=command
 compdef mkcd=mkdir
 compdef fzcd=cd
+
+compdef _gnu_generic fdupes
+
 unalias run-help &> /dev/null
 autoload run-help

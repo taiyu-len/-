@@ -3,8 +3,8 @@ setopt AUTO_NAME_DIRS
 
 __my_git_prompt() {
 	$(git rev-parse --is-inside-work-tree 2>/dev/null) || return 0
-	git status -bs --porcelain=v2 2>/dev/null |
-	awk -f "$ZDOTDIR/prompt.awk"
+	# https://github.com/taiyu-len/my-git-prompt
+	git status -bs --porcelain=v2 2>/dev/null | my-git-prompt
 }
 __my_ps1='!%!%(1j. %%%j.)%(?.. ?%?) $(shrink-path "${(D)PWD}")$(__my_git_prompt)'
 
