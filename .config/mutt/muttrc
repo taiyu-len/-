@@ -11,6 +11,9 @@ set ssl_force_tls
 # Do not mark mail as Old
 unset mark_old
 
+# show threads
+set sort = threads
+
 # Scroll by lines
 set menu_scroll
 
@@ -22,6 +25,8 @@ bind pager G  bottom
 bind index G  last-entry
 bind pager j  next-line
 bind pager k  previous-line
+bind pager ]  half-down
+bind pager [  half-up
 bind pager N  search-opposite
 bind index gj sidebar-next-new
 bind index gJ sidebar-next
@@ -45,6 +50,10 @@ set smart_wrap=yes
 set markers=no
 set text_flowed=yes
 set include=yes
+
+auto_view text/*
+set mailcap_path=~/.config/mutt/mailcap
+set allow_ansi
 
 # Colors
 color sidebar_indicator default blue
