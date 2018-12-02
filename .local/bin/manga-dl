@@ -101,17 +101,16 @@ wget+=(--tries inf)
 wget+=(--timeout 60)
 wget+=(--no-check-certificate)
 wget+=(--continue)
+wget+=(--show-progress)
+wget+=(--progress=dot:binary --progress=bar:noscroll)
 wget+=(--save-cookies "$cookie_file")
 wget+=(--load-cookies "$cookie_file")
 wget+=(--keep-session-cookies)
-if $quiet
-then wget+=(--quiet)
-else wget+=(--no-verbose)
-fi
+wget+=(--quiet)
 
 # Download Urls
 download_urls() {
-	log "Downloading $title from $site now. ${pages:-unknown} pages\\n"
+	log "$(tput smso)Downloading $title from $site now. ${pages:-unknown} pages$(tput rmso)\\n"
 	savedir="${SAVEDIR-${SAVEDIR_PREFIX-/tmp}/$site/$title}"
 	mkdir -p "$savedir"
 	cd       "$savedir"
@@ -128,16 +127,20 @@ download_urls() {
 }
 
 download_original() {
-	local parallel=(parallel -P 1 -n 4)
 	local url
 	# shellcheck disable=SC2119
 	while read_url
-	do echo "$url"
-	done | tee urls | until "${parallel[@]}" "${wget[@]}" {}; do :; done
+	do
+		local urls=("$url")
+		while read_url -t 1
+		do urls+=("$url")
+		done
+		${wget[@]} "${urls[@]}" || true
+	done
 }
 download_numbered() {
 	#shellcheck disable=SC2016
-	local parallel=(parallel -P 1 --rpl '{#} $_=sprintf("%03d",$job->seq())')
+	local parallel=(parallel -P 2 --rpl '{#} $_=sprintf("%03d",$job->seq())')
 	local url
 	# shellcheck disable=SC2119
 	while read_url
