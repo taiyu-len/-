@@ -4,6 +4,9 @@ let maplocalleader = ","
 " Suspend from insert mode
 inoremap  <C-O>
 
+" insert mode Ctrl-W uses normal mode state
+inoremap  <C-O>
+
 " Make Y consistent with D, C, etc
 nnoremap Y y$
 nnoremap gy "*y

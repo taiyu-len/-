@@ -4,7 +4,6 @@ set undofile undodir=~/.vim/undo
 set directory=~/.vim/swap//
 set path+=include
 set viminfofile=~/.vim/viminfo
-set hidden
 set shell=/bin/bash
 
 "{{{ Setup Arrow keys for different terminals

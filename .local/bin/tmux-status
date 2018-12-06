@@ -13,7 +13,12 @@ then
 
 	echo -n "$date"
 	[ "$ip"          ] && sep "$ip"
-	[ "$mail" != "0" ] && sep "#[fg=green]Mail:$mail"
+	if pgrep offlineimap >/dev/null 2>&1
+	then sep "#[fg=green]Check"
+	elif [ "$mail" != "0" ]
+	then sep "#[fg=green]Mail:$mail"
+	fi
+	sep
 	exec sleep 10;
 else # $1 = right
 

@@ -31,4 +31,5 @@ report.next.labels=ID,Active,Age,Deps,P,Project,Type,Repeat,Tags,S,Due,Until,Des
 
 context.pending=status:pending
 search.case.sensitive=false
+verbose=blank,header,footnote,label,new-id,affected,edit,special,project,sync,unwait,recur
 context=pending
