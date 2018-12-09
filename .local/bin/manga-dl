@@ -79,6 +79,7 @@ set_site() {
 	( *imgur.com/*               ) site=imgursolo   ;;
 	( *mangadex.org/*            ) site=mangadex    ;;
 	( *read.egscans.com/*        ) site=egscans     ;;
+	( *manga.fascans.com/*       ) site=fascans     ;;
 	( * )
 		err "Unknown link: '$link'\\n"
 		return 1
@@ -102,7 +103,7 @@ wget+=(--timeout 60)
 wget+=(--no-check-certificate)
 wget+=(--continue)
 wget+=(--show-progress)
-wget+=(--progress=dot:binary --progress=bar:noscroll)
+wget+=(--progress=bar:noscroll)
 wget+=(--save-cookies "$cookie_file")
 wget+=(--load-cookies "$cookie_file")
 wget+=(--keep-session-cookies)
@@ -133,7 +134,7 @@ download_original() {
 	do
 		local urls=("$url")
 		while read_url -t 1
-		do urls+=("$url")
+		do urls+=("$url"); echo "$url" >> urls
 		done
 		${wget[@]} "${urls[@]}" || true
 	done
@@ -142,6 +143,7 @@ download_numbered() {
 	#shellcheck disable=SC2016
 	local parallel=(parallel -P 2 --rpl '{#} $_=sprintf("%03d",$job->seq())')
 	local url
+	local wget=(${wget[@]} --progress=dot:mega)
 	# shellcheck disable=SC2119
 	while read_url
 	do echo "$url"
@@ -151,7 +153,7 @@ download_prefixed() {
 	local url i=1
 	# shellcheck disable=SC2119
 	while read_url
-	do "${wget[@]}" "$url" "-O$(printf "%03d" $i)_$(basename "$url")" && ((++i))
+	do "${wget[@]}" "$url" "-O$(printf "%03d" $i)_$(basename "$url")" && ((++i)); echo "$url" >> urls
 	done
 }
 download_mangadex() {
@@ -172,6 +174,7 @@ name_regex[mangastream]='(.*)\ -'
 name_regex[foolslide]='(.*::.*) :: '
 name_regex[mangadex]='(.*) - MangaDex'
 name_regex[egscans]='EGScans - Online Manga Viewer - (.* - .*) - Page'
+name_regex[fascans]='/<title>/{n;s/ *(.*) - Page.*/\1/;T;p;q}'
 
 # if 0, do not rename
 # if 1, renumber completely
@@ -185,6 +188,7 @@ rename_images[mangastream]=0
 rename_images[foolslide]=0
 rename_images[mangadex]=3
 rename_images[egscans]=0
+rename_images[fascans]=0
 # TODO save related metadata.
 rename_images[imgur]=2
 rename_images[imgursolo]=0
@@ -211,6 +215,10 @@ substring_format() {
 # Read in initial webpage, and write out urls
 extract_title() {
 	title=$(sed -nr -e "/<title>/{s/.*<title>${name_regex[$site]}.*/\\1/;T;p;q}" <&10)
+	[ "$title" ] || { err "unable to get name from url\\n"; return 1; }
+}
+extract_title2() {
+	title=$(sed -nr -e "${name_regex[$site]}" <&10)
 	[ "$title" ] || { err "unable to get name from url\\n"; return 1; }
 }
 extract_page_count() {
@@ -267,6 +275,11 @@ process_egscans() {
 	# make use of webtoon javascript for images
 	extract_title &&
 	output_urls_from_page '/img_html.push.*picture/{s/.* src="([^"]*)".*/read.egscans.com\/\1/;p}'
+}
+process_fascans() {
+	# make use of webtoon javascript for images
+	extract_title2 &&
+	output_urls_from_page "/data-src/{s/.*data-src=' ([^']*) '.*/\1/;/Credit/b;p}"
 }
 process_imgur() {
 	title=$(basename "$link")
