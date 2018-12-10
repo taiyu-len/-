@@ -96,8 +96,8 @@ Rxvt.intensityStyles:true
 
 Rxvt.underlineColor:    #7777FF
 ! black dark/light
-Rxvt.color0:        [70]#111122
-Rxvt.color8:        [80]#888899
+Rxvt.color0:        [70]#101010
+Rxvt.color8:        [80]#767676
 
 ! red dark/light
 Rxvt.color1:        [70]#FF7777
@@ -112,8 +112,8 @@ Rxvt.color3:        [70]#FFFF77
 Rxvt.color11:       [80]#FFFF77
 
 ! blue dark/light
-Rxvt.color4:        [70]#7777FF
-Rxvt.color12:       [80]#7777FF
+Rxvt.color4:        [70]#9999FF
+Rxvt.color12:       [80]#9999FF
 
 ! magenta dark/light
 Rxvt.color5:        [70]#FF77FF
