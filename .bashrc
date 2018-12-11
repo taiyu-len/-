@@ -55,7 +55,7 @@ alias egrep='egrep --color=auto'
 alias diff='diff --color=auto'
 alias ip='ip -c'
 #}}}
-#{{{ Replacemnents
+#{{{ Replacements
 alias rename=perl-rename
 #}}}
 #{{{ human readable
@@ -99,6 +99,7 @@ alias racket="rlwrap racket"
 alias JP='LANG="ja_JP.UTF8" LC_ALL="ja_JP.UTF8" '
 #}}}
 #{{{ misc
+alias zathura="zathura --fork"
 alias info="info --vi-keys"
 alias hl='highlight -O ansi'
 alias mnt='udisksctl mount -b'
