@@ -110,7 +110,7 @@ set nowrap           " Disable wrapping
 "}}}
 "{{{ Display
 set background="dark"
-colorscheme kuro
+colorscheme eldar
 
 set list listchars=eol:$,tab:│\ ,trail:•,extends:→,precedes:←,conceal:δ,nbsp:•
 set fillchars=vert:\|,stlnc:-,stl:^

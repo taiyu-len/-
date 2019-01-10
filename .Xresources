@@ -65,8 +65,8 @@ Rxvt.iso14755: false
 Rxvt.iso14755_52: false
 
 ! set up fading on no focus
-Rxvt.fading: 20%
-Rxvt.shading: 15
+Rxvt.fading: 5%
+Rxvt.shading: 8
 
 ! set pastable tabs
 Rxvt.pastableTabs:  true
@@ -96,36 +96,36 @@ Rxvt.intensityStyles:true
 
 Rxvt.underlineColor:    #7777FF
 ! black dark/light
-Rxvt.color0:        [70]#101010
-Rxvt.color8:        [80]#767676
+Rxvt.color0:        [75]#101010
+Rxvt.color8:        [85]#C6C6C6
 
 ! red dark/light
-Rxvt.color1:        [70]#FF7777
-Rxvt.color9:        [80]#FF7777
+Rxvt.color1:        [75]#FFAAAA
+Rxvt.color9:        [85]#FFAAAA
 
 ! green dark/light
-Rxvt.color2:        [70]#77FF77
-Rxvt.color10:       [80]#77FF77
+Rxvt.color2:        [75]#AAFFAA
+Rxvt.color10:       [85]#AAFFAA
 
 ! yellow dark/light
-Rxvt.color3:        [70]#FFFF77
-Rxvt.color11:       [80]#FFFF77
+Rxvt.color3:        [75]#FFFFAA
+Rxvt.color11:       [85]#FFFFAA
 
 ! blue dark/light
-Rxvt.color4:        [70]#9999FF
-Rxvt.color12:       [80]#9999FF
+Rxvt.color4:        [75]#AAAAFF
+Rxvt.color12:       [85]#AAAAFF
 
 ! magenta dark/light
-Rxvt.color5:        [70]#FF77FF
-Rxvt.color13:       [80]#FF77FF
+Rxvt.color5:        [75]#FFAAFF
+Rxvt.color13:       [85]#FFAAFF
 
 ! cyan dark/light
-Rxvt.color6:        [70]#77FFFF
-Rxvt.color14:       [80]#77FFFF
+Rxvt.color6:        [75]#AAFFFF
+Rxvt.color14:       [85]#AAFFFF
 
 ! white dark/light
-Rxvt.color7:        [70]#DDDDEE
-Rxvt.color15:       [80]#EEEEFF
+Rxvt.color7:        [75]#DDDDEE
+Rxvt.color15:       [85]#EEEEFF
 !!}}}
 !!}}}
 !!{{{ Rofi
