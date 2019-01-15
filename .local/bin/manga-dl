@@ -80,6 +80,7 @@ set_site() {
 	( *mangadex.org/*            ) site=mangadex    ;;
 	( *read.egscans.com/*        ) site=egscans     ;;
 	( *manga.fascans.com/*       ) site=fascans     ;;
+	( *merakiscans.com/*         ) site=meraki      ;;
 	( * )
 		err "Unknown link: '$link'\\n"
 		return 1
@@ -108,7 +109,7 @@ wget+=(--save-cookies "$cookie_file")
 wget+=(--load-cookies "$cookie_file")
 wget+=(--keep-session-cookies)
 wget+=(--quiet)
-
+export NQDIR=/tmp/manga-nq
 # Download Urls
 download_urls() {
 	log "$(tput smso)Downloading $title from $site now. ${pages:-unknown} pages$(tput rmso)\\n"
@@ -116,14 +117,14 @@ download_urls() {
 	mkdir -p "$savedir"
 	cd       "$savedir"
 # shellcheck disable=SC2191
-	local wget=("${wget[@]}" --referer="'$link'")
+	local wget=("${wget[@]}" --referer="$link")
 	case "${rename_images[$site]}" in
 	0) download_original ;;
 	1) download_numbered ;;
 	2) download_prefixed ;;
 	3) download_mangadex ;;
 	esac
-	NQDIR=/tmp/manga-nq nq -c sxiv -r "$savedir" </dev/null >/dev/null 2>&1
+	nq -c sxiv -r "$savedir" </dev/null >/dev/null 2>&1
 	exec 11<&-
 }
 
@@ -174,7 +175,9 @@ name_regex[mangastream]='(.*)\ -'
 name_regex[foolslide]='(.*::.*) :: '
 name_regex[mangadex]='(.*) - MangaDex'
 name_regex[egscans]='EGScans - Online Manga Viewer - (.* - .*) - Page'
+# default title extracter doesnt work for fascans
 name_regex[fascans]='/<title>/{n;s/ *(.*) - Page.*/\1/;T;p;q}'
+name_regex[meraki]='(.* - .*) - Meraki Scans'
 
 # if 0, do not rename
 # if 1, renumber completely
@@ -189,6 +192,7 @@ rename_images[foolslide]=0
 rename_images[mangadex]=3
 rename_images[egscans]=0
 rename_images[fascans]=0
+rename_images[meraki]=0
 # TODO save related metadata.
 rename_images[imgur]=2
 rename_images[imgursolo]=0
@@ -292,6 +296,14 @@ process_imgursolo() {
 	local args
 	mapfile -t args < <(perl -ne 'if (/item:/) { print "https://i.imgur.com/$1$2\n" if s|"hash":"([^"]*)".*?"ext":"([^"]*)"||; last }' <&10)
 	output_urls_from_args "${args[@]}"
+}
+process_meraki() {
+	local extract_pages='/var images/{s/.*(\[.*\]).*/\1/;p;q}'
+	local base_url="$(sed 's,.com,.com/manga,' <<< $link)"
+	# remove the first page, not part of manga
+	local gen_url="del(.[0])[]|\"$base_url/\" + ."
+	extract_title &&
+	output_urls_from_args $(sed -nr "$extract_pages" <&10 | jq -r "$gen_url")
 }
 #shellcheck disable=SC2155
 #shellcheck disable=SC2046
