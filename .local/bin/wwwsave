@@ -3,7 +3,7 @@ set -o nounset
 set -o errexit
 
 savedir=${WWWSAVEDIR:-"$HOME/www"}
-homepage=${WWWHOMEPAGE:-"$savedir/homepage.html"}
+index=${WWWINDEX:-"$savedir/index.html"}
 useragent=${USER_AGENT:-"Mozilla/5.0 (compatible; Konqueror/3.2; Linux)"}
 
 use_js=true
@@ -76,24 +76,24 @@ if [ "$reject_list" ]
 then options+=(--reject="$reject_list")
 fi
 # List of always blocked websites.
-banned_domains="google.com|wikipedia.org|wikimedia.org"
+banned_domains="wikipedia.org|wikimedia.org"
 options+=(--reject-regex="$banned_domains")
 
 # Download all urls
 echo wget "${options[@]}" "${urls[@]}"
 wget "${options[@]}" "${urls[@]}" || true
 
-# store urls into homepage
+# store urls into index
 for url in "${urls[@]}"
 do
-	echo "<a href=\"$url\">" >> $homepage
-	echo "$url"              >> $homepage
-	echo "</a><br>"          >> $homepage
+	echo "<a href=\"$url\">" >> $index
+	echo "$url"              >> $index
+	echo "</a><br>"          >> $index
 done
 
 # then edit them
 : ${EDITOR:=vi}
 if [ "$EDITOR" = vim ]
-then vim + $homepage # opens homepage at bottom
-else "$EDITOR" $homepage
+then vim + $index # opens index at bottom
+else "$EDITOR" $index
 fi

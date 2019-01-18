@@ -137,18 +137,20 @@ download_original() {
 		while read_url -t 1
 		do urls+=("$url"); echo "$url" >> urls
 		done
-		${wget[@]} "${urls[@]}" || true
+		"${wget[@]}" "${urls[@]}" || true
 	done
 }
 download_numbered() {
 	#shellcheck disable=SC2016
-	local parallel=(parallel -P 2 --rpl '{#} $_=sprintf("%03d",$job->seq())')
+	local parallel=(parallel -P 2 --quote --rpl '{#} $_=sprintf("%03d",$job->seq())')
 	local url
-	local wget=(${wget[@]} --progress=dot:mega)
+	local wget=("${wget[@]}" --progress=dot:mega)
 	# shellcheck disable=SC2119
 	while read_url
 	do echo "$url"
-	done | tee urls | until "${parallel[@]}" "${wget[@]}" '-O{#}.jpg' {}; do :; done
+	done | tee urls | until "${parallel[@]}" "${wget[@]}" '-O{#}.jpg' '{}'
+	do true
+	done
 }
 download_prefixed() {
 	local url i=1
