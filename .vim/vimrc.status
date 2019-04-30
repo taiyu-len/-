@@ -27,7 +27,7 @@ endfunction
 "}}}
 "}}}
 set statusline=%{VIMRC_Column()}
-set statusline+= │ #%n
+set statusline+= │ W%{winnr()} B%n
 set statusline+= │ %{VIMRC_Modified()}%t
 set statusline+=%{PrintIf(' │ %s',&filetype)}
 set statusline+= │ %=

@@ -21,11 +21,21 @@
 	stat    = diff --stat
 	dirstat = diff --dirstat
 	todo    = grep TODO
+	fetch-pr = "! remote=${2:-origin}; branch=${3:-pr-$1}; \
+		if test -v 1; then git fetch \"$remote\" \"pull/$1/head:$branch\"; \
+		else echo Usage: git fetch-pr PULL_REQUEST_ID [REMOTE_NAME] [NEW_BRANCH_NAME] && false; fi"
+	pr = "! branch=${3:-pr-$1}; git fetch-pr \"$@\" && git checkout \"$branch\""
+
 [commit]
 	verbose = 1
-	gpgsign = true
+	gpgsign = false
 [sendemail]
 	smtpEncryption = tls
 	smtpServer =  smtp.gmail.com
 	smtpServerPort = 587
 	suppresscc = self
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process

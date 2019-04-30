@@ -28,14 +28,15 @@ let g:sexp_filetypes = 'clojure,scheme,lisp,timl,c,cpp'
 let g:sexp_enable_insert_mode_mappings=0
 call UseAddon("vim-eunuch", "tpope")
 call UseAddon("vim-unimpaired", "tpope")
+call UseAddon("nerdcommenter", "scrooloose")
+nmap cx <plug>NERDCommenterToggle
 "}}}
 "{{{ Netrw
 call UseAddon("vim-vinegar", "tpope")
 nmap gu <Plug>VinegarUp
 let g:netrw_http_cmd = "curl -so"
-let g:netrw_liststyle = 4
-let g:netrw_hide = 1
-let g:netrw_list_hide = netrw_gitignore#Hide()
+let g:netrw_liststyle = 2
+let g:netrw_hide = 0
 let g:netrw_sizestyle = "h"
 "}}}
 "{{{ Buffer
@@ -49,6 +50,9 @@ call UseAddon("NrrwRgn", "chrisbra")
 "{{{ Syntax
 call UseAddon("vim-plugin-AnsiEsc", "powerman")
 call UseAddon("vim-cpp-enhanced-highlight", "octol")
+call UseAddon("vim-ledger", "ledger")
+" needed for some reason
+packadd vim-ledger
 "}}}
 "{{{ Fold
 call UseAddon("FastFold","Konfekt")
@@ -67,6 +71,11 @@ let g:vimwiki_list = [{
 call UseAddon("vim-man", "vim-utils")
 call UseAddon("vinfo", "alx741")
 set keywordprg=:Man
+augroup VIMRC_Man
+	autocmd!
+	autocmd FileType man setlocal colorcolumn=0
+augroup END
+
 "}}}
 "{{{ Git
 call UseAddon("vim-fugitive", "tpope")
@@ -110,5 +119,6 @@ let g:neomake_cpp_ninja_maker = {
 	\ 'errorformat': '../%f:%l:%c: %trror: %m,../%f:%l:%c: %tarning: %m,../%f:%l:%c: %tote: %m',
 	\ }
 let g:neomake_c_ninja_maker = g:neomake_cpp_ninja_maker
+
 "}}}
 " vim: foldmarker={{{,}}}: foldlevel=0: foldmethod=marker
