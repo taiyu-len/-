@@ -13,6 +13,7 @@ readonly s=" | " # field separator
 
 readonly dirname="$(dirname -- "$1")"
 readonly filename="$(basename -- "$1")"
+readonly realname="$(shrink-path "$(realpath -- "$1")")"
 readonly filesize="$(du -Hh -- "$1" | cut -f 1)"
 
 readonly geometry="${2}x${3}"
@@ -26,6 +27,6 @@ for i in "${!quicktag[@]}"
 do qtags+=" $i=${quicktag[$i]} "
 done
 
-echo "${filesize}${s}${geometry}${s}${filename}${tags:+${s}tags: ${tags}}${qtags:+ ${s} quicktags: ${qtags}}"
+echo "${filesize}${s}${geometry}${s}${realname}${tags:+${s}tags: ${tags}}${qtags:+ ${s} quicktags: ${qtags}}"
 
 

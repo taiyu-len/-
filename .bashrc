@@ -164,9 +164,16 @@ wttr() { curl "wttr.in/$*" ;}
 cheat.sh() { curl "cheat.sh/$*" ;}
 #}}}
 xclip_loop() {
-	while ! read -t "${1:-1}"
-	do xclip -o; echo
-	done | awk '$0 != last && $0 != "" { last=$0; print; fflush(); }'
+	local prev=
+	local cur=
+	if test -v 1; then local selection="-selection"; fi
+	while ! read -t 0.1
+	do
+		cur="$(xclip -o $selection $1 2> /dev/null)"
+		if test "$cur" != "$prev"
+		then prev="$cur"; printf "%s\n" "$cur";
+		fi
+	done
 }
 # Parallel implementation
 plll() {

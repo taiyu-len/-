@@ -15,7 +15,7 @@ err() {
 	res=1
 	{
 		printf "$@"
-		printf '== %s\n' ${link+link="$link"} ${title+title="$title"} ${site+site="$site"}
+		printf '== %s\n' ${link+"link = $link"} ${title+"title = $title"} ${site+"site = $site"}
 	} >&2
 }
 show_help() {
@@ -37,10 +37,6 @@ do case "$opt" in
 	*) echo "Discarding unknown option: $opt";;
 esac done
 shift $((OPTIND - 1))
-
-if [ "$#" -eq 0 ]
-then show_help; exit
-fi
 
 $debug && set -x
 
@@ -95,7 +91,7 @@ generate_urls() {
 }
 
 # wget opts
-cookie_file=$(mktemp)
+: ${cookie_file:=$(mktemp)}
 #shellcheck disable=SC2064
 trap "{ rm '$cookie_file'; }" EXIT
 wget=(wget)
@@ -124,7 +120,10 @@ download_urls() {
 	2) download_prefixed ;;
 	3) download_mangadex ;;
 	esac
-	nq -c sxiv -r "$savedir" </dev/null >/dev/null 2>&1
+	if [ $site = "mangadex" ]
+	then nq -c sxiv -V -r "$savedir" # version sort patch
+	else nq -c sxiv -r "$savedir"
+	fi </dev/null >/dev/null 2>&1
 	exec 11<&-
 }
 
@@ -161,7 +160,7 @@ download_prefixed() {
 }
 download_mangadex() {
 	download_original
-	sedname 's/\(^\|[^0-9]\)\([0-9]\.\)/\10\2/' ./* 2>&1 | grep -v change
+	# sedname 's/\(^\|[^0-9]\)\([0-9]\.\)/\10\2/' ./* 2>&1 | grep -v change
 }
 
 #shellcheck disable=SC2120
@@ -313,7 +312,7 @@ process_mangadex() {
 	extract_title || return 1
 	local chapter="$(sed -r 's/https:..mangadex.org.chapter.([0-9]*).*/\1/' <<< "$link")"
 	local query='
-		if .server | contains("mangadex")
+		if .server | contains("mangadex") or contains("cdndex")
 		then .server + .hash + "/" + .page_array[]
 		else "https://mangadex.org" + .server + .hash + "/" + .page_array[]
 		end'
@@ -321,7 +320,16 @@ process_mangadex() {
 	output_urls_from_args $(jq -r "$query" <<< "$json")
 }
 
-for url
-do process_url "$url"
-done
+
+# If no argument read urls from stdin line by line
+if [ "$#" -eq 0 ]
+then
+	while read url
+	do process_url "$url"
+	done
+else
+	for url
+	do process_url "$url"
+	done
+fi
 exit $res
