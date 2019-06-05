@@ -198,7 +198,7 @@ alarm() {
 	sleep_until "$1"
 	beep -d50 -nr5 -nr5 -nr5 -nr5 -nr5
 	while pgrep slock >/dev/null
-	do beep -d50 -r4 && sleep 5m
+	do beep -d50 -r4 && sleep 5m || sleep 1
 	done
 }
 lensay() {
