@@ -30,7 +30,10 @@
 		export XMODIFIERS='@im=uim'
 		uim-xim &
 	fi
-	try xrandr --output LVDS1 --above VGA1
+
+	# my smaller monitor is above and to the right of my main monitor.
+	try xrandr --output VGA1 --above LVDS1
+	try xrandr --output VGA1 --pos 656x0
 	try xflux  -l 49&
 	try urxvtd -qof
 	try qjoypad&
