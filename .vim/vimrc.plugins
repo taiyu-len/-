@@ -9,6 +9,7 @@ endfunction
 "{{{ Sessions
 call UseAddon('vim-prosession', 'dhruvasagar')
 call UseAddon('vim-obsession', 'tpope')
+set sessionoptions-=options
 "}}}
 "{{{ AutoClose (), {}, [], etc
 call UseAddon("delimitMate", "Raimondi")
@@ -29,6 +30,7 @@ let g:sexp_enable_insert_mode_mappings=0
 call UseAddon("vim-eunuch", "tpope")
 call UseAddon("vim-unimpaired", "tpope")
 call UseAddon("nerdcommenter", "scrooloose")
+call UseAddon("traces.vim", "markonm")
 nmap cx <plug>NERDCommenterToggle
 "}}}
 "{{{ Netrw
@@ -58,6 +60,7 @@ packadd vim-ledger
 call UseAddon("FastFold","Konfekt")
 let g:fastfold_fold_command_suffixes =  ['x', 'X']
 let g:fastfold_fold_movement_commands = []
+let g:fastfold_minlines = 0
 "}}}
 "{{{ Wiki
 call UseAddon('vimwiki', 'vimwiki')

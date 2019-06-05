@@ -112,7 +112,7 @@ set nowrap           " Disable wrapping
 set background="dark"
 colorscheme eldar
 
-set list listchars=eol:$,tab:│\ ,trail:•,extends:→,precedes:←,conceal:δ,nbsp:•
+set list listchars=tab:│\ ,trail:•,extends:→,precedes:←,conceal:δ,nbsp:•
 set fillchars=vert:\|,stlnc:-,stl:^
 
 set hlsearch
