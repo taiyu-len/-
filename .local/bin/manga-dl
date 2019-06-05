@@ -71,12 +71,15 @@ set_site() {
 	( *jaiminisbox.com/reader*   ) site=foolslide   ;;
 	( *reader.championscans.com/*) site=foolslide   ;;
 	( *reader.kireicake.com/*    ) site=foolslide   ;;
+	( *sensescans.com/*          ) site=foolslide   ;;
 	( *imgur.com/a/*             ) site=imgur       ;;
 	( *imgur.com/*               ) site=imgursolo   ;;
 	( *mangadex.org/*            ) site=mangadex    ;;
 	( *read.egscans.com/*        ) site=egscans     ;;
 	( *manga.fascans.com/*       ) site=fascans     ;;
 	( *merakiscans.com/*         ) site=meraki      ;;
+	( *toonily.com/*             ) site=toonily     ;;
+	( *leviatanscans.com/*       ) site=toonily     ;;
 	( * )
 		err "Unknown link: '$link'\\n"
 		return 1
@@ -179,6 +182,7 @@ name_regex[egscans]='EGScans - Online Manga Viewer - (.* - .*) - Page'
 # default title extracter doesnt work for fascans
 name_regex[fascans]='/<title>/{n;s/ *(.*) - Page.*/\1/;T;p;q}'
 name_regex[meraki]='(.* - .*) - Meraki Scans'
+name_regex[toonily]='(.*) - .*'
 
 # if 0, do not rename
 # if 1, renumber completely
@@ -194,6 +198,7 @@ rename_images[mangadex]=3
 rename_images[egscans]=0
 rename_images[fascans]=0
 rename_images[meraki]=0
+rename_images[toonily]=0
 # TODO save related metadata.
 rename_images[imgur]=2
 rename_images[imgursolo]=0
@@ -306,6 +311,10 @@ process_meraki() {
 	extract_title &&
 	output_urls_from_args $(sed -nr "$extract_pages" <&10 | jq -r "$gen_url")
 }
+process_toonily() {
+	extract_title && title+=" $(basename "$link")" &&
+	output_urls_from_page '/WP-manga/{s/\s*([^"]*).*/\1/;p}'
+}
 #shellcheck disable=SC2155
 #shellcheck disable=SC2046
 process_mangadex() {
@@ -324,8 +333,23 @@ process_mangadex() {
 # If no argument read urls from stdin line by line
 if [ "$#" -eq 0 ]
 then
-	while read url
-	do process_url "$url"
+	# Queue of urls to download
+	urls=()
+	# continue if there are urls in queue, or if queue is empty
+	# until we read the next url
+	while [ "${#urls[@]}" -gt 0 ] || read urls[0]
+	do
+
+		# read from input and add jobs to queue
+		while read -t 1 url
+		do urls+=("$url");
+		done
+		if [ "${#urls[@]}" -gt 0 ]; then
+			url="${urls[0]}"      # get first url
+			unset urls[0]         # pop first url
+			urls=("${urls[@]}")   # reorder urls (1,2,3 => 0,1,2)
+			process_url "$url"
+		fi
 	done
 else
 	for url
