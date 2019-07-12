@@ -183,7 +183,7 @@ name_regex[egscans]='EGScans - Online Manga Viewer - (.* - .*) - Page'
 name_regex[fascans]='/<title>/{n;s/ *(.*) - Page.*/\1/;T;p;q}'
 name_regex[meraki]='(.* - .*) - Meraki Scans'
 name_regex[toonily]='(.*) - .*'
-name_regex[leviatan]='(.*)'
+name_regex[leviatan]='(.*)<\/title>'
 
 # if 0, do not rename
 # if 1, renumber completely
