@@ -5,6 +5,7 @@ set directory=~/.vim/swap//
 set path+=include
 set viminfofile=~/.vim/viminfo
 set shell=/bin/bash
+set efm^=%-Gmake:\ ***\ %s,%-Gmake[%*\\d]:\ ***\ %s
 
 "{{{ Setup Arrow keys for different terminals
 if &term == 'screen-256color'

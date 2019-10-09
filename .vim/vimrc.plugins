@@ -34,12 +34,17 @@ call UseAddon("traces.vim", "markonm")
 nmap cx <plug>NERDCommenterToggle
 "}}}
 "{{{ Netrw
-call UseAddon("vim-vinegar", "tpope")
-nmap gu <Plug>VinegarUp
+"call UseAddon("vim-vinegar", "tpope")
+"nmap gu <Plug>VinegarUp
 let g:netrw_http_cmd = "curl -so"
 let g:netrw_liststyle = 2
 let g:netrw_hide = 0
 let g:netrw_sizestyle = "h"
+"}}}
+"{{{ NerdTree
+call UseAddon("nerdtree", "scrooloose")
+let NERDTreeAutoDeleteBuffer=1
+nmap - :e %:h<CR>
 "}}}
 "{{{ Buffer
 call UseAddon("a.vim", "vim-scripts")
@@ -122,6 +127,5 @@ let g:neomake_cpp_ninja_maker = {
 	\ 'errorformat': '../%f:%l:%c: %trror: %m,../%f:%l:%c: %tarning: %m,../%f:%l:%c: %tote: %m',
 	\ }
 let g:neomake_c_ninja_maker = g:neomake_cpp_ninja_maker
-
 "}}}
 " vim: foldmarker={{{,}}}: foldlevel=0: foldmethod=marker
