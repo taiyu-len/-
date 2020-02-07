@@ -13,14 +13,12 @@ set sessionoptions-=options
 "}}}
 "{{{ AutoClose (), {}, [], etc
 call UseAddon("delimitMate", "Raimondi")
-let delimitMate_expand_cr = 1
+ " manually set later for compatibality with autocompletion
+let delimitMate_expand_cr = 0
 let delimitMate_expand_space = 1
 "}}}
-"{{{ Snippets
-let g:UltiSnipsSnippetDirectories=["snippet"]
-call UseAddon("UltiSnips", "sirver")
-"}}}
 "{{{ Useful
+" misc helpful addons for editing
 call UseAddon("vim-surround", "tpope")
 call UseAddon("vim-repeat", "tpope")
 call UseAddon("vim-sexp", "guns")
@@ -33,18 +31,19 @@ call UseAddon("nerdcommenter", "scrooloose")
 call UseAddon("traces.vim", "markonm")
 nmap cx <plug>NERDCommenterToggle
 "}}}
-"{{{ Netrw
+"{{{ Directory Browser
 "call UseAddon("vim-vinegar", "tpope")
 "nmap gu <Plug>VinegarUp
 let g:netrw_http_cmd = "curl -so"
 let g:netrw_liststyle = 2
 let g:netrw_hide = 0
 let g:netrw_sizestyle = "h"
-"}}}
-"{{{ NerdTree
-call UseAddon("nerdtree", "scrooloose")
-let NERDTreeAutoDeleteBuffer=1
-nmap - :e %:h<CR>
+
+" call UseAddon("nerdtree", "scrooloose")
+" let NERDTreeAutoDeleteBuffer=1
+call UseAddon("vim-dirvish", "justinmk")
+
+" nmap - :e %:h<CR>
 "}}}
 "{{{ Buffer
 call UseAddon("a.vim", "vim-scripts")
@@ -92,40 +91,87 @@ augroup VIMRC_fugitive
 	autocmd BufReadPost fugitive://* set bufhidden=delete
 augroup END
 "}}}
+"{{{ Snippets
+let g:UltiSnipsSnippetDirectories=["snippet"]
+call UseAddon("UltiSnips", "sirver")
+let g:UltiSnipsExpandTrigger="<nop>"
+let g:UltiSnipsJumpForwardTrigger="<nop>"
+let g:UltiSnipsJumpBackwardTrigger="<nop>"
+"}}}
+"{{{ LSP
+" Language server protocol
+call UseAddon("async.vim", "prabirshrestha")
+call UseAddon("vim-lsp",   "prabirshrestha")
+let g:lsp_fold_enabled  = 0
+let g:lsp_signs_enabled = 1 " enable signs
+let g:lsp_diagnostics_echo_cursor = 1 " enable echo under cursor when in normal mode
+let g:lsp_signs_error   = {'text': '▕▏'}
+let g:lsp_signs_warning = {'text': '▕▏'}
+let g:lsp_signs_hint    = {'text': '▕▏'}
+
+if executable('clangd')
+    au User lsp_setup call lsp#register_server({
+        \ 'name': 'clangd',
+        \ 'cmd': {server_info->['clangd', '-background-index', '--clang-tidy', '--compile-commands-dir=build']},
+        \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp'],
+        \ })
+endif
+" Auto completion
+call UseAddon("asyncomplete.vim", "prabirshrestha")
+call UseAddon("asyncomplete-lsp.vim", "prabirshrestha")
+autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
+
+" Snippets
+call UseAddon('vim-lsp-snippets', 'thomasfaingnaert')
+call UseAddon('vim-lsp-ultisnips', 'thomasfaingnaert')
+"}}}
+"{{{ Snippet/AutoComplete/ keybindings
+" Tab to expand snippet/select next completion
+" S-Tab to select prev completion
+" Enter to select completion
+" C-j to select next text insert point
+let g:ulti_expand_or_jump_res = 0
+function! VIMRC_Tab_Keybind()
+	" try to expand first, otherwise try
+	call UltiSnips#ExpandSnippetOrJump()
+	return g:ulti_expand_or_jump_res != 0  ? "" :
+	                        \ pumvisible() ? "\<C-N>" : "\<Tab>"
+endfunction
+inoremap <silent>          <Tab>   <C-R>=VIMRC_Tab_Keybind()<CR>
+snoremap <silent>          <Tab>   <Esc>:call UltiSnips#JumpForwards()<CR>
+snoremap <silent>          <S-Tab> <Esc>:call UltiSnips#JumpBackwards()<CR>
+inoremap <silent> <expr>   <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+imap     <silent> <expr>   <CR>    pumvisible() ? "\<C-y>" : "\<Plug>delimitMateCR"
+"
+"}}}
 "{{{ Ale
-" call UseAddon("ale", "w0rp")
-let g:ale_lint_on_text_change = 0
-let g:ale_linters = {
-	\ 'c': ['clangtidy', 'cppcheck'],
-	\ 'cpp': ['clangtidy', 'cppcheck']
-	\}
-
-let g:ale_sign_info    = '▕▏'
-let g:ale_sign_warning = '▕▏'
-let g:ale_sign_error   = '▕▏'
-let g:ale_cpp_clangtidy_checks = [
-	\'*', '-fuchsia-default-arguments',
-	\'-fuchsia-overloaded-operator',
-	\'-cppcoreguidelines-pro-type-vararg', '-hicpp-vararg',
-	\'google-runtime-int', 'cert-err58-cpp']
-hi ALEErrorSign   ctermfg=1 ctermbg=0 cterm=bold
-hi ALEWarningSign ctermfg=3 ctermbg=0 cterm=bold
-hi ALEInfoSign    ctermfg=4 ctermbg=0 cterm=bold
-
-nmap <silent> <C-k> <Plug>(ale_previous_wrap)
-nmap <silent> <C-j> <Plug>(ale_next_wrap)
+"call UseAddon("ale", "w0rp")
+"nmap <silent> <C-k> <Plug>(ale_previous_wrap)
+"nmap <silent> <C-j> <Plug>(ale_next_wrap)
+" let g:ale_lint_on_text_change = 0
+" let g:ale_linters = {
+" 	\ 'c': ['clangtidy'],
+" 	\ 'cpp': ['clangtidy']
+" 	\}
+"
+" let g:ale_sign_info    = '▕▏'
+" let g:ale_sign_warning = '▕▏'
+" let g:ale_sign_error   = '▕▏'
+" hi ALEErrorSign   ctermfg=1 ctermbg=0 cterm=bold
+" hi ALEWarningSign ctermfg=3 ctermbg=0 cterm=bold
+" hi ALEInfoSign    ctermfg=4 ctermbg=0 cterm=bold
 "}}}
 "{{{ Make
-call UseAddon("neomake", "neomake")
-let g:neomake_error_sign   = {'text': '▕▏', 'texthl': 'NeomakeErrorSign'}
-let g:neomake_warning_sign = {'text': '▕▏', 'texthl': 'NeomakeWarningSign'}
-let g:neomake_message_sign = {'text': '▕▏', 'texthl': 'NeomakeMessageSign'}
-let g:neomake_info_sign    = {'text': '▕▏', 'texthl': 'NeomakeInfoSign'}
-let g:airline#extensions#neomake#enabled=0
-let g:neomake_cpp_ninja_maker = {
-	\ 'args': ['-Cbuild'],
-	\ 'errorformat': '../%f:%l:%c: %trror: %m,../%f:%l:%c: %tarning: %m,../%f:%l:%c: %tote: %m',
-	\ }
-let g:neomake_c_ninja_maker = g:neomake_cpp_ninja_maker
+" call UseAddon("neomake", "neomake")
+" let g:neomake_error_sign   = {'text': '▕▏', 'texthl': 'NeomakeErrorSign'}
+" let g:neomake_warning_sign = {'text': '▕▏', 'texthl': 'NeomakeWarningSign'}
+" let g:neomake_message_sign = {'text': '▕▏', 'texthl': 'NeomakeMessageSign'}
+" let g:neomake_info_sign    = {'text': '▕▏', 'texthl': 'NeomakeInfoSign'}
+" let g:airline#extensions#neomake#enabled=0
+" let g:neomake_cpp_ninja_maker = {
+" 	\ 'args': ['-Cbuild'],
+" 	\ 'errorformat': '../%f:%l:%c: %trror: %m,../%f:%l:%c: %tarning: %m,../%f:%l:%c: %tote: %m',
+" 	\ }
+" let g:neomake_c_ninja_maker = g:neomake_cpp_ninja_maker
 "}}}
 " vim: foldmarker={{{,}}}: foldlevel=0: foldmethod=marker
