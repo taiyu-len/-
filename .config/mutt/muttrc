@@ -33,6 +33,7 @@ bind index gJ sidebar-next
 bind index gk sidebar-prev-new
 bind index gK sidebar-prev
 bind index go sidebar-open
+bind pager,index  sidebar-toggle-visible
 
 #Sidebar
 set sidebar_visible
@@ -43,6 +44,10 @@ set sidebar_short_path
 set sidebar_folder_indent
 set sidebar_indent_string = " "
 set sidebar_next_new_wrap
+
+# Pager
+set pager_index_lines=10
+set pager_stop=yes
 
 # Formatting
 set reflow_text=yes
@@ -56,18 +61,27 @@ set mailcap_path=~/.config/mutt/mailcap
 set allow_ansi
 
 # Colors
-color sidebar_indicator default blue
+color sidebar_indicator bold default blue
 color sidebar_highlight white   black
 color sidebar_spoolfile cyan    default
-color sidebar_new       default green
+color sidebar_new       black   green
 color sidebar_flagged   red     default
 
-color quoted0   blue        default
-color quoted1   green       default
-color quoted2   red         default
-color quoted3   blue        default
-color quoted4   green       default
-color quoted5   red         default
-color quoted6   blue        default
-color signature green       default
-color tilde     cyan        default
+color quoted0    blue        default
+color quoted1    green       default
+color quoted2    red         default
+color quoted3    blue        default
+color quoted4    green       default
+color quoted5    red         default
+color quoted6    blue        default
+color signature  green       default
+color tilde      cyan        default
+color tree       red         default
+color attachment red         default
+color header     cyan        default .*
+# Message highlighting
+color index      green       default github
+color index      green       default gitlab
+color index      blue        default fantia
+color index      blue        default pixiv
+color index      blue        default skeb
