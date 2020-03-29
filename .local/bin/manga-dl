@@ -75,11 +75,13 @@ set_site() {
 	( *imgur.com/a/*             ) site=imgur         ;;
 	( *imgur.com/*               ) site=imgursolo     ;;
 	( *mangadex.org/*            ) site=mangadex      ;;
+	( *mangadex.cc/*             ) site=mangadex      ;;
 	( *read.egscans.com/*        ) site=egscans       ;;
 	( *manga.fascans.com/*       ) site=fascans       ;;
 	( *merakiscans.com/*         ) site=meraki        ;;
 	( *toonily.com/*             ) site=toonily       ;;
 	( *leviatanscans.com/*       ) site=leviatan      ;;
+	( *hatigarmscanz.net/*       ) site=leviatan      ;;
 	( *lhtranslation.net/*       ) site=lhtranslation ;;
 	( *mangasushi.net/*          ) site=mangasushi    ;;
 	( *wowescans.co/*            ) site=wowescans    ;;
@@ -110,12 +112,13 @@ wget+=(--progress=bar:noscroll)
 wget+=(--save-cookies "$cookie_file")
 wget+=(--load-cookies "$cookie_file")
 wget+=(--keep-session-cookies)
-wget+=(--quiet)
-export NQDIR=/tmp/manga-nq
+wget+=(--no-verbose)
+SAVEDIR_PREFIX="${SAVEDIR_PREFIX-/tmp/manga-dl}"
+export NQDIR="$SAVEDIR_PREFIX/manga-nq"
 # Download Urls
 download_urls() {
 	log "$(tput smso)Downloading $title from $site now. ${pages:-unknown} pages$(tput rmso)\\n"
-	savedir="${SAVEDIR-${SAVEDIR_PREFIX-/tmp}/$site/$title}"
+	savedir="${SAVEDIR-$SAVEDIR_PREFIX/$site/$title}"
 	mkdir -p "$savedir"
 	cd       "$savedir"
 # shellcheck disable=SC2191
@@ -187,7 +190,7 @@ name_regex[egscans]='EGScans - Online Manga Viewer - (.* - .*) - Page'
 name_regex[fascans]='/<title>/{n;s/ *(.*) - Page.*/\1/;T;p;q}'
 name_regex[meraki]='(.* - .*) - Meraki Scans'
 name_regex[toonily]='(.*) - .*'
-name_regex[leviatan]='Leviatan Scans - (.*)<\/title>'
+name_regex[leviatan]='.* - (.*)<\/title>'
 name_regex[lhtranslation]='(.*) - LHTranslation'
 name_regex[mangasushi]='(.*) - Mangasushi'
 name_regex[wowescans]='Wowe Scans - (.*)<\/title>'
@@ -357,7 +360,8 @@ process_lhtranslation() {
 #shellcheck disable=SC2046
 process_mangadex() {
 	extract_title || return 1
-	local chapter="$(sed -r 's/https:..mangadex.org.chapter.([0-9]*).*/\1/' <<< "$link")"
+	exec 10<&- # close page fd
+	local chapter="$(sed -r 's/https:.*mangadex.*.chapter.([0-9]*).*/\1/' <<< "$link")"
 	local query='
 		if .status == "deleted"
 		then error("chapter has been deleted")

@@ -23,7 +23,7 @@ highlight DiffDelete           NONE ctermfg=7 ctermbg=1 cterm=bold
 "{{{ Columns
 highlight ColorColumn          NONE ctermbg=0
 highlight!link CursorColumn    ColorColumn
-highlight!link CursorLine      ColorColumn
+highlight CursorLine           NONE cterm=underline
 highlight FoldColumn           NONE ctermbg=0 ctermfg=6
 highlight SignColumn           NONE ctermbg=0
 highlight LineNr               NONE ctermfg=1

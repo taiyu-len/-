@@ -72,6 +72,7 @@ elseif &term == 'rxvt-unicode-256color'
 endif
 "}}}
 "{{{ Command
+command! W w
 cnoremap <C-Backspace> <C-w>
 nnoremap q: <nop>
 nnoremap q/ <nop>

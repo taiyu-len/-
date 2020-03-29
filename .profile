@@ -31,7 +31,6 @@ export TASKRC="$XDG_CONFIG_HOME"/task/taskrc
 export WEECHAT_HOME="$XDG_CONFIG_HOME"/weechat
 #}}}
 #{{{ Files
-export ZSHRC=~/.zshrc
 export BASHRC=~/.bashrc
 export VIMRC=~/.vim/vimrc
 #}}}

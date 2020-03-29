@@ -4,7 +4,6 @@
 # Changing Directories #
 setopt AUTO_CD
 setopt AUTO_PUSHD
-setopt CDABLE_VARS
 setopt PUSHD_IGNORE_DUPS
 setopt PUSHD_SILENT
 ##############

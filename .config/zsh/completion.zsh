@@ -1,7 +1,7 @@
 # : completion : function : completer : command : argument : tag
 # Completers to use.
 #zstyle ':completion:*' completer _expand _extensions _complete _ignored _correct _approximate _files
-zstyle ':completion:*' completer _extensions _expand _prefix _complete _ignored _correct _approximate
+zstyle ':completion:*' completer _extensions _expand _prefix _complete _ignored _correct
 #{{{ Display
 # Use colors for results
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}" # enable colors
@@ -36,10 +36,10 @@ zstyle ':completion:*:processes' command 'ps -a'
 #}}}
 #{{{ Corrections
 # allow 1 error per 3 characters
-zstyle -e ':completion:*:approximate:' max-errors 'reply=($(((3+$#PREFIX+$#SUFFIX)/3)) numeric)'
+#zstyle -e ':completion:*:approximate:' max-errors 'reply=($(((3+$#PREFIX+$#SUFFIX)/3)) numeric)'
 zstyle    ':completion:*:expand:' keep-prefix true
 # ignore functions starting with _ when approximate matching
-zstyle  ':completion:*:(^approximate*):*:functions' ignored-patterns '_*'
+# zstyle  ':completion:*:(^approximate*):*:functions' ignored-patterns '_*'
 #}}}
 #{{{ Filtering
 # ignore cd ../$pwd

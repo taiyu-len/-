@@ -27,7 +27,8 @@
 # +------------------+-----------+-----------+------+
 # |/etc/zlogout      |    J      |           |      |
 # +------------------+-----------+-----------+------+
-ZPLUG_HOME="$ZDOTDIR/zplug/"
+ZPLUG_HOME="$ZDOTDIR/zplug"
+# zmodload zsh/zprof
 source "$HOME/.bashrc"
 source "$ZPLUG_HOME/init.zsh"
 source "$ZDOTDIR/plugins.zsh"
@@ -37,3 +38,4 @@ source "$ZDOTDIR/completion.zsh"
 source "$ZDOTDIR/keybinds.zsh"
 source "$ZDOTDIR/alias.zsh"
 source "$ZDOTDIR/prompt.zsh"
+# zprof

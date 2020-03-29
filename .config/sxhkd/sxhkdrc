@@ -16,6 +16,11 @@ super + grave
 ## Manage MPC Audio
 super + XF86Audio{Play,Next,Prev,LowerVolume,RaiseVolume,Mute}
 	mpc {toggle,next,prev,volume -10,volume +10,0}
+
+## Manage Audio
+XF86Audio{LowerVolume,RaiseVolume,Mute}
+	amixer -q sset Master {5%-,5%+,toggle}
+
 ## Lock screen
 XF86ScreenSaver
 	slock
@@ -86,6 +91,9 @@ super + alt + {1-9}
 ## Cancel preselection for node
 super + alt + space
 	bspc node -p cancel
+## Create node recepticle
+super + alt + Return
+	bspc node -i
 #}}}
 #{{{ Desktop
 ## Focus to specified desktop

@@ -31,12 +31,17 @@
 		uim-xim &
 	fi
 
-	# my smaller monitor is above and to the right of my main monitor.
-	try xrandr --output VGA1 --above LVDS1
-	try xrandr --output VGA1 --pos 656x0
+	# Monitor locations
+	try xrandr --output VGA1 --right-of LVDS1
+
+	# Tablet settings
+	try xsetwacom set "Wacom Intuos BT S Pen stylus" MapToOutput 1680x1050+0+0
 	try xflux  -l 49&
 	try urxvtd -qof
 	try qjoypad&
+
+	# mount picture database
+	try tmsu mount ~/pics/mnt -D ~/pics/.tmsu/db
 	src ~/.fehbg
 	xset -b on # enable bell
 } >/dev/null 2>&1
