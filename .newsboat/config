@@ -1,0 +1,24 @@
+auto-reload yes
+reload-time 30
+feedlist-format " %n %u %t"
+feedlist-title-format " %u/%t"
+datetime-format "%b %d %H:%M"
+articlelist-format "%D │%f│ %t"
+articlelist-title-format " %T (%u/%t) - %U"
+
+
+unbind-key J
+unbind-key K
+unbind-key L
+unbind-key h
+unbind-key j
+unbind-key k
+unbind-key l
+
+bind-key J next-feed
+bind-key K prev-feed
+bind-key L toggle-show-read-feeds
+bind-key h quit
+bind-key j next
+bind-key k prev
+bind-key l open
