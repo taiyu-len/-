@@ -4,15 +4,17 @@ sep() { printf "%s" "#[fg=brightwhite]▕▏" "$@"; }
 if [ "$1" = "left" ]
 then
 	date=$(printf "#[fg=blue,bold]%(%d-%b-#[fg=brightblue,nobold]%a)T")
-	ip="$(ip -br addr | awk '$2=="UP" {
-		split($3,a,"(\\.|/)");
-		printf "#[fg=yellow,nobold]"a[1]"."a[2]"."a[3]"."
-		printf "#[fg=brightyellow,bold]"a[4]
-	}')"
+	ip="$(ip -j addr | jq -r '.[] |
+		select(.operstate=="UP").addr_info[] |
+		select(.family=="inet").local |
+		split(".") |
+		"#[fg=yellow,nobold]" + (.[0:3]|join(".")) + 
+		".#[fg=brightyellow,bold]" + .[3]'
+	)"
 	mail="$(dircount "$MAIL/taiyu-len/INBOX/new")"
 
 	echo -n "$date"
-	[ "$ip"          ] && sep "$ip"
+	[ "$ip" ] && sep "$ip"
 	if pgrep offlineimap >/dev/null 2>&1
 	then sep "#[fg=green,bold]Check"
 	elif [ "$mail" != "0" ]

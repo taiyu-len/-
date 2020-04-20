@@ -99,13 +99,15 @@ alias racket="rlwrap racket"
 alias JP='LANG="ja_JP.UTF8" LC_ALL="ja_JP.UTF8" '
 #}}}
 #{{{ misc
-alias zathura="zathura --fork"
+alias zathura="zathura --fork --log-level=error"
 alias info="info --vi-keys"
 alias hl='highlight -O ansi'
 alias mnt='udisksctl mount -b'
 alias unmnt='udisksctl unmount -b'
 alias bget="wget --header='User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:36.0) Gecko/20100101 Firefox/36.0' --header='Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' --header='Accept-Language: en,ja;q=0.7,en-US;q=0.3' --header='Content-Type: application/x-www-form-urlencoded'"
 alias hc="herbstclient"
+alias img2clip="xclip -selection clipboard -target image/png -i"
+alias garyc="surf https://garyc.me/sketch/"
 #}}}
 #}}}
 #{{{ GPG

@@ -138,7 +138,7 @@ let g:load_doxygen_syntax=1
 
 " Columns/Margins
 nnoremap <silent><leader>n :set nu! rnu!<cr>
-set colorcolumn=+0
+set colorcolumn=+1
 set conceallevel=2 concealcursor=
 
 set winminheight=0 winminwidth=0

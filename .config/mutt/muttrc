@@ -56,7 +56,9 @@ set markers=no
 set text_flowed=yes
 set include=yes
 
-auto_view text/*
+auto_view text/html
+mime_lookup text/html
+set wait_key=no
 set mailcap_path=~/.config/mutt/mailcap
 set allow_ansi
 

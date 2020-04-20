@@ -15,6 +15,7 @@ bspc config pointer_follows_monitor true
 bspc config swallow_first_click     true
 # Make windows fill entire node
 bspc config honor_size_hints        false
+bspc config ignore_ewmh_focus       true
 
 bspc config normal_border_color   '#110000'
 bspc config active_border_color   '#221111'
