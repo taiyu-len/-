@@ -5,6 +5,8 @@ feedlist-title-format " %u/%t"
 datetime-format "%b %d %H:%M"
 articlelist-format "%D │%f│ %t"
 articlelist-title-format " %T (%u/%t) - %U"
+max-items 10000
+set browser=newsboat-handler.sh
 
 
 unbind-key J

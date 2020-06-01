@@ -2,6 +2,7 @@
 # TODO Rewrite to be more modular
 # TODO Save all metadata associated with it
 # TODO Better Options
+printf manga-dl > /proc/$$/comm
 set -o errexit
 set -o nounset
 
