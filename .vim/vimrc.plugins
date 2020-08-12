@@ -42,7 +42,8 @@ let g:netrw_sizestyle = "h"
 " call UseAddon("nerdtree", "scrooloose")
 " let NERDTreeAutoDeleteBuffer=1
 call UseAddon("vim-dirvish", "justinmk")
-
+nmap  <Plug>(dirvish_up)
+nmap  - <Plug>(dirvish_up)
 " nmap - :e %:h<CR>
 "}}}
 "{{{ Buffer
@@ -56,6 +57,7 @@ call UseAddon("NrrwRgn", "chrisbra")
 "{{{ Syntax
 call UseAddon("vim-plugin-AnsiEsc", "powerman")
 call UseAddon("vim-cpp-enhanced-highlight", "octol")
+let g:cpp_class_scope_highlight=1
 call UseAddon("vim-ledger", "ledger")
 " needed for some reason
 packadd vim-ledger
@@ -97,6 +99,8 @@ call UseAddon("UltiSnips", "sirver")
 "}}}
 "{{{ LSP
 " Language server protocol
+if 1 " DISABLE vim-lsp for now
+
 call UseAddon("async.vim", "prabirshrestha")
 call UseAddon("vim-lsp",   "prabirshrestha")
 let g:lsp_fold_enabled  = 0
@@ -106,12 +110,13 @@ let g:lsp_diagnostics_echo_delay  = 150
 let g:lsp_signs_error   = {'text': '▕▏'}
 let g:lsp_signs_warning = {'text': '▕▏'}
 let g:lsp_signs_hint    = {'text': '▕▏'}
-
+let g:lsp_log_verbose = 1
+let g:lsp_log_file = expand('/tmp/vim-lsp.log')
 
 if executable('clangd')
     au User lsp_setup call lsp#register_server({
         \ 'name': 'clangd',
-        \ 'cmd': {server_info->['clangd', '-background-index', '--clang-tidy', '--compile-commands-dir=build']},
+        \ 'cmd': {server_info->['clangd', '-background-index', '--clang-tidy']},
         \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp'],
         \ })
 endif
@@ -119,10 +124,25 @@ endif
 call UseAddon("asyncomplete.vim", "prabirshrestha")
 call UseAddon("asyncomplete-lsp.vim", "prabirshrestha")
 autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
-
 " Snippets
 call UseAddon('vim-lsp-snippets', 'thomasfaingnaert')
 call UseAddon('vim-lsp-ultisnips', 'thomasfaingnaert')
+
+else " coc.vim
+
+call UseAddon("coc.vim", "neoclide")
+set cmdheight=2
+set shortmess+=c
+
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
+
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+endif
 "}}}
 "{{{ Ale
 "call UseAddon("ale", "w0rp")

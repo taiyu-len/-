@@ -146,6 +146,7 @@ download_original() {
 		while read_url -t 1
 		do urls+=("$url"); echo "$url" >> urls
 		done
+		all_urls+=("${urls[@]}")
 		"${wget[@]}" "${urls[@]}" || true
 	done
 }
@@ -157,9 +158,10 @@ download_numbered() {
 	# shellcheck disable=SC2119
 	while read_url
 	do echo "$url"
-	done | tee urls | until "${parallel[@]}" "${wget[@]}" '-O{#}.jpg' '{}'
-	do true
-	done
+	done | tee urls |
+		until "${parallel[@]}" "${wget[@]}" '-O{#}.jpg' '{}'
+		do true
+		done
 	echo
 }
 download_prefixed() {
@@ -371,6 +373,7 @@ process_mangadex() {
 		else "https://mangadex.org" + .server + .hash + "/" + .page_array[]
 		end'
 	local json="$(curl -s "https://mangadex.org/api/chapter/$chapter")"
+	title="$chapter - $title"
 	output_urls_from_args $(jq -r "$query" <<< "$json")
 }
 

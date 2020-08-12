@@ -38,7 +38,7 @@
 	try xsetwacom set "Wacom Intuos BT S Pen stylus" MapToOutput 1680x1050+0+0
 	try xflux  -l 49&
 	try urxvtd -qof
-	try qjoypad&
+	try qjoypad --notray &
 
 	# mount picture database
 	try tmsu mount ~/pics/mnt -D ~/pics/.tmsu/db

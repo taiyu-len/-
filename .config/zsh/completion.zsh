@@ -36,6 +36,7 @@ zstyle ':completion:*:processes' command 'ps -a'
 #}}}
 #{{{ Corrections
 # allow 1 error per 3 characters
+zstyle -e ':completion:*:approximate:' max-errors 0
 #zstyle -e ':completion:*:approximate:' max-errors 'reply=($(((3+$#PREFIX+$#SUFFIX)/3)) numeric)'
 zstyle    ':completion:*:expand:' keep-prefix true
 # ignore functions starting with _ when approximate matching

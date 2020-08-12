@@ -38,6 +38,10 @@ alias sudo="sudo "
 alias torify="torify "
 alias exec="exec "
 alias command="command "
+#{{{ pkill
+alias pstop="pkill -STOP"
+alias pcont="pkill -CONT"
+#}}}
 #{{{ Config
 alias config="/usr/bin/git --git-dir=$HOME/.home.git/ --work-tree=$HOME"
 #}}}
@@ -193,11 +197,11 @@ plll() {
 spawn() { ("$@" </dev/null &>/dev/null &) ;}
 hless() { highlight -Oansi "$@" | less -R ;}
 sleep_until() {
-	d="$(date -d "$1" +%s)" || return 1
+	local d="$(date -d "$*" +%s)" || return 1
 	sleep $[d - $(date +%s)]
 }
 alarm() {
-	sleep_until "$1"
+	date +%T;  date -d "$*" +%T; sleep_until "$*"
 	beep -d50 -nr5 -nr5 -nr5 -nr5 -nr5
 	while pgrep slock >/dev/null
 	do beep -d50 -r4 && sleep 5m || sleep 1

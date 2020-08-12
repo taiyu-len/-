@@ -1,6 +1,11 @@
 [core]
 	editor = vim
 	excludesfile = ~/.config/git/ignore
+[delta]
+	features = side-by-side line-numbers decorations
+	whitespace-error-style = 22 reverse
+	hunk-header-decoration-style = blue ul
+	line-numbers-zero-style = white
 [user]
 	name = taiyu
 [include] ; User data i dont want to upload
@@ -14,6 +19,7 @@
 	branch = true
 [diff]
 	algorithm = patience
+	colorMoved = default
 [color]
 	ui = true
 [alias]
@@ -21,6 +27,7 @@
 	stat    = diff --stat
 	dirstat = diff --dirstat
 	todo    = grep TODO
+	delta   = -c "core.pager=delta" diff
 	fetch-pr = "! remote=${2:-origin}; branch=${3:-pr-$1}; \
 		if test -v 1; then git fetch \"$remote\" \"pull/$1/head:$branch\"; \
 		else echo Usage: git fetch-pr PULL_REQUEST_ID [REMOTE_NAME] [NEW_BRANCH_NAME] && false; fi"

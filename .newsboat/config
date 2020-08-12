@@ -4,9 +4,13 @@ feedlist-format " %n %u %t"
 feedlist-title-format " %u/%t"
 datetime-format "%b %d %H:%M"
 articlelist-format "%D │%f│ %t"
-articlelist-title-format " %T (%u/%t) - %U"
+articlelist-title-format "(%u/%t) %T - %U"
+itemview-title-format "(%u/%t) %T"
 max-items 10000
-set browser=newsboat-handler.sh
+browser newsboat-handler.sh
+
+highlight-article "content =~ \"レン\"" white red bold
+highlight all "レン" white red bold
 
 
 unbind-key J
