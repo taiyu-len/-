@@ -56,7 +56,7 @@ super + {shift + backslash,minus}
 	bspc node -F {vertical,horizontal}
 ## Focus next or previous node
 super + {_,shift + }c
-	bspc node -f {next,prev}.local
+	bspc node -f {next,prev}.local.!hidden.window
 ## Focus next or previous node in history.
 super + {_,shift +}tab
 	bspc wm -h off; \
