@@ -3,9 +3,12 @@
 	excludesfile = ~/.config/git/ignore
 [delta]
 	features = side-by-side line-numbers decorations
-	whitespace-error-style = 22 reverse
+	whitespace-error-style       = 22 reverse
 	hunk-header-decoration-style = blue ul
-	line-numbers-zero-style = white
+	line-numbers-zero-style      = white
+	line-numbers-minus-style     = red
+	line-numbers-left-format     = "{nm:^4}│ "
+	line-numbers-right-format    = "│{np:^4}│ "
 [user]
 	name = taiyu
 [include] ; User data i dont want to upload

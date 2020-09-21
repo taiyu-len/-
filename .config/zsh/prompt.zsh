@@ -3,21 +3,21 @@ setopt AUTO_NAME_DIRS
 
 # https://github.com/taiyu-len/shrink-path
 # https://github.com/taiyu-len/my-git-prompt
-__my_ps1='!%!%(1j. %%%j.)%(?.. ?%?) $(shrink-path "${(D)PWD}")$(my-git-prompt)'
+__my_ps1='!%!%(1j. %%%j.)%(?.. ?%?)'
 
 function zle-line-init zle-keymap-select {
 	local e;
 	if test "$KEYMAP" = vicmd
-	then e="< "
-	else e="> "
+	then PS1="$__my_ps1< "
+	else PS1="$__my_ps1> "
 	fi
-	PS1="$__my_ps1$e"
 	zle reset-prompt
 }
 zle -N zle-keymap-select
 zle -N zle-line-init
 
 PS1="$__my_ps1> "
+RPS1='%B $(shrink-path "${(D)PWD}")$(my-git-prompt)%b'
 PS2="%_ "
 PS3="?# "
 

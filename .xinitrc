@@ -20,7 +20,6 @@
 
 	# swap escape and capslock keys
 	test -f ~/.Xmodmap && xmodmap "$_"
-	try xcape
 
 	# enable japanese Input
 	if hash uim-xim

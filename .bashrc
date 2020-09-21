@@ -89,6 +89,7 @@ alias fget='NQDIR=/tmp/nq-wget \fq'
 alias cpumin="sudo cpupower frequency-set -u 800MHz"
 alias cpumed="sudo cpupower frequency-set -u 1.60GHz"
 alias cpumax="sudo cpupower frequency-set -u 2.53GHz"
+alias cpuinfo="cpupower frequency-info"
 #}}}
 #{{{ cmd | uploader
 alias ix="curl -F 'f:1=<-' ix.io"

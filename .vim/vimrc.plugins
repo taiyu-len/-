@@ -10,6 +10,8 @@ endfunction
 call UseAddon('vim-prosession', 'dhruvasagar')
 call UseAddon('vim-obsession', 'tpope')
 set sessionoptions-=options
+set sessionoptions-=buffers
+set sessionoptions-=folds
 "}}}
 "{{{ AutoClose (), {}, [], etc
 call UseAddon("delimitMate", "Raimondi")
