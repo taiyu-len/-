@@ -85,7 +85,8 @@ set_site() {
 	( *hatigarmscanz.net/*       ) site=leviatan      ;;
 	( *lhtranslation.net/*       ) site=lhtranslation ;;
 	( *mangasushi.net/*          ) site=mangasushi    ;;
-	( *wowescans.co/*            ) site=wowescans    ;;
+	( *wowescans.co/*            ) site=wowescans     ;;
+	( *alphapolis.co.jp/*        ) site=alphapolis    ;;
 	( * )
 		err "Unknown link: '$link'\\n"
 		return 1
@@ -197,6 +198,7 @@ name_regex[leviatan]='.* - (.*)<\/title>'
 name_regex[lhtranslation]='(.*) - LHTranslation'
 name_regex[mangasushi]='(.*) - Mangasushi'
 name_regex[wowescans]='Wowe Scans - (.*)<\/title>'
+name_regex[alphapolis]='([^|]*) .*<\/title>'
 
 # if 0, do not rename
 # if 1, renumber completely
@@ -217,6 +219,7 @@ rename_images[leviatan]=0
 rename_images[lhtranslation]=0
 rename_images[mangasushi]=0
 rename_images[wowescans]=0
+rename_images[alphapolis]=1
 # TODO save related metadata.
 rename_images[imgur]=2
 rename_images[imgursolo]=0
@@ -375,6 +378,12 @@ process_mangadex() {
 	local json="$(curl -s "https://mangadex.org/api/chapter/$chapter")"
 	title="$chapter - $title"
 	output_urls_from_args $(jq -r "$query" <<< "$json")
+}
+process_alphapolis() {
+	extract_title || return 1
+	output_urls_from_page '/_pages.push.*https/{
+		s/.*\("(.*)"\).*/\1/;s/500x711/1080x1536/;p
+	}'
 }
 
 
