@@ -1,0 +1,74 @@
+#!/bin/bash
+set -o errexit
+
+#######################
+# return true if manifest exists, or if user replies yes otherwise
+check_directory() {
+	if [ ! -f manifest.xml ]
+	then
+		echo "No manifest file exists."
+		echo "Is this the right directory? [$PWD]"
+		read -p "Continue anyway? [yN] > " -n 1 -r
+		echo
+		[[ "$REPLY" =~ ^[yY]$ ]]
+	fi
+}
+
+####################
+get_manifest() {
+	manifest_url='http://patch.savecoh.com/manifest.xml'
+	curl -s "$manifest_url" -o manifest.new
+}
+
+###########################
+# true if manifests differs,
+# or user chooses to continue otherwise
+compare_manifest() {
+	if diff -q manifest.new manifest.xml 2>/dev/null
+	then
+		echo "Manifest file is unchanged"
+		read -p "Continue Updating?  [yN] > " -n 1 -r
+		echo
+		[[ "$REPLY" == ^[yY]$ ]]
+	fi
+}
+
+######################
+# update manifest file
+update_manifest() {
+	[ -f manifest.xml ] && mv -f manifest.xml manifest.old
+	mv manifest.new manifest.xml
+}
+
+########################
+# download updated files
+download_files() {
+	local xqprg='.manifest.filelist.file[] | [."@name", ."@md5", .url] | flatten | join(" ")'
+	xq -r "$xqprg" < manifest.xml | while read name md5 urls
+	do
+		echo "$name: $md5"
+		continue
+		# aria2c needs to invocations to redownload if updated
+		aria2c --allow-overwrite=true --checksum=md5="$md5" --out="$name" --quiet $urls || \
+		aria2c --allow-overwrite=true --checksum=md5="$md5" --out="$name" $urls
+	done
+}
+
+#################
+# Select launcher and exit
+select_launcher() {
+	xqprg='.manifest.profiles.launch[]|"./"+."@exec"+" "+."@params"'
+	readarray -t options < <(xq -r "$xqprg" < manifest.xml | sed 's/\\/\//')
+	select choice in "${options[@]}" exit;
+	do
+		eval "$choice"
+		exit 0
+	done
+}
+
+check_directory || exit 0
+get_manifest
+compare_manifest || select_launcher
+update_manifest
+download_files
+select_launcher
