@@ -1,0 +1,58 @@
+#!/bin/bash
+try() { hash "$1" && "$@" ;}
+src() { [ -x "$1" ] && . "$1" ;}
+
+# Monitor settings
+try xrandr --output VGA1 --right-of LVDS1
+try xflux  -l 49&
+src ~/.fehbg # wallpaper
+xset -b on # enable bell
+
+# Input settings
+try xsetwacom set "Wacom Intuos BT S Pen stylus" MapToOutput 1680x1050+0+0
+try qjoypad --notray &
+
+# mount picture database
+try tmsu mount ~/pics/mnt -D ~/pics/.tmsu/db
+
+if hash urxvtd # set terminal
+then export TERMINAL=urxvtc
+	urxvtd -qof
+else export TERMINAL=xterm
+fi
+
+if hash palemoon # set browser
+then export BROWSER=palemoon
+elif hash firefox
+then export BROWSER=firefox
+fi
+
+# Load Xresources
+test -f ~/.Xresources && xrdb -load "$_"
+
+# caps->esc, esc->f13
+test -f ~/.Xmodmap && xmodmap "$_"
+
+# enable japanese Input
+if hash uim-xim
+then
+	export GTK_IM_MODULE='uim'
+	export QT_IM_MODULE='uim'
+	export XMODIFIERS='@im=uim'
+	uim-xim &
+fi
+
+if [ -z "$DBUS_SESSION_BUS_ADDRESS" ]
+then eval "$(dbus-launch --sh-syntax --exit-with-session)"
+fi
+echo "$DBUS_SESSION_BUS_ADDRESS" > ~/.cache/dbusaddr
+
+xdg-user-dirs-update
+
+if [ -d /etc/X11/xinit/xinitrc.d ]
+then
+	for f in /etc/X11/xinit/xinitrc.d/*
+	do src "$f"
+	done
+	unset f
+fi
