@@ -14,7 +14,7 @@
 # - @todo Linux apropos/whatis take options; we don't complete them yet
 
 _man() {
-  local dirs expl mrd awk variant noinsert
+  local tmp dirs expl mrd awk variant noinsert
   local -a context line state state_descr args modes
   local -aU sects
   local -A opt_args val_args sect_descs
@@ -444,18 +444,19 @@ _man_pages() {
 
   [[ $variant = solaris* ]] && sopt='-s '
   if ! ((CURRENT > 1 || noinsert)); then
-    if zstyle -t ":completion:${curcontext}:manuals.$sect_dirname" insert-sections
-    then
-      compadd "$@" -P "$sopt$sect_dirname " - ${pages%$~suf}
-    elif zstyle -t ":completion:${curcontext}:manuals.$sect_dirname" append-sections
-    then
-      compadd "$@" -s ".$sect_dirname" - ${pages%$~suf}
-    else
-      compadd "$@" - ${pages%$~suf}
-    fi
-  else
-    compadd "$@" - ${pages%$~suf}
+    zstyle -s ":completion:${curcontext}:manuals.$sect_dirname" insert-sections tmp
   fi
+  case "$tmp" in
+    prepend|true|on|yes|1)
+      compadd "$@" -P "$sopt$sect_dirname " - ${pages%$~suf}
+    ;;
+    append)
+      compadd "$@" -s ".$sect_dirname" - ${pages%$~suf}
+    ;;
+    *)
+      compadd "$@" - ${pages%$~suf}
+    ;;
+  esac
 }
 
 _man "$@"

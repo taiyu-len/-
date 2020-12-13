@@ -1,13 +1,13 @@
 #!/bin/sh
-bspc monitor LVDS1 -d 1 2 3 4 5
-bspc monitor VGA1  -d 6 7 8 9 0
+bspc monitor LVDS1 -d 1 2 3 4 5 6 7 8 9 0
+#bspc monitor VGA1  -d 6 7 8 9 0
 # LVDS1 is main monitor
-bspc wm -O LVDS1 VGA1
+#bspc wm -O LVDS1 VGA1
 
 bspc config split_ratio             0.52
-bspc config single_monocle          false
-bspc config borderless_monocle      false
-bspc config gapless_monocle         false
+bspc config single_monocle          true
+bspc config borderless_monocle      true
+bspc config gapless_monocle         true
 bspc config click_to_focus          any
 # Move pointer to monitor when changing focus
 bspc config pointer_follows_monitor true
@@ -27,9 +27,10 @@ bspc rule -a 'Zathura'  state=tiled
 bspc rule -a 'Qjoypad'  state=floating
 
 # Overlapping borders
-width=5
-bspc config border_width $width
-bspc config window_gap  -$width
+
+width=1
+bspc config border_width 1
+bspc config window_gap  -1
 for side in top bottom right left ; do
 	bspc config ${side}_padding $width
 done
