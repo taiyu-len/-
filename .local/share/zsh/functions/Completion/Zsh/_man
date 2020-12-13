@@ -14,7 +14,7 @@
 # - @todo Linux apropos/whatis take options; we don't complete them yet
 
 _man() {
-  local tmp dirs expl mrd awk variant noinsert
+  local dirs expl mrd awk variant noinsert
   local -a context line state state_descr args modes
   local -aU sects
   local -A opt_args val_args sect_descs
@@ -414,7 +414,7 @@ _man() {
 }
 
 _man_pages() {
-  local pages sopt
+  local pages sopt tmp
 
   # What files corresponding to manual pages can end in.
   local suf='.((?|<->*|ntcl)(|.gz|.bz2|.z|.Z|.lzma))'

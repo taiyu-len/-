@@ -1,0 +1,18 @@
+"1.2pre-pm-3
+
+loadplugins '\.(js|penta)$'
+group user
+map -count -modes=n,v <Space> -builtin <count><C-d>
+map -count -modes=n <lt> <count>gT
+map        -modes=n <A-lt> :tabmove -1<cr>
+map -count -modes=n > <count>gt
+map        -modes=n <A->> :tabmove +1<cr>
+map -count -modes=n,v <S-Space> -builtin <count><C-u>
+set cdpath=''
+set editor='emacsclient +<line>:<column> -c <file>'
+set guioptions=brsmN
+colorscheme zenburn
+
+set passkeys=www.kongregate.com:w,W,a,A,s,S,d,D,r,R,t,T
+
+" vim: set ft=pentadactyl:
