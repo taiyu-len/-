@@ -3,7 +3,7 @@ setopt AUTO_NAME_DIRS
 
 # https://github.com/taiyu-len/shrink-path
 # https://github.com/taiyu-len/my-git-prompt
-__my_ps1='!%!%(1j. %%%j.)%(?.. ?%?)'
+__my_ps1='%(1j.%F{m}%j%f%%.)%(?..%F{red}%?%f)'
 
 function zle-line-init zle-keymap-select {
 	local e;

@@ -98,7 +98,6 @@ alias sprunge.us="curl -F 'sprunge=<-' http://sprunge.us"
 #}}}
 #{{{ readline wrappers
 alias dc="rlwrap dc"
-alias racket="rlwrap racket"
 #}}}
 #{{{ Locale Aliases
 alias JP='LANG="ja_JP.UTF8" LC_ALL="ja_JP.UTF8" '
@@ -218,20 +217,33 @@ lensay() {
 	"${ponycmd[@]}" "$@"
 }
 #{{{ *cd
-mkcd() { mkdir -p "$*" &&  cd "$_" ;}
-
-# fuzzy cd lookup
-hash fzf 2>/dev/null &&
-	fzcd() {
-		local dir
-		dir=$(find "${1:-.}" -path '*/\.*' -prune \
-			-o -type d -print 2> /dev/null | fzf +m) &&
-		cd "$dir"
-	}
+cd() {
+	if [[ $# -eq 1 ]] && [[ -f "$1" ]]; then
+		local dir="$(dirname "$1")"
+		[[ ! -e "$dir" ]] && return 1
+		echo "Correcting $1 to $dir"
+		builtin cd "$dir"
+	else
+		builtin cd "$@"
+	fi
+}
+cl() {
+	cd $1 && ls
+}
+mkcd() {
+	if [[ "$#" -ne 1 ]]
+	then printf 'usage: mkcd <new-directory>\n'; return 1;
+	fi
+	if [[ ! -d "$1" ]]
+	then \command mkdir -p "$1"
+	else printf '`%s'\'' already exists: cd-ing.\n' "$1"
+	fi
+	builtin cd "$1"
+}
 
 tmpcd() {
-	cd "$(mktemp -dp /tmp ${*:+-d "$*.XXXXXXXXX"})"
-	pwd
+	builtin cd "$(mktemp -d)"
+	builtin pwd
 }
 #}}}
 #}}}

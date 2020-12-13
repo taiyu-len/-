@@ -18,7 +18,8 @@ zstyle ':completion:*:options'      description 'yes'
 zstyle ':completion:*'              group-name ''
 # Display more information for man pages
 zstyle ':completion:*:manuals'    separate-sections true
-zstyle ':completion:*:manuals.*'  insert-sections   true
+zstyle ':completion:*:manuals.*'  append-sections   true
+# zstyle ':completion:*:manuals.*'  insert-sections   true
 #}}}
 #{{{ Selection
 # Use menu by default
@@ -55,9 +56,8 @@ zstyle ':completion:*' hosts off
 #}}}
 #{{{ Cache
 zstyle ':completion:*' use-cache on
-zstyle ':completion:*' cache-path ~/.cache/zsh
+zstyle ':completion:*' cache-path "${ZDOTDIR}/.cache"
 #}}}
-fpath+=("$HOME/.local/share/zsh/functions/Completion/Zsh")
 
 autoload -Uz compinit
 compinit

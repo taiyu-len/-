@@ -13,7 +13,7 @@
 # +------------------+-----------+-----------+------+
 # |/etc/zshrc        |    E      |    C      |      |
 # +------------------+-----------+-----------+------+
-# |$ZDOTDIR/.zshrc   |    F      |    D      |      |
+# |$ZDOTDIR/.zshrc   |    F      |    D      |      | <--- You are here
 # +------------------+-----------+-----------+------+
 # |/etc/zlogin       |    G      |           |      |
 # +------------------+-----------+-----------+------+
@@ -27,11 +27,8 @@
 # +------------------+-----------+-----------+------+
 # |/etc/zlogout      |    J      |           |      |
 # +------------------+-----------+-----------+------+
-ZPLUG_HOME="$ZDOTDIR/zplug"
 # zmodload zsh/zprof
 source "$HOME/.bashrc"
-source "$ZPLUG_HOME/init.zsh"
-source "$ZDOTDIR/plugins.zsh"
 source "$ZDOTDIR/options.zsh"
 source "$ZDOTDIR/history.zsh"
 source "$ZDOTDIR/completion.zsh"
