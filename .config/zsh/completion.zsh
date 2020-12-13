@@ -18,8 +18,7 @@ zstyle ':completion:*:options'      description 'yes'
 zstyle ':completion:*'              group-name ''
 # Display more information for man pages
 zstyle ':completion:*:manuals'    separate-sections true
-zstyle ':completion:*:manuals.*'  append-sections   true
-# zstyle ':completion:*:manuals.*'  insert-sections   true
+zstyle ':completion:*:manuals.*'  insert-sections   append
 #}}}
 #{{{ Selection
 # Use menu by default
