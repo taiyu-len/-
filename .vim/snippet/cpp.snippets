@@ -1,0 +1,98 @@
+extends c
+priority 2
+# Preprocessors
+##############################################################################
+snippet #ifndef "header guard"
+#ifndef ${2:NS_}${1:`!p snip.rv = fn.replace('.','_').upper() `}
+#define $2$1
+${VISUAL}$0
+#endif // $2$1
+endsnippet
+
+# Control Flow
+##############################################################################
+snippet for "for (auto x : xs) {...}" b
+for (auto ${1:x} : ${2:$1s})
+{
+	${VISUAL}$0
+}
+endsnippet
+
+snippet forit "for (auto i = std::begin(x); i != std::end(x); ++i){...}" b
+for (auto ${1:i} = std::begin(${2:x}); $1 != std::end($2); ++$1)
+{
+	${VISUAL}$0
+}
+endsnippet
+
+# Blocks
+##############################################################################
+snippet ns  "namespace" b
+namespace ${1:name} {
+${VISUAL}$0
+} // namespace $1
+endsnippet
+
+snippet class "class" b
+class ${1:/* name */}
+{
+	${VISUAL}$0
+};
+endsnippet
+
+snippet ro5 "class rule of 5" b
+class ${1:/* name */}
+{
+	${0}
+public:
+	$1()  = default;
+	~$1() = default;
+	$1($1 const&) = default;
+	$1($1 &&)     = default
+	auto operator=($1 const&) -> $1& = default;
+	auto operator=($1 &&)     -> $1& = default;
+};
+endsnippet
+
+snippet enumc "enum class" b
+enum class ${1:/* name */}
+{
+	$0,
+};
+endsnippet
+
+# Functions
+##############################################################################
+snippet temp "template<typename T>"
+template<typename ${1:T}>
+endsnippet
+
+snippet fn "auto fn(...) -> ... {}"
+auto ${1:fn}(${2:/* params */}) ${4:-> ${3:/* ret */}}
+{
+	${0}
+}
+endsnippet
+
+snippet istream
+auto operator>>(std::istream& is, ${1:/*type*/}& x) -> std::istream&
+{
+	${VISUAL}$0
+	return is;
+}
+endsnippet
+
+snippet ostream
+auto operator<<(std::ostream& os, ${1:/*type*/} const& x) -> std::ostream&
+{
+	${VISUAL}$0
+	return os;
+}
+endsnippet
+
+snippet l "lambda"
+[${2:&}](${1:/* param */})
+{
+	${VISUAL}$0
+}
+endsnippet
