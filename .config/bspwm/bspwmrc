@@ -29,9 +29,10 @@ bspc rule -a 'Qjoypad'  state=floating
 # Overlapping borders
 
 width=1
-bspc config border_width 1
-bspc config window_gap  -1
+bspc config border_width $width
+bspc config window_gap  -$width
 for side in top bottom right left ; do
 	bspc config ${side}_padding $width
+	bspc config ${side}_monocle_padding -$width
 done
 exec sxhkd

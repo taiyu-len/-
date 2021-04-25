@@ -1,4 +1,5 @@
 auto-reload yes
+suppress-first-reload yes
 reload-time 30
 feedlist-format " %n %u %t"
 feedlist-title-format " %u/%t"

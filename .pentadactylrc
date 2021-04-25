@@ -14,5 +14,6 @@ set guioptions=brsmN
 colorscheme zenburn
 
 set passkeys=www.kongregate.com:w,W,a,A,s,S,d,D,r,R,t,T
+set scs=1
 
 " vim: set ft=pentadactyl:

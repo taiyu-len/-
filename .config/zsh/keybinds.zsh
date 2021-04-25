@@ -22,7 +22,8 @@ typeset -A key
 autoload zkbd
 zkbd_file() {
 	{ test -f "$ZDOTDIR/zkbd/${TERM}-${VENDOR}-${OSTYPE}" && printf "%s" "$_" ;} ||
-	{ test -f "$ZDOTDIR/zkbd/${TERM}-${DISPLAY}"          && printf "%s" "$_" ;}
+	{ test -f "$ZDOTDIR/zkbd/${TERM}-${DISPLAY}"          && printf "%s" "$_" ;} ||
+	{ test -f "$ZDOTDIR/zkbd/${TERM}"                     && printf "%s" "$_" ;}
 }
 load_zkbd() { keyfile="$(zkbd_file)" && source "$keyfile" ;}
 if ! load_zkbd

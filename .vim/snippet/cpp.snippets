@@ -28,20 +28,20 @@ endsnippet
 # Blocks
 ##############################################################################
 snippet ns  "namespace" b
-namespace ${1:name} {
+namespace ${1} {
 ${VISUAL}$0
 } // namespace $1
 endsnippet
 
 snippet class "class" b
-class ${1:/* name */}
+class ${1}
 {
 	${VISUAL}$0
 };
 endsnippet
 
 snippet ro5 "class rule of 5" b
-class ${1:/* name */}
+class ${1}
 {
 	${0}
 public:
@@ -55,7 +55,7 @@ public:
 endsnippet
 
 snippet enumc "enum class" b
-enum class ${1:/* name */}
+enum class ${1}
 {
 	$0,
 };
@@ -68,14 +68,14 @@ template<typename ${1:T}>
 endsnippet
 
 snippet fn "auto fn(...) -> ... {}"
-auto ${1:fn}(${2:/* params */}) ${4:-> ${3:/* ret */}}
+auto ${1:fn}(${2}) ${4:-> ${3}}
 {
 	${0}
 }
 endsnippet
 
 snippet istream
-auto operator>>(std::istream& is, ${1:/*type*/}& x) -> std::istream&
+auto operator>>(std::istream& is, ${1}& x) -> std::istream&
 {
 	${VISUAL}$0
 	return is;
@@ -83,7 +83,7 @@ auto operator>>(std::istream& is, ${1:/*type*/}& x) -> std::istream&
 endsnippet
 
 snippet ostream
-auto operator<<(std::ostream& os, ${1:/*type*/} const& x) -> std::ostream&
+auto operator<<(std::ostream& os, ${1} const& x) -> std::ostream&
 {
 	${VISUAL}$0
 	return os;
@@ -91,7 +91,7 @@ auto operator<<(std::ostream& os, ${1:/*type*/} const& x) -> std::ostream&
 endsnippet
 
 snippet l "lambda"
-[${2:&}](${1:/* param */})
+[${2:&}](${1})
 {
 	${VISUAL}$0
 }

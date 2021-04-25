@@ -371,11 +371,9 @@ process_mangadex() {
 	local query='
 		if .status == "deleted"
 		then error("chapter has been deleted")
-		elif .server | contains("mangadex") or contains("cdndex")
-		then .server + .hash + "/" + .page_array[]
-		else "https://mangadex.org" + .server + .hash + "/" + .page_array[]
+		else .data.server + .data.pages[]
 		end'
-	local json="$(curl -s "https://mangadex.org/api/chapter/$chapter")"
+	local json="$(curl -s "https://api.mangadex.org/v2/chapter/$chapter")"
 	title="$chapter - $title"
 	output_urls_from_args $(jq -r "$query" <<< "$json")
 }

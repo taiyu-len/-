@@ -12,7 +12,7 @@ download_manga() {
 	tmux send  -t "$pane_id" $'\n'
 }
 view_nitter_image() {
-	/bin/feh "$url:small" 2> /dev/null &
+	/bin/feh "$url" 2> /dev/null &
 }
 view_image() {
 	/bin/feh "$url" 2> /dev/null &
@@ -25,10 +25,10 @@ open_in_browser() {
 }
 
 case "$url" in
-	( *mangadex.org*    ) download_manga ;;
-	( *nitter.net*.jpg  ) view_nitter_image ;;
-	( *nitter.net*.jpeg ) view_nitter_image ;;
-	( *nitter.net*.png  ) view_nitter_image ;;
+#	( *mangadex.org*    ) download_manga ;;
+	( *nitter.*.jpg  ) view_nitter_image ;;
+	( *nitter.*.jpeg ) view_nitter_image ;;
+	( *nitter.*.png  ) view_nitter_image ;;
 	( *.jpg             ) view_image ;;
 	( *.jpeg            ) view_image ;;
 	( *.png             ) view_image ;;
