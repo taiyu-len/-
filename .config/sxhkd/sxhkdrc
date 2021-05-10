@@ -10,6 +10,12 @@ super + space
 ## Reload sxhkdrc
 super + Escape
 	pkill -USR1 -x sxhkd
+## Screen Shot
+super + Print
+        scrot -u '/tmp/%s-$wx$h.jpg'
+## Selection Screen shot
+	super + shift + Print
+	scrot -s '/tmp/%s-$wx$h.jpg'
 ## Select window
 super + grave
 	rofi -show window
@@ -114,5 +120,9 @@ super + BackSpace
 super + shift + bracket{left,right}
 	bspc monitor -f {prev,next}
 #}}}
+#}}}
+#{{{ Tablet Commands
+button8
+	xdotool key F18
 #}}}
 # vim: filetype=sh foldmethod=marker foldmarker={{{,}}}
